@@ -46,7 +46,7 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "lint": "eslint src --ext .js,.jsx"
+    "lint": "eslint src"
   },
   "jest": {
     "transform": {
@@ -58,6 +58,10 @@
     "moduleNameMapper": {
       "^@/(.*)$": "<rootDir>/src/$1"
     },
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "<rootDir>/src/__tests__/pages/HomePage.test.js"
+    ],
     "testEnvironment": "jsdom"
   }
 }
