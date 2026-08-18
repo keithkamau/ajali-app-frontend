@@ -1,7 +1,5 @@
 /* src/index.css */
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
-@import 'tailwindcss';
-
 @theme {
   --font-display: 'DM Sans', sans-serif;
   --font-body: 'Inter', sans-serif;

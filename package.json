@@ -34,7 +34,10 @@
     "eslint-plugin-react": "^7.33.2",
     "vite": "^5.0.5",
     "@vitejs/plugin-react": "^4.2.0",
-    "prop-types": "^15.8.1"
+    "prop-types": "^15.8.1",
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-react": "^7.26.3",
+    "babel-jest": "^29.7.0"
   },
   "scripts": {
     "start": "vite",
@@ -46,6 +49,9 @@
     "lint": "eslint src --ext .js,.jsx"
   },
   "jest": {
+    "transform": {
+      "^.+\\.[jt]sx?$": "babel-jest"
+    },
     "setupFilesAfterEnv": [
       "<rootDir>/setupTests.js"
     ],
