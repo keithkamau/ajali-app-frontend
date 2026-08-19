@@ -1282,3 +1282,127 @@ select.input {
 .shadow-lg {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
+
+/* AUTH SPECIFIC STYLES */
+.auth-container {
+  max-width: 420px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.auth-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 2rem;
+}
+
+.auth-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--color-ink);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.auth-subtitle {
+  font-family: var(--font-body);
+  color: var(--color-ink-muted);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.auth-divider-line {
+  flex: 1;
+  height: 1px;
+  background-color: var(--color-border);
+}
+
+.auth-divider-text {
+  font-size: 0.875rem;
+  color: var(--color-ink-muted);
+  white-space: nowrap;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.875rem;
+  color: var(--color-ink-muted);
+}
+
+.auth-footer a {
+  color: var(--color-navy);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+.password-strength {
+  margin-top: 0.375rem;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.password-strength-bar {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  background-color: var(--color-border);
+  transition: all 0.3s ease;
+}
+
+.password-strength-bar.weak {
+  background-color: var(--color-red);
+}
+
+.password-strength-bar.medium {
+  background-color: var(--color-amber);
+}
+
+.password-strength-bar.strong {
+  background-color: var(--color-green);
+}
+
+.password-strength-text {
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  color: var(--color-ink-muted);
+}
+
+.password-strength-text.weak {
+  color: var(--color-red);
+}
+
+.password-strength-text.medium {
+  color: var(--color-amber);
+}
+
+.password-strength-text.strong {
+  color: var(--color-green);
+}
+
+.auth-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 2rem 0;
+}
+
+.auth-loading .spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+}
