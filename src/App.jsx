@@ -5,6 +5,7 @@ import DashboardPage from "./pages/DashboardPage";
 import CreateIncidentPage from "./pages/CreateIncidentPage";
 import IncidentDetailPage from "./pages/IncidentDetailPage";
 import EditIncidentPage from "./pages/EditIncidentPage";
+import AdminPage from "./pages/AdminPage";
 import "./App.css";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
             <Route path='/incidents/create' element={<CreateIncidentPage />} />
             <Route path='/incidents/:id' element={<IncidentDetailPage />} />
             <Route path='/incidents/:id/edit' element={<EditIncidentPage />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Routes>
         </main>
       </div>

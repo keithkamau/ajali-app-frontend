@@ -1,3 +1,4 @@
+import React from "react";
 function AdminDashboard() {
   const stats = {
     total: 124,
