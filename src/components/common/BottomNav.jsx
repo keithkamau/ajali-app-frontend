@@ -1,3 +1,4 @@
+// src/components/common/BottomNav.jsx
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
