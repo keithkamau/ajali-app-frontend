@@ -1,15 +1,4 @@
 import React from "react";
-<<<<<<< HEAD
-function Header() {
-  return (
-    <footer>
-      <p>© 2026 Ajali! All rights reserved.</p>
-    </footer>
-  );
-}
-
-export { Header };
-=======
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../redux/slices/authSlice";
@@ -49,4 +38,3 @@ export const Header = () => {
     </header>
   );
 };
->>>>>>> abb89dfc09a27713adf698d71d498578d6892537
