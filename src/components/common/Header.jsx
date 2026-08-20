@@ -30,7 +30,7 @@ export const Header = ({ onToggleSidebar, sidebarOpen }) => {
               width='24'
               height='24'
               fill='none'
-              stroke='currentColor'
+              stroke='white'
               strokeWidth='2'
               strokeLinecap='round'
               strokeLinejoin='round'
@@ -55,7 +55,7 @@ export const Header = ({ onToggleSidebar, sidebarOpen }) => {
             title='Logout'
             aria-label='Logout'
           >
-            <LogoutIcon color='rgba(255,255,255,0.7)' size={18} />
+            <LogoutIcon color='#ffffff' size={18} />
             <span className='logout-label'>Logout</span>
           </button>
         </div>

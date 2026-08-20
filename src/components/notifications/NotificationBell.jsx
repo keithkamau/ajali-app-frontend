@@ -38,7 +38,7 @@ export const NotificationBell = () => {
         aria-expanded={open}
         className='notification-bell-btn'
       >
-        <BellIcon color='var(--color-ink)' size={22} />
+        <BellIcon color='#ffffff' size={22} />
         {unread_count > 0 && (
           <span className='notification-badge' aria-hidden='true'>
             {unread_count > 99 ? "99+" : unread_count}
