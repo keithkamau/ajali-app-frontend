@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
   CreateIcon,
@@ -9,12 +9,34 @@ import {
 } from "../components/icons";
 
 export const HomePage = () => {
+  const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
-  const { incidents } = useSelector(
-    (state) => state.incidents || { incidents: [] },
-  );
 
-  // Mock stats
+  // Mock recent activity with IDs for navigation
+  const recentActivity = [
+    {
+      id: 1,
+      title: "Road accident reported",
+      status: "pending",
+      time: "2 hours ago",
+      description: "Multi-vehicle collision on Mombasa Road",
+    },
+    {
+      id: 2,
+      title: "Emergency response dispatched",
+      status: "resolved",
+      time: "5 hours ago",
+      description: "Medical team dispatched to Nairobi CBD",
+    },
+    {
+      id: 3,
+      title: "Medical emergency reported",
+      status: "under_investigation",
+      time: "1 day ago",
+      description: "Emergency medical response at Westlands",
+    },
+  ];
+
   const stats = {
     total: 128,
     inProgress: 34,
@@ -22,27 +44,24 @@ export const HomePage = () => {
     sosAlerts: 12,
   };
 
-  // Mock recent activity
-  const recentActivity = [
-    {
-      id: 1,
-      title: "Road accident reported",
-      status: "pending",
-      time: "2 hours ago",
-    },
-    {
-      id: 2,
-      title: "Emergency response dispatched",
-      status: "resolved",
-      time: "5 hours ago",
-    },
-    {
-      id: 3,
-      title: "Medical emergency reported",
-      status: "under_investigation",
-      time: "1 day ago",
-    },
-  ];
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case "pending":
+        return "status-badge-pending";
+      case "under_investigation":
+        return "status-badge-under-investigation";
+      case "resolved":
+        return "status-badge-resolved";
+      case "rejected":
+        return "status-badge-rejected";
+      default:
+        return "status-badge-pending";
+    }
+  };
+
+  const handleActivityClick = (id) => {
+    navigate(`/incidents/${id}`);
+  };
 
   return (
     <div className='home-page'>
@@ -55,7 +74,6 @@ export const HomePage = () => {
         </p>
       </div>
 
-      {/* Quick Actions */}
       <div className='home-quick-actions'>
         <Link to='/incidents/create' className='quick-action-btn primary'>
           <span className='action-icon'>
@@ -83,7 +101,6 @@ export const HomePage = () => {
         </button>
       </div>
 
-      {/* Stats Section */}
       <div className='home-stats'>
         <div className='stat-card'>
           <div className='stat-number'>{stats.total}</div>
@@ -103,7 +120,6 @@ export const HomePage = () => {
         </div>
       </div>
 
-      {/* Recent Activity */}
       <div className='home-recent'>
         <div className='card'>
           <h2 className='heading-4' style={{ marginBottom: "0.5rem" }}>
@@ -119,15 +135,23 @@ export const HomePage = () => {
           {recentActivity.length > 0 ? (
             <div className='activity-list'>
               {recentActivity.map((item) => (
-                <div key={item.id} className='activity-item'>
+                <div
+                  key={item.id}
+                  className='activity-item clickable'
+                  onClick={() => handleActivityClick(item.id)}
+                  style={{ cursor: "pointer" }}
+                >
                   <div className='activity-item-header'>
                     <span className='activity-item-title'>{item.title}</span>
                     <span
-                      className={`status-badge status-badge-${item.status}`}
+                      className={`status-badge ${getStatusBadgeClass(item.status)}`}
                     >
                       {item.status.replace("_", " ")}
                     </span>
                   </div>
+                  <p className='activity-item-description'>
+                    {item.description}
+                  </p>
                   <span className='activity-item-date'>{item.time}</span>
                 </div>
               ))}

@@ -1,42 +1,65 @@
-import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchIncidents } from "../redux/slices/incidentSlice";
-
-// Mock data for fallback
-const mockIncidents = [
-  {
-    id: 1,
-    title: "Road accident on Mombasa Road",
-    status: "pending",
-    description: "Multi-vehicle collision",
-    created_at: "2024-01-15T10:30:00",
-  },
-  {
-    id: 2,
-    title: "Emergency medical response",
-    status: "resolved",
-    description: "Medical emergency at Nairobi CBD",
-    created_at: "2024-01-14T14:20:00",
-  },
-  {
-    id: 3,
-    title: "Fire incident reported",
-    status: "under_investigation",
-    description: "Fire at industrial area",
-    created_at: "2024-01-13T09:15:00",
-  },
-];
+import {
+  fetchIncidents,
+  deleteIncident,
+  clearSuccess,
+} from "../redux/slices/incidentSlice";
 
 export const DashboardPage = () => {
   const dispatch = useDispatch();
-  const { items, loading, error } = useSelector((state) => state.incidents);
+  const navigate = useNavigate();
+  const { items, loading, error, success } = useSelector(
+    (state) => state.incidents,
+  );
+  const { user } = useSelector((state) => state.auth);
+  const [deleteId, setDeleteId] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   useEffect(() => {
     dispatch(fetchIncidents());
   }, [dispatch]);
 
-  const incidents = items && items.length > 0 ? items : mockIncidents;
+  useEffect(() => {
+    if (success) {
+      const timer = setTimeout(() => {
+        dispatch(clearSuccess());
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [success, dispatch]);
+
+  const handleDelete = async () => {
+    await dispatch(deleteIncident(deleteId));
+    setShowDeleteModal(false);
+    setDeleteId(null);
+  };
+
+  const handleEdit = (id) => {
+    navigate(`/incidents/${id}/edit`);
+  };
+
+  const handleView = (id) => {
+    navigate(`/incidents/${id}`);
+  };
+
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case "pending":
+        return "status-badge-pending";
+      case "under_investigation":
+        return "status-badge-under-investigation";
+      case "resolved":
+        return "status-badge-resolved";
+      case "rejected":
+        return "status-badge-rejected";
+      default:
+        return "status-badge-pending";
+    }
+  };
+
+  const userIncidents = items.filter((item) => item.user_id === user?.id);
 
   return (
     <div className='dashboard-page'>
@@ -52,7 +75,9 @@ export const DashboardPage = () => {
           New report
         </Link>
       </div>
+
       {error && <div className='alert alert-error'>{error}</div>}
+      {success && <div className='alert alert-success'>{success}</div>}
 
       <div className='incident-list'>
         {loading ? (
@@ -60,13 +85,30 @@ export const DashboardPage = () => {
             <span className='spinner'></span>
             <p>Loading your reports...</p>
           </div>
+        ) : userIncidents.length === 0 ? (
+          <div className='empty-state'>
+            <p className='body-text text-muted'>
+              You haven't reported any incidents yet
+            </p>
+            <Link
+              to='/incidents/create'
+              className='btn btn-primary'
+              style={{ marginTop: "1rem" }}
+            >
+              Report your first incident
+            </Link>
+          </div>
         ) : (
-          incidents.map((incident) => (
-            <div key={incident.id} className='incident-card'>
+          userIncidents.map((incident) => (
+            <div
+              key={incident.id}
+              className='incident-card'
+              onClick={() => handleView(incident.id)}
+            >
               <div className='incident-card-header'>
                 <span className='incident-card-title'>{incident.title}</span>
                 <span
-                  className={`status-badge status-badge-${incident.status}`}
+                  className={`status-badge ${getStatusBadgeClass(incident.status)}`}
                 >
                   {incident.status?.replace("_", " ") || "pending"}
                 </span>
@@ -80,11 +122,58 @@ export const DashboardPage = () => {
                     ? new Date(incident.created_at).toLocaleDateString()
                     : "Recently"}
                 </span>
+                <div
+                  className='incident-card-actions'
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    onClick={() => handleEdit(incident.id)}
+                    className='btn btn-sm btn-secondary'
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDeleteId(incident.id);
+                      setShowDeleteModal(true);
+                    }}
+                    className='btn btn-sm btn-danger'
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
           ))
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div
+          className='modal-overlay'
+          onClick={() => setShowDeleteModal(false)}
+        >
+          <div className='modal' onClick={(e) => e.stopPropagation()}>
+            <h3 className='heading-4'>Delete Incident</h3>
+            <p className='body-text text-muted'>
+              Are you sure you want to delete this incident? This action cannot
+              be undone.
+            </p>
+            <div className='modal-actions'>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className='btn btn-secondary'
+              >
+                Cancel
+              </button>
+              <button onClick={handleDelete} className='btn btn-danger'>
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

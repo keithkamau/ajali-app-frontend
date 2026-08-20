@@ -1,4 +1,3 @@
-// src/pages/AdminIncidentsPage.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -138,65 +137,63 @@ function AdminIncidentsPage() {
       </div>
 
       <div className='admin-table-wrapper'>
-        <div className='card'>
+        <div className='card' style={{ overflow: "auto" }}>
           {filteredIncidents.length === 0 ? (
             <div className='empty-state'>
               <p className='body-text text-muted'>No incidents found.</p>
             </div>
           ) : (
-            <div className='admin-table'>
-              <div className='admin-table-header'>
-                <span>Report ID</span>
-                <span>Incident</span>
-                <span>Location</span>
-                <span>Type</span>
-                <span>Status</span>
-                <span>Priority</span>
-                <span>Reported</span>
-                <span>Action</span>
-              </div>
-
-              {filteredIncidents.map((incident) => (
-                <div key={incident.id} className='admin-table-row'>
-                  <span
-                    className='admin-table-reference'
-                    data-label='Report ID'
-                  >
-                    {incident.id}
-                  </span>
-                  <span data-label='Incident'>
-                    <strong>{incident.title}</strong>
-                  </span>
-                  <span data-label='Location'>{incident.location}</span>
-                  <span data-label='Type'>{incident.type}</span>
-                  <span data-label='Status'>
-                    <span
-                      className={`status-badge ${getStatusBadgeClass(incident.status)}`}
-                    >
-                      {incident.status}
-                    </span>
-                  </span>
-                  <span data-label='Priority'>
-                    <span
-                      className={`priority-badge ${getPriorityClass(incident.priority)}`}
-                    >
-                      {incident.priority}
-                    </span>
-                  </span>
-                  <span data-label='Reported'>{incident.reportedAt}</span>
-                  <span data-label='Action'>
-                    <button
-                      className='btn btn-sm btn-secondary'
-                      onClick={() =>
-                        navigate(`/admin/incidents/${incident.id}`)
-                      }
-                    >
-                      View
-                    </button>
-                  </span>
-                </div>
-              ))}
-            </div>
+            <table className='admin-table'>
+              <thead>
+                <tr>
+                  <th>Report ID</th>
+                  <th>Incident</th>
+                  <th>Location</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Priority</th>
+                  <th>Reported</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredIncidents.map((incident) => (
+                  <tr key={incident.id}>
+                    <td className='admin-table-reference'>{incident.id}</td>
+                    <td>
+                      <strong>{incident.title}</strong>
+                    </td>
+                    <td>{incident.location}</td>
+                    <td>{incident.type}</td>
+                    <td>
+                      <span
+                        className={`status-badge ${getStatusBadgeClass(incident.status)}`}
+                      >
+                        {incident.status}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`priority-badge ${getPriorityClass(incident.priority)}`}
+                      >
+                        {incident.priority}
+                      </span>
+                    </td>
+                    <td>{incident.reportedAt}</td>
+                    <td>
+                      <button
+                        className='btn btn-sm btn-secondary'
+                        onClick={() =>
+                          navigate(`/admin/incidents/${incident.id}`)
+                        }
+                      >
+                        View
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           )}
         </div>
       </div>
