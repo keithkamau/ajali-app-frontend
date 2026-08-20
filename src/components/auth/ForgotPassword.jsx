@@ -1,4 +1,3 @@
-// src/components/auth/ForgotPassword.jsx
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -52,7 +51,7 @@ export const ForgotPassword = () => {
       <div className='auth-card'>
         <h1 className='auth-title'>Reset Password</h1>
         <p className='auth-subtitle'>
-          Enter your email address and we'll send you a link to reset your
+          Enter your email address and we will send you a link to reset your
           password
         </p>
 

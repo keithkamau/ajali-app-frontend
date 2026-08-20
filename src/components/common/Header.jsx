@@ -1,9 +1,9 @@
-// src/components/common/Header.jsx
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../redux/slices/authSlice";
 import { NotificationBell } from "../notifications/NotificationBell";
+import { LogoutIcon } from "../icons";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -19,24 +19,19 @@ export const Header = () => {
     <header className='header'>
       <div className='header-container'>
         <Link to='/home' className='header-logo'>
-          <span className='header-logo-icon'>🚨</span>
-          <span>Ajali</span>
+          <span className='header-logo-text'>Ajali</span>
         </Link>
 
         <div className='header-actions'>
           <NotificationBell />
           <button
             onClick={handleLogout}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "1.25rem",
-              padding: "0.25rem",
-            }}
+            className='header-logout-btn'
             title='Logout'
+            aria-label='Logout'
           >
-            🚪
+            <LogoutIcon color='var(--color-ink-muted)' size={18} />
+            <span>Logout</span>
           </button>
         </div>
       </div>

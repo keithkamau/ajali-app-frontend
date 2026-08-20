@@ -1,4 +1,3 @@
-// src/components/notifications/NotificationFilter.jsx
 import React from "react";
 
 const FILTERS = [

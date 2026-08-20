@@ -23,6 +23,14 @@ export const NotificationList = ({ onClose }) => {
     return true;
   });
 
+  const handleMarkAllRead = () => {
+    dispatch(markAllAsRead());
+  };
+
+  const handleClearAll = () => {
+    dispatch(clearAllNotifications());
+  };
+
   return (
     <div
       role='dialog'
@@ -33,13 +41,13 @@ export const NotificationList = ({ onClose }) => {
         <span className='heading-5'>Notifications</span>
         <div className='notification-panel-actions'>
           <button
-            onClick={() => dispatch(markAllAsRead())}
+            onClick={handleMarkAllRead}
             className='btn btn-sm btn-secondary'
           >
             Mark all read
           </button>
           <button
-            onClick={() => dispatch(clearAllNotifications())}
+            onClick={handleClearAll}
             className='btn btn-sm btn-secondary'
             style={{ color: "var(--color-ink-muted)" }}
           >
@@ -56,7 +64,7 @@ export const NotificationList = ({ onClose }) => {
         {loading && (
           <div className='notification-empty-state'>
             <span className='spinner spinner-sm'></span>
-            <p className='body-small text-muted'>Loading…</p>
+            <p className='body-small text-muted'>Loading...</p>
           </div>
         )}
         {!loading && filtered.length === 0 && (

@@ -1379,3 +1379,76 @@ img, video {
   font-weight: 600;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
+
+.password-toggle-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-ink-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.password-toggle-btn:hover {
+  color: var(--color-ink);
+  background-color: var(--color-ground);
+}
+
+.header-logo-text {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--color-navy);
+}
+
+.sidebar-user-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+.sidebar-user-email {
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--color-ink);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  accent-color: var(--color-navy);
+}
+
+.auth-forgot-link {
+  font-size: 0.875rem;
+  color: var(--color-ink-muted);
+}
+
+.auth-forgot-link:hover {
+  color: var(--color-navy);
+  text-decoration: underline;
+}
+
+.splash-description {
+  color: var(--color-ink-muted);
+  max-width: 320px;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}

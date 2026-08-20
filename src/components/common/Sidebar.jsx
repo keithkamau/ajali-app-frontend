@@ -1,36 +1,47 @@
-// src/components/common/Sidebar.jsx
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { HomeIcon, CreateIcon, ActivityIcon, BellIcon } from "../icons";
 
 export const Sidebar = () => {
   const location = useLocation();
   const { user } = useSelector((state) => state.auth);
 
   const navItems = [
-    { path: "/home", icon: "🏠", label: "Dashboard" },
-    { path: "/incidents/create", icon: "📝", label: "Report Incident" },
-    { path: "/activity", icon: "📋", label: "Activity" },
-    { path: "/notifications", icon: "🔔", label: "Alerts" },
+    { path: "/home", icon: HomeIcon, label: "Dashboard" },
+    { path: "/incidents/create", icon: CreateIcon, label: "Report Incident" },
+    { path: "/activity", icon: ActivityIcon, label: "Activity" },
+    { path: "/notifications", icon: BellIcon, label: "Alerts" },
   ];
+
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name.charAt(0).toUpperCase();
+  };
 
   return (
     <aside className='sidebar'>
       <div className='sidebar-logo'>
-        <span>🚨</span>
         <span>Ajali</span>
       </div>
 
       <nav className='sidebar-nav'>
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
+          const Icon = item.icon;
+          const color = isActive
+            ? "var(--color-navy)"
+            : "var(--color-ink-muted)";
+
           return (
             <Link
               key={item.path}
               to={item.path}
               className={`sidebar-nav-item ${isActive ? "active" : ""}`}
             >
-              <span className='nav-icon'>{item.icon}</span>
+              <span className='nav-icon'>
+                <Icon color={color} size={20} />
+              </span>
               <span>{item.label}</span>
             </Link>
           );
@@ -39,16 +50,10 @@ export const Sidebar = () => {
 
       <div className='sidebar-bottom'>
         <div className='sidebar-user'>
-          <div className='avatar avatar-sm'>
-            {user?.full_name?.charAt(0) || "U"}
-          </div>
+          <div className='avatar avatar-sm'>{getInitials(user?.full_name)}</div>
           <div>
-            <div style={{ fontSize: "0.875rem", fontWeight: "500" }}>
-              {user?.full_name || "User"}
-            </div>
-            <div
-              style={{ fontSize: "0.75rem", color: "var(--color-ink-muted)" }}
-            >
+            <div className='sidebar-user-name'>{user?.full_name || "User"}</div>
+            <div className='sidebar-user-email'>
               {user?.email || "user@email.com"}
             </div>
           </div>

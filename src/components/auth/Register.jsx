@@ -1,4 +1,3 @@
-// src/components/auth/Register.jsx
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -36,14 +35,12 @@ export const Register = () => {
     score: 0,
   });
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
       navigate("/home");
     }
   }, [isAuthenticated, navigate]);
 
-  // Clear success message after 3 seconds
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
@@ -54,14 +51,12 @@ export const Register = () => {
     }
   }, [success, dispatch, navigate]);
 
-  // Clear error on unmount
   useEffect(() => {
     return () => {
       dispatch(clearError());
     };
   }, [dispatch]);
 
-  // Update password strength
   useEffect(() => {
     const strength = getPasswordStrength(formData.password);
     setPasswordStrength(strength);
@@ -113,14 +108,16 @@ export const Register = () => {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
-    // Clear field error when user types
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-    // Clear global error when user types
     if (error) {
       dispatch(clearError());
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleSubmit = async (e) => {
@@ -255,19 +252,11 @@ export const Register = () => {
               />
               <button
                 type='button'
-                onClick={() => setShowPassword(!showPassword)}
-                style={{
-                  position: "absolute",
-                  right: "0.75rem",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "var(--color-ink-muted)",
-                }}
+                onClick={togglePasswordVisibility}
+                className='password-toggle-btn'
+                aria-label={showPassword ? "Hide password" : "Show password"}
               >
-                {showPassword ? "🙈" : "👁️"}
+                {showPassword ? "Hide" : "Show"}
               </button>
             </div>
 
@@ -310,14 +299,7 @@ export const Register = () => {
           </div>
 
           <div className='form-group'>
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "0.5rem",
-                cursor: "pointer",
-              }}
-            >
+            <label className='checkbox-label'>
               <input
                 type='checkbox'
                 name='terms'
@@ -325,7 +307,7 @@ export const Register = () => {
                 onChange={handleChange}
                 disabled={isLoading}
               />
-              <span style={{ fontSize: "0.875rem" }}>
+              <span>
                 I agree to the <Link to='/terms'>Terms of Service</Link> and{" "}
                 <Link to='/privacy'>Privacy Policy</Link>
               </span>
