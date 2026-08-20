@@ -14,6 +14,7 @@ import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./components/admin/AdminDashboard";
 import AdminIncidentsPage from "./pages/AdminIncidentsPage";
 import AdminIncidentDetailPage from "./pages/AdminIncidentDetailPage";
+import UserManagement from "./components/admin/UserManagement";
 
 function AppContent() {
   const location = useLocation();
@@ -52,10 +53,8 @@ function AppContent() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="incidents" element={<AdminIncidentsPage />} />
-             <Route
-                path="incidents/:id"
-                element={<AdminIncidentDetailPage />}
-             />
+            <Route path="incidents/:id" element={<AdminIncidentDetailPage />} />
+            <Route path="users" element={<UserManagement />} />
           </Route>
         </Routes>
       </main>
