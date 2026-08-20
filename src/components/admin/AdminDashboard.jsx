@@ -53,79 +53,7 @@ function AdminDashboard() {
   ];
 
   return (
-    <div className="admin-layout">
-      {/* Sidebar */}
-      <aside className="admin-sidebar">
-        <div className="admin-logo">
-          <div className="logo-mark">
-            A<span>J</span>ALI
-          </div>
-          <p>Smart. Fast. Verified.</p>
-        </div>
-
-        <nav className="admin-nav">
-          <button className="admin-nav-item active">
-            <span className="nav-icon">⌂</span>
-            Dashboard
-          </button>
-
-          <button className="admin-nav-item">
-            <span className="nav-icon">▤</span>
-            Reports
-          </button>
-
-          <button className="admin-nav-item">
-            <span className="nav-icon">♙</span>
-            Responders
-          </button>
-
-          <button className="admin-nav-item">
-            <span className="nav-icon">♙</span>
-            Users
-          </button>
-
-          <button className="admin-nav-item">
-            <span className="nav-icon">!</span>
-            Alerts
-          </button>
-
-          <button className="admin-nav-item">
-            <span className="nav-icon">◔</span>
-            Analytics
-          </button>
-
-          <button className="admin-nav-item">
-            <span className="nav-icon">⚙</span>
-            Settings
-          </button>
-        </nav>
-
-        <button className="admin-logout">
-          <span className="nav-icon">↪</span>
-          Logout
-        </button>
-      </aside>
-
-      {/* Main Content */}
-      <main className="admin-main">
-        {/* Top Bar */}
-        <header className="admin-topbar">
-          <div>
-            <h1>Dashboard</h1>
-            <p>Overview of Ajali emergency reports</p>
-          </div>
-
-          <div className="admin-profile">
-            <div className="admin-welcome">
-              <span>Welcome, Admin</span>
-              <small>Administrator</small>
-            </div>
-
-            <div className="admin-avatar">A</div>
-          </div>
-        </header>
-
-        {/* Dashboard Content */}
+      
         <div className="admin-content">
           {/* Statistics */}
           <section className="admin-stats">
@@ -267,8 +195,6 @@ function AdminDashboard() {
             </div>
           </section>
         </div>
-      </main>
-    </div>
   );
 }
 
