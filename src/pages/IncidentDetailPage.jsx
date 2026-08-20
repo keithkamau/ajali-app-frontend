@@ -1,125 +1,130 @@
-// src/pages/IncidentDetailPage.jsx
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchIncident, removeIncident } from "../redux/slices/incidentSlice";
-import { mockIncidents } from "../utils/mockData";
-import { formatDateTime } from "../utils/formatters";
-import { MapPinIcon, ArrowIcon, CloseIcon } from "../components/icons";
+import {
+  fetchIncidentById,
+  deleteIncident,
+  updateIncidentStatus,
+  fetchStatusHistory,
+  clearError,
+  clearSuccess,
+  clearStatusHistory,
+} from "../redux/slices/incidentSlice";
+import { MapPinIcon } from "../components/icons";
 
 export const IncidentDetailPage = () => {
   const { id } = useParams();
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { currentIncident, statusHistory, loading, error, success } =
+    useSelector((state) => state.incidents);
+  const { user } = useSelector((state) => state.auth);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusComment, setStatusComment] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
 
-  // Try to get from Redux first, fallback to mock
-  const reduxIncident = useSelector((state) => state.incidents?.current);
-  const [incident, setIncident] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [showLocationModal, setShowLocationModal] = useState(false);
+  const isAdmin = user?.role === "admin";
+  const isOwner = currentIncident?.user_id === user?.id;
 
   useEffect(() => {
-    // Try to fetch from Redux
-    dispatch(fetchIncident(id));
-
-    // Also find in mock data as fallback
-    const found = mockIncidents.find((i) => i.id === parseInt(id));
-    if (found) {
-      setIncident(found);
-      setLoading(false);
+    dispatch(fetchIncidentById(id));
+    if (isAdmin) {
+      dispatch(fetchStatusHistory(id));
     }
-  }, [dispatch, id]);
+    return () => {
+      dispatch(clearStatusHistory());
+    };
+  }, [dispatch, id, isAdmin]);
 
-  // Use Redux incident if available, otherwise mock
   useEffect(() => {
-    if (reduxIncident) {
-      setIncident(reduxIncident);
-      setLoading(false);
+    if (success) {
+      const timer = setTimeout(() => {
+        dispatch(clearSuccess());
+      }, 3000);
+      return () => clearTimeout(timer);
     }
-  }, [reduxIncident]);
+  }, [success, dispatch]);
 
-  // Get status badge class
-  const getStatusClass = (status) => {
-    const statusMap = {
-      pending: "status-badge-pending",
-      under_investigation: "status-badge-under-investigation",
-      resolved: "status-badge-resolved",
-      rejected: "status-badge-rejected",
-    };
-    return statusMap[status] || "status-badge-pending";
-  };
-
-  // Get status display label
-  const getStatusLabel = (status) => {
-    const statusMap = {
-      pending: "Pending",
-      under_investigation: "Under Investigation",
-      resolved: "Resolved",
-      rejected: "Rejected",
-    };
-    return statusMap[status] || status;
-  };
-
-  // Handle delete
   const handleDelete = async () => {
-    if (
-      window.confirm(
-        "Are you sure you want to delete this incident report? This action cannot be undone.",
-      )
-    ) {
-      await dispatch(removeIncident(id));
-      navigate("/dashboard");
-    }
+    await dispatch(deleteIncident(id));
+    setShowDeleteModal(false);
+    navigate("/dashboard");
   };
 
-  // Handle share location
-  const handleShareLocation = () => {
-    if (navigator.share) {
-      navigator
-        .share({
-          title: "Incident Location",
-          text: `Incident at: ${incident.location.address || "Unknown location"}`,
-          url: `https://maps.google.com/maps?q=${incident.location.lat},${incident.location.lng}`,
-        })
-        .catch(() => {});
-    } else {
-      // Fallback - copy to clipboard
-      const url = `https://maps.google.com/maps?q=${incident.location.lat},${incident.location.lng}`;
-      navigator.clipboard.writeText(url);
-      alert("Location link copied to clipboard!");
-    }
-  };
-
-  // Handle get directions
-  const handleGetDirections = () => {
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${incident.location.lat},${incident.location.lng}`;
-    window.open(url, "_blank");
-  };
-
-  // Handle emergency contact
-  const handleEmergencyContact = () => {
-    // In production, this would open phone dialer
-    alert(
-      "Emergency contacts will be shown here.\n\nIn Kenya, call:\n- Police: 999 or 112\n- Ambulance: 999 or 112\n- Fire: 999 or 112",
+  const handleStatusUpdate = async () => {
+    await dispatch(
+      updateIncidentStatus({
+        id,
+        status: selectedStatus,
+        comment: statusComment,
+      }),
     );
+    setShowStatusModal(false);
+    setStatusComment("");
+    setSelectedStatus("");
+    // Refresh status history
+    dispatch(fetchStatusHistory(id));
   };
 
-  if (loading) {
+  const handleEdit = () => {
+    navigate(`/incidents/${id}/edit`);
+  };
+
+  const formatDate = (date) => {
+    if (!date) return "N/A";
+    return new Date(date).toLocaleString("en-KE", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case "pending":
+        return "status-badge-pending";
+      case "under_investigation":
+        return "status-badge-under-investigation";
+      case "resolved":
+        return "status-badge-resolved";
+      case "rejected":
+        return "status-badge-rejected";
+      default:
+        return "status-badge-pending";
+    }
+  };
+
+  if (loading && !currentIncident) {
     return (
-      <div className='empty-state'>
-        <span className='spinner spinner-lg'></span>
-        <p className='body-text text-muted'>Loading incident details...</p>
+      <div className='loading-state'>
+        <span className='spinner'></span>
+        <p>Loading incident details...</p>
       </div>
     );
   }
 
-  if (!incident) {
+  if (error && !currentIncident) {
+    return (
+      <div className='alert alert-error'>
+        {error}
+        <Link
+          to='/dashboard'
+          className='btn btn-secondary'
+          style={{ marginTop: "1rem" }}
+        >
+          Back to Dashboard
+        </Link>
+      </div>
+    );
+  }
+
+  if (!currentIncident) {
     return (
       <div className='empty-state'>
-        <h3 className='heading-4'>Incident Not Found</h3>
-        <p className='body-small text-muted'>
-          The incident you're looking for doesn't exist.
-        </p>
+        <p className='body-text text-muted'>Incident not found</p>
         <Link
           to='/dashboard'
           className='btn btn-primary'
@@ -131,226 +136,225 @@ export const IncidentDetailPage = () => {
     );
   }
 
+  const statusOptions = [
+    { value: "pending", label: "Pending" },
+    { value: "under_investigation", label: "Under Investigation" },
+    { value: "resolved", label: "Resolved" },
+    { value: "rejected", label: "Rejected" },
+  ];
+
   return (
     <div className='incident-detail-page'>
-      {/* Header */}
-      <div className='incident-detail-header'>
-        <Link to='/dashboard' className='btn btn-secondary btn-sm'>
-          ← Back to Dashboard
-        </Link>
-        <div className='incident-detail-ref'>
-          {incident.reference ||
-            `A/J-2024-${String(incident.id).padStart(4, "0")}`}
+      {success && (
+        <div className='alert alert-success' style={{ marginBottom: "1rem" }}>
+          {success}
         </div>
-      </div>
+      )}
 
-      {/* Main Card */}
-      <div className='incident-detail-card'>
-        <div className='incident-detail-top'>
-          <div className='incident-detail-status'>
-            <span className={`status-badge ${getStatusClass(incident.status)}`}>
-              {getStatusLabel(incident.status)}
+      <div className='incident-detail-header'>
+        <div>
+          <Link to='/dashboard' className='back-link'>
+            ← Back to Dashboard
+          </Link>
+          <h1 className='heading-2'>{currentIncident.title}</h1>
+          <div className='incident-detail-meta'>
+            <span className='body-small text-muted'>
+              Reported on {formatDate(currentIncident.created_at)}
             </span>
-            <span className='incident-detail-type'>{incident.type}</span>
-            {incident.isAnonymous && (
-              <span className='incident-detail-anonymous'>Anonymous</span>
+            <span
+              className={`status-badge ${getStatusBadgeClass(currentIncident.status)}`}
+            >
+              {currentIncident.status?.replace("_", " ") || "pending"}
+            </span>
+            {currentIncident.reference && (
+              <span className='body-small text-muted'>
+                Reference: {currentIncident.reference}
+              </span>
             )}
           </div>
-          <div className='incident-detail-actions'>
-            <Link
-              to={`/incidents/${incident.id}/edit`}
-              className='btn btn-secondary btn-sm'
-            >
-              Edit
-            </Link>
-            <button className='btn btn-danger btn-sm' onClick={handleDelete}>
-              Delete
-            </button>
-          </div>
         </div>
-
-        <h1 className='heading-2 incident-detail-title'>{incident.title}</h1>
-
-        <div className='incident-detail-meta'>
-          <div>
-            <span className='body-small text-muted'>Reported</span>
-            <span className='body-text'>
-              {formatDateTime(incident.created_at)}
-            </span>
-          </div>
-          <div>
-            <span className='body-small text-muted'>Last updated</span>
-            <span className='body-text'>
-              {formatDateTime(incident.updated_at)}
-            </span>
-          </div>
-        </div>
-
-        <div className='divider'></div>
-
-        <div className='incident-detail-description'>
-          <h3 className='heading-4'>Description</h3>
-          <p className='body-text'>
-            {incident.description || "No description provided."}
-          </p>
-        </div>
-      </div>
-
-      {/* Location Section */}
-      <div className='incident-detail-card'>
-        <h3 className='heading-4'>Location</h3>
-        <div className='incident-location'>
-          <div className='location-coords'>
-            <MapPinIcon color='var(--color-red)' size={24} />
-            <div>
-              <div className='location-address'>
-                {incident.location.address || "Address not specified"}
-              </div>
-              <div className='location-coord-text'>
-                <span>Lat: {incident.location.lat}</span>
-                <span>Lng: {incident.location.lng}</span>
-              </div>
-            </div>
-          </div>
-          <div className='location-actions'>
-            <button
-              className='btn btn-secondary btn-sm'
-              onClick={handleGetDirections}
-            >
-              Get Directions
-            </button>
-            <button
-              className='btn btn-secondary btn-sm'
-              onClick={handleShareLocation}
-            >
-              Share Location
-            </button>
-            <button
-              className='btn btn-secondary btn-sm'
-              onClick={() => setShowLocationModal(true)}
-            >
-              View on Map
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Tracking & Timeline Section */}
-      <div className='incident-detail-card'>
-        <h3 className='heading-4'>Status Timeline</h3>
-        <div className='timeline'>
-          <div className='timeline-item active'>
-            <div className='timeline-dot'></div>
-            <div className='timeline-content'>
-              <div className='timeline-title'>Report Submitted</div>
-              <div className='timeline-time'>
-                {formatDateTime(incident.created_at)}
-              </div>
-              <div className='timeline-desc'>
-                Incident reported by{" "}
-                {incident.isAnonymous ? "anonymous user" : "user"}
-              </div>
-            </div>
-          </div>
-
-          {incident.status !== "pending" && (
-            <div
-              className={`timeline-item ${incident.status === "resolved" ? "resolved" : incident.status === "rejected" ? "rejected" : "active"}`}
-            >
-              <div className='timeline-dot'></div>
-              <div className='timeline-content'>
-                <div className='timeline-title'>
-                  {getStatusLabel(incident.status)}
-                </div>
-                <div className='timeline-time'>
-                  {formatDateTime(incident.updated_at)}
-                </div>
-                <div className='timeline-desc'>
-                  Status updated to {getStatusLabel(incident.status)}
-                </div>
-              </div>
-            </div>
+        <div className='incident-detail-actions'>
+          {(isOwner || isAdmin) && (
+            <>
+              <button onClick={handleEdit} className='btn btn-secondary'>
+                Edit
+              </button>
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className='btn btn-danger'
+              >
+                Delete
+              </button>
+            </>
           )}
-
-          {incident.status === "under_investigation" && (
-            <div className='timeline-item'>
-              <div className='timeline-dot'></div>
-              <div className='timeline-content'>
-                <div className='timeline-title'>Under Investigation</div>
-                <div className='timeline-time'>
-                  {formatDateTime(incident.updated_at)}
-                </div>
-                <div className='timeline-desc'>
-                  Responders are investigating this incident
-                </div>
-              </div>
-            </div>
+          {isAdmin && (
+            <button
+              onClick={() => setShowStatusModal(true)}
+              className='btn btn-primary'
+            >
+              Update Status
+            </button>
           )}
         </div>
       </div>
 
-      {/* Tracking Options */}
-      <div className='incident-detail-card'>
-        <h3 className='heading-4'>Tracking Options</h3>
-        <div className='tracking-options'>
-          <button
-            className='btn btn-primary btn-block'
-            onClick={handleShareLocation}
-          >
-            Share Location with Responders
-          </button>
-          <button
-            className='btn btn-secondary btn-block'
-            onClick={handleGetDirections}
-          >
-            Get Directions to Incident
-          </button>
-          <button
-            className='btn btn-secondary btn-block'
-            onClick={handleEmergencyContact}
-          >
-            Emergency Contacts
-          </button>
+      <div className='incident-detail-content'>
+        <div className='card incident-detail-card'>
+          <h3 className='heading-4' style={{ marginBottom: "0.5rem" }}>
+            Description
+          </h3>
+          <p className='body-text'>{currentIncident.description}</p>
         </div>
+
+        {currentIncident.location_lat && currentIncident.location_lng && (
+          <div className='card incident-detail-card'>
+            <h3 className='heading-4' style={{ marginBottom: "0.5rem" }}>
+              Location
+            </h3>
+            <div className='incident-detail-location'>
+              <MapPinIcon color='var(--color-red)' size={24} />
+              <span className='body-text'>
+                {currentIncident.location_address ||
+                  `${currentIncident.location_lat}, ${currentIncident.location_lng}`}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {currentIncident.images && currentIncident.images.length > 0 && (
+          <div className='card incident-detail-card'>
+            <h3 className='heading-4' style={{ marginBottom: "0.5rem" }}>
+              Images
+            </h3>
+            <div className='incident-detail-media'>
+              {currentIncident.images.map((img, index) => (
+                <img key={index} src={img} alt={`Incident ${index + 1}`} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {currentIncident.videos && currentIncident.videos.length > 0 && (
+          <div className='card incident-detail-card'>
+            <h3 className='heading-4' style={{ marginBottom: "0.5rem" }}>
+              Videos
+            </h3>
+            <div className='incident-detail-media'>
+              {currentIncident.videos.map((video, index) => (
+                <video key={index} controls src={video} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Status History - Admin Only */}
+        {isAdmin && statusHistory && statusHistory.length > 0 && (
+          <div className='card incident-detail-card'>
+            <h3 className='heading-4' style={{ marginBottom: "0.5rem" }}>
+              Status History
+            </h3>
+            <div className='status-timeline'>
+              {statusHistory.map((entry, index) => (
+                <div key={index} className='status-timeline-item'>
+                  <div className='status-timeline-badge'>
+                    <span
+                      className={`status-badge ${getStatusBadgeClass(entry.new_status)}`}
+                    >
+                      {entry.new_status?.replace("_", " ")}
+                    </span>
+                  </div>
+                  <div className='status-timeline-content'>
+                    <div className='status-timeline-comment'>
+                      {entry.comment || "Status updated"}
+                    </div>
+                    <div className='status-timeline-meta'>
+                      <span className='body-small text-muted'>
+                        By {entry.changed_by || "Admin"} at{" "}
+                        {formatDate(entry.changed_at)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Location Modal */}
-      {showLocationModal && (
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
         <div
           className='modal-overlay'
-          onClick={() => setShowLocationModal(false)}
+          onClick={() => setShowDeleteModal(false)}
         >
-          <div
-            className='modal-content modal-map'
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className='modal-header'>
-              <h3 className='heading-4'>Incident Location</h3>
+          <div className='modal' onClick={(e) => e.stopPropagation()}>
+            <h3 className='heading-4'>Delete Incident</h3>
+            <p className='body-text text-muted'>
+              Are you sure you want to delete this incident? This action cannot
+              be undone.
+            </p>
+            <div className='modal-actions'>
               <button
-                className='modal-close'
-                onClick={() => setShowLocationModal(false)}
+                onClick={() => setShowDeleteModal(false)}
+                className='btn btn-secondary'
               >
-                <CloseIcon color='var(--color-ink-muted)' size={20} />
+                Cancel
+              </button>
+              <button onClick={handleDelete} className='btn btn-danger'>
+                Delete
               </button>
             </div>
-            <div className='modal-body'>
-              <div className='map-placeholder'>
-                <div className='map-placeholder-content'>
-                  <MapPinIcon color='var(--color-red)' size={48} />
-                  <div className='map-placeholder-address'>
-                    {incident.location.address || "Unknown location"}
-                  </div>
-                  <div className='map-placeholder-coords'>
-                    {incident.location.lat}, {incident.location.lng}
-                  </div>
-                  <button
-                    className='btn btn-primary'
-                    onClick={handleGetDirections}
-                  >
-                    Get Directions
-                  </button>
-                </div>
-              </div>
+          </div>
+        </div>
+      )}
+
+      {/* Status Update Modal */}
+      {showStatusModal && (
+        <div
+          className='modal-overlay'
+          onClick={() => setShowStatusModal(false)}
+        >
+          <div className='modal' onClick={(e) => e.stopPropagation()}>
+            <h3 className='heading-4'>Update Status</h3>
+            <div className='form-group'>
+              <label className='label label-required'>Status</label>
+              <select
+                className='input'
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+              >
+                <option value=''>Select status...</option>
+                {statusOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className='form-group'>
+              <label className='label'>Comment</label>
+              <textarea
+                className='input'
+                placeholder='Add a comment about this status change...'
+                value={statusComment}
+                onChange={(e) => setStatusComment(e.target.value)}
+                rows='3'
+              />
+            </div>
+            <div className='modal-actions'>
+              <button
+                onClick={() => setShowStatusModal(false)}
+                className='btn btn-secondary'
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleStatusUpdate}
+                className='btn btn-primary'
+                disabled={!selectedStatus}
+              >
+                Update Status
+              </button>
             </div>
           </div>
         </div>
