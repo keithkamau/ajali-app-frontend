@@ -1,14 +1,33 @@
 // src/App.jsx
 import React from "react";
-import { BrowserRouter as Router, Routes, Route ,useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom";
+import { useSelector } from "react-redux";
+
+// Components
 import { Header } from "./components/common/Header";
-import { Footer } from "./components/common/Footer";
-// import HomePage from "./pages/HomePage";
-// import LoginPage from "./pages/LoginPage";
-// import RegisterPage from "./pages/RegisterPage";
-// import DashboardPage from "./pages/DashboardPage";
+import { BottomNav } from "./components/common/BottomNav";
+import { Sidebar } from "./components/common/Sidebar";
+
+// Auth Pages
+import LandingPage from "./pages/LandingPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
+
+// App Pages
+import HomePage from "./pages/HomePage";
+import DashboardPage from "./pages/DashboardPage";
 import CreateIncidentPage from "./pages/CreateIncidentPage";
 import IncidentDetailPage from "./pages/IncidentDetailPage";
+import ActivityPage from "./pages/ActivityPage";
+import NotificationsPage from "./pages/NotificationsPage";
+import ProfilePage from "./pages/ProfilePage";
 import AdminPage from "./pages/AdminPage";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./components/admin/AdminDashboard";
@@ -16,50 +35,119 @@ import AdminIncidentsPage from "./pages/AdminIncidentsPage";
 import AdminIncidentDetailPage from "./pages/AdminIncidentDetailPage";
 import UserManagement from "./components/admin/UserManagement";
 
-function AppContent() {
+// Protected Route Wrapper
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated } = useSelector((state) => state.auth);
   const location = useLocation();
 
-  const showNav = !["/login", "/register", "/"].includes(
-    location.pathname
-  );
+  if (!isAuthenticated) {
+    // Redirect to login with return URL
+    window.location.href = `/login?redirect=${encodeURIComponent(location.pathname)}`;
+    return null;
+  }
+
+  return children;
+};
+
+function AppContent() {
+  const location = useLocation();
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
+  // Auth pages where navigation should be hidden
+  const authPages = [
+    "/",
+    "/login",
+    "/register",
+    "/forgot-password",
+    "/reset-password",
+  ];
+
+  const showNav = isAuthenticated && !authPages.includes(location.pathname);
 
   return (
-    <div className="app-container">
+    <div className='app-container'>
       {showNav && <Header />}
-
-      <main className="main-content">
+      {showNav && <Sidebar />}
+      <main className='main-content'>
         <Routes>
-          {/* <Route path="/" element={<HomePage />} /> */}
-          {/* <Route path="/login" element={<LoginPage />} /> */}
-          {/* <Route path="/register" element={<RegisterPage />} /> */}
-
-          {/* <Route path="/dashboard" element={<DashboardPage />} /> */}
-
+          {/* Public Routes */}
+          <Route path='/' element={<LandingPage />} />
+          <Route path='/login' element={<LoginPage />} />
+          <Route path='/register' element={<RegisterPage />} />
+          <Route path='/forgot-password' element={<ForgotPasswordPage />} />
           <Route
-            path="/incidents/create"
-            element={<CreateIncidentPage />}
+            path='/reset-password/:token'
+            element={<ResetPasswordPage />}
           />
 
-          {/* <Route
-            path="/incidents/:id"
-            element={<IncidentDetailPage />}
-          /> */}
-
-          {/* <Route
-            path="/incidents/:id/edit"
-            element={<EditIncidentPage />}
-          /> */}
-
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="incidents" element={<AdminIncidentsPage />} />
-            <Route path="incidents/:id" element={<AdminIncidentDetailPage />} />
-            <Route path="users" element={<UserManagement />} />
-          </Route>
+          {/* Protected Routes */}
+          <Route
+            path='/home'
+            element={
+              <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/dashboard'
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/incidents/create'
+            element={
+              <ProtectedRoute>
+                <CreateIncidentPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/incidents/:id'
+            element={
+              <ProtectedRoute>
+                <IncidentDetailPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/activity'
+            element={
+              <ProtectedRoute>
+                <ActivityPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/notifications'
+            element={
+              <ProtectedRoute>
+                <NotificationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/profile'
+            element={
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path='/admin'
+            element={
+              <ProtectedRoute>
+                <AdminPage />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
-
-      <Footer />
+      {showNav && <BottomNav />}
     </div>
   );
 }

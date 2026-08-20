@@ -1,32 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  registerUser,
+  resetPassword,
   clearError,
   clearSuccess,
 } from "../../redux/slices/authSlice";
-import {
-  validateEmail,
-  validatePhoneNumber,
-  validateFullName,
-  getPasswordStrength,
-} from "../../utils/validators";
+import { getPasswordStrength } from "../../utils/validators";
 
-export const Register = () => {
+export const ResetPassword = () => {
+  const { token } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isLoading, error, success, isAuthenticated } = useSelector(
-    (state) => state.auth,
-  );
+  const { isLoading, error, success } = useSelector((state) => state.auth);
 
   const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    phoneNumber: "",
     password: "",
     confirmPassword: "",
-    terms: false,
   });
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
@@ -34,12 +24,6 @@ export const Register = () => {
     level: "none",
     score: 0,
   });
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/home");
-    }
-  }, [isAuthenticated, navigate]);
 
   useEffect(() => {
     if (success) {
@@ -65,23 +49,6 @@ export const Register = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.fullName) {
-      newErrors.fullName = "Full name is required";
-    } else if (!validateFullName(formData.fullName)) {
-      newErrors.fullName = "Name must be between 2 and 100 characters";
-    }
-
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    if (formData.phoneNumber && !validatePhoneNumber(formData.phoneNumber)) {
-      newErrors.phoneNumber =
-        "Please enter a valid Kenyan phone number (e.g., 0712345678)";
-    }
-
     if (!formData.password) {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 8) {
@@ -94,25 +61,15 @@ export const Register = () => {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
-    if (!formData.terms) {
-      newErrors.terms = "You must agree to the terms and conditions";
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-    if (error) {
-      dispatch(clearError());
     }
   };
 
@@ -126,14 +83,8 @@ export const Register = () => {
     if (!validateForm()) return;
 
     try {
-      const { fullName, email, phoneNumber, password } = formData;
       await dispatch(
-        registerUser({
-          full_name: fullName,
-          email,
-          phone_number: phoneNumber,
-          password,
-        }),
+        resetPassword({ token, newPassword: formData.password }),
       ).unwrap();
     } catch (err) {
       // Error handled by thunk
@@ -169,8 +120,8 @@ export const Register = () => {
   return (
     <div className='auth-container'>
       <div className='auth-card'>
-        <h1 className='auth-title'>Create Account</h1>
-        <p className='auth-subtitle'>Join Ajali to get started</p>
+        <h1 className='auth-title'>Create New Password</h1>
+        <p className='auth-subtitle'>Enter your new password below</p>
 
         {error && (
           <div className='alert alert-error' style={{ marginBottom: "1rem" }}>
@@ -186,65 +137,13 @@ export const Register = () => {
 
         <form onSubmit={handleSubmit}>
           <div className='form-group'>
-            <label className='label label-required'>Full Name</label>
-            <input
-              type='text'
-              name='fullName'
-              className={`input ${errors.fullName ? "input-error" : ""}`}
-              placeholder='Enter your full name'
-              value={formData.fullName}
-              onChange={handleChange}
-              disabled={isLoading}
-              autoComplete='name'
-            />
-            {errors.fullName && (
-              <div className='form-error'>{errors.fullName}</div>
-            )}
-          </div>
-
-          <div className='form-group'>
-            <label className='label label-required'>Email</label>
-            <input
-              type='email'
-              name='email'
-              className={`input ${errors.email ? "input-error" : ""}`}
-              placeholder='your@email.com'
-              value={formData.email}
-              onChange={handleChange}
-              disabled={isLoading}
-              autoComplete='email'
-            />
-            {errors.email && <div className='form-error'>{errors.email}</div>}
-          </div>
-
-          <div className='form-group'>
-            <label className='label'>Phone Number</label>
-            <input
-              type='tel'
-              name='phoneNumber'
-              className={`input ${errors.phoneNumber ? "input-error" : ""}`}
-              placeholder='0712345678'
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              disabled={isLoading}
-              autoComplete='tel'
-            />
-            <div className='form-hint'>
-              Optional but recommended for SMS alerts
-            </div>
-            {errors.phoneNumber && (
-              <div className='form-error'>{errors.phoneNumber}</div>
-            )}
-          </div>
-
-          <div className='form-group'>
-            <label className='label label-required'>Password</label>
+            <label className='label label-required'>New Password</label>
             <div style={{ position: "relative" }}>
               <input
                 type={showPassword ? "text" : "password"}
                 name='password'
                 className={`input ${errors.password ? "input-error" : ""}`}
-                placeholder='Create a strong password'
+                placeholder='Enter new password'
                 value={formData.password}
                 onChange={handleChange}
                 disabled={isLoading}
@@ -282,7 +181,7 @@ export const Register = () => {
           </div>
 
           <div className='form-group'>
-            <label className='label label-required'>Confirm Password</label>
+            <label className='label label-required'>Confirm New Password</label>
             <input
               type='password'
               name='confirmPassword'
@@ -298,23 +197,6 @@ export const Register = () => {
             )}
           </div>
 
-          <div className='form-group'>
-            <label className='checkbox-label'>
-              <input
-                type='checkbox'
-                name='terms'
-                checked={formData.terms}
-                onChange={handleChange}
-                disabled={isLoading}
-              />
-              <span>
-                I agree to the <Link to='/terms'>Terms of Service</Link> and{" "}
-                <Link to='/privacy'>Privacy Policy</Link>
-              </span>
-            </label>
-            {errors.terms && <div className='form-error'>{errors.terms}</div>}
-          </div>
-
           <button
             type='submit'
             className='btn btn-primary btn-block btn-lg'
@@ -323,16 +205,16 @@ export const Register = () => {
             {isLoading ? (
               <>
                 <span className='spinner spinner-sm'></span>
-                Creating account...
+                Resetting...
               </>
             ) : (
-              "Create Account"
+              "Reset Password"
             )}
           </button>
         </form>
 
         <div className='auth-footer'>
-          Already have an account? <Link to='/login'>Log in</Link>
+          <Link to='/login'>Back to Log In</Link>
         </div>
       </div>
     </div>
