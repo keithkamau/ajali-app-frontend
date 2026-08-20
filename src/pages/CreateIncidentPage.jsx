@@ -1,2 +1,8 @@
+import React from "react";
 import IncidentForm from "../components/incidents/IncidentForm";
-export default function CreateIncidentPage() { return <IncidentForm />; }
+
+export const CreateIncidentPage = () => {
+  return <IncidentForm />;
+};
+
+export default CreateIncidentPage;
