@@ -14,6 +14,15 @@ export const Sidebar = ({ isOpen }) => {
     { path: "/notifications", icon: BellIcon, label: "Alerts" },
   ];
 
+  // Admin routes - only visible to admin users
+  const adminItems = [
+    { path: "/admin", icon: HomeIcon, label: "Admin Dashboard" },
+    { path: "/admin/incidents", icon: ActivityIcon, label: "All Incidents" },
+    { path: "/admin/users", icon: CreateIcon, label: "Manage Users" },
+  ];
+
+  const isAdmin = user?.role === "admin";
+
   const getInitials = (name) => {
     if (!name) return "U";
     return name.charAt(0).toUpperCase();
@@ -25,9 +34,6 @@ export const Sidebar = ({ isOpen }) => {
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
           const Icon = item.icon;
-          const color = isActive
-            ? "var(--color-navy)"
-            : "rgba(255,255,255,0.6)";
           const iconColor = isActive ? "#0f172a" : "rgba(255,255,255,0.6)";
 
           return (
@@ -44,6 +50,34 @@ export const Sidebar = ({ isOpen }) => {
             </Link>
           );
         })}
+
+        {/* Admin Section */}
+        {isAdmin && isOpen && (
+          <div className='sidebar-divider'>
+            <span className='sidebar-divider-label'>Admin</span>
+          </div>
+        )}
+
+        {isAdmin &&
+          adminItems.map((item) => {
+            const isActive = location.pathname === item.path;
+            const Icon = item.icon;
+            const iconColor = isActive ? "#0f172a" : "rgba(255,255,255,0.6)";
+
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`sidebar-nav-item ${isActive ? "active" : ""}`}
+                title={isOpen ? "" : item.label}
+              >
+                <span className='nav-icon'>
+                  <Icon color={iconColor} size={isOpen ? 20 : 28} />
+                </span>
+                {isOpen && <span className='nav-label'>{item.label}</span>}
+              </Link>
+            );
+          })}
       </nav>
 
       {isOpen && (

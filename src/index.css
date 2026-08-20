@@ -405,6 +405,20 @@ a:hover {
   display: none;
 }
 
+.sidebar-divider {
+  padding: 1rem 0.75rem 0.5rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-divider-label {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 600;
+}
+
 .sidebar-bottom {
   padding: 1rem 1.5rem 0;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -945,6 +959,19 @@ a:hover {
   }
 }
 
+.home-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .home-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .home-recent {
   margin-top: 1.5rem;
   padding: 0 0.25rem;
@@ -981,6 +1008,9 @@ a:hover {
 
 .quick-action-btn .action-icon {
   font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .quick-action-btn.primary {
@@ -1023,6 +1053,76 @@ a:hover {
   flex-wrap: wrap;
   gap: 1rem;
   padding: 0 0.25rem;
+}
+
+.incident-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ============================================
+   INCIDENT CARD
+   ============================================ */
+.incident-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.incident-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.incident-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.incident-card-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--color-ink);
+  flex: 1;
+  margin-right: 0.75rem;
+}
+
+.incident-card-description {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--color-ink-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.incident-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--color-border);
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.incident-card-meta {
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 /* ============================================
@@ -1421,6 +1521,66 @@ a:hover {
   margin-top: 1.5rem;
 }
 
+/* Admin Table */
+.admin-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.admin-table-header {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 2px solid var(--color-border);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-ink-muted);
+}
+
+.admin-table-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr 1fr 1fr;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-border);
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.admin-table-reference {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+}
+
+@media (max-width: 768px) {
+  .admin-table-header {
+    display: none;
+  }
+  
+  .admin-table-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem 0;
+  }
+  
+  .admin-table-row span {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .admin-table-row span::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--color-ink-muted);
+    font-size: 0.75rem;
+  }
+}
+
 /* ============================================
    STAT CARDS
    ============================================ */
@@ -1451,6 +1611,23 @@ a:hover {
 .empty-state {
   text-align: center;
   padding: 3rem 1.5rem;
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+  gap: 1rem;
+}
+
+.loading-state p {
+  color: var(--color-ink-muted);
+  font-size: 0.875rem;
 }
 
 /* ============================================
