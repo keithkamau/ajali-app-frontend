@@ -1,0 +1,80 @@
+.analytics-chart {
+  background: white;
+  border: 1px solid #e7eaee;
+  border-radius: 10px;
+  padding: 22px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.analytics-chart-header {
+  margin-bottom: 25px;
+}
+
+.analytics-chart-header h3 {
+  margin: 0;
+  color: #0d182a;
+  font-size: 15px;
+}
+
+.bar-chart {
+  height: 250px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: 12px;
+  border-bottom: 1px solid #dfe3e8;
+  padding: 0 10px;
+}
+
+.bar-item {
+  height: 100%;
+  flex: 1;
+  max-width: 55px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.bar-wrapper {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.bar {
+  width: 100%;
+  min-height: 4px;
+  background: #e53935;
+  border-radius: 5px 5px 0 0;
+  transition: height 0.3s ease;
+}
+
+.bar-value {
+  color: #0d182a;
+  font-size: 10px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.bar-item span {
+  color: #89929f;
+  font-size: 9px;
+  margin-top: 8px;
+}
+
+@media (max-width: 600px) {
+  .analytics-chart {
+    padding: 15px;
+  }
+
+  .bar-chart {
+    gap: 5px;
+  }
+
+  .bar-item span {
+    font-size: 8px;
+  }
+}
