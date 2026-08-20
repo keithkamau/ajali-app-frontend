@@ -28,33 +28,41 @@ export const Sidebar = ({ isOpen }) => {
           const color = isActive
             ? "var(--color-navy)"
             : "rgba(255,255,255,0.6)";
+          const iconColor = isActive ? "#0f172a" : "rgba(255,255,255,0.6)";
 
           return (
             <Link
               key={item.path}
               to={item.path}
               className={`sidebar-nav-item ${isActive ? "active" : ""}`}
+              title={isOpen ? "" : item.label}
             >
               <span className='nav-icon'>
-                <Icon color={color} size={20} />
+                <Icon color={iconColor} size={isOpen ? 20 : 28} />
               </span>
-              <span className='nav-label'>{item.label}</span>
+              {isOpen && <span className='nav-label'>{item.label}</span>}
             </Link>
           );
         })}
       </nav>
 
-      <div className='sidebar-bottom'>
-        <div className='sidebar-user'>
-          <div className='avatar avatar-sm'>{getInitials(user?.full_name)}</div>
-          <div className='sidebar-user-info'>
-            <div className='sidebar-user-name'>{user?.full_name || "User"}</div>
-            <div className='sidebar-user-email'>
-              {user?.email || "user@email.com"}
+      {isOpen && (
+        <div className='sidebar-bottom'>
+          <div className='sidebar-user'>
+            <div className='avatar avatar-sm'>
+              {getInitials(user?.full_name)}
+            </div>
+            <div className='sidebar-user-info'>
+              <div className='sidebar-user-name'>
+                {user?.full_name || "User"}
+              </div>
+              <div className='sidebar-user-email'>
+                {user?.email || "user@email.com"}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </aside>
   );
 };
