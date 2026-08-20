@@ -31,7 +31,7 @@ import ProfilePage from "./pages/ProfilePage";
 import AdminPage from "./pages/AdminPage";
 import AdminIncidentsPage from "./pages/AdminIncidentsPage";
 import AdminUsersPage from "./pages/AdminUsersPage";
-import AdminIncidentDetailPage from "./pages/AdminIncidentDetailPage"; // NEW
+import AdminIncidentDetailPage from "./pages/AdminIncidentDetailPage";
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -53,7 +53,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 
 function AppContent() {
   const location = useLocation();
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const authPages = [
@@ -69,6 +69,8 @@ function AppContent() {
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
+
+  const isAdmin = user?.role === "admin";
 
   return (
     <div className='app-container'>
@@ -90,7 +92,7 @@ function AppContent() {
             element={<ResetPasswordPage />}
           />
 
-          {/* Protected Routes */}
+          {/* Protected Routes - User */}
           <Route
             path='/home'
             element={

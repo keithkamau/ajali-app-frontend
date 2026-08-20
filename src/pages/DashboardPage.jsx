@@ -36,12 +36,24 @@ export const DashboardPage = () => {
     setDeleteId(null);
   };
 
-  const handleEdit = (id) => {
+  const handleEdit = (id, e) => {
+    e.stopPropagation();
     navigate(`/incidents/${id}/edit`);
   };
 
-  const handleView = (id) => {
-    navigate(`/incidents/${id}`);
+  const handleViewIncident = (id) => {
+    // Check if user is admin
+    if (user?.role === "admin") {
+      navigate(`/admin/incidents/${id}`);
+    } else {
+      navigate(`/incidents/${id}`);
+    }
+  };
+
+  const handleDeleteClick = (id, e) => {
+    e.stopPropagation();
+    setDeleteId(id);
+    setShowDeleteModal(true);
   };
 
   const getStatusBadgeClass = (status) => {
@@ -102,8 +114,8 @@ export const DashboardPage = () => {
           userIncidents.map((incident) => (
             <div
               key={incident.id}
-              className='incident-card'
-              onClick={() => handleView(incident.id)}
+              className='incident-card clickable'
+              onClick={() => handleViewIncident(incident.id)}
             >
               <div className='incident-card-header'>
                 <span className='incident-card-title'>{incident.title}</span>
@@ -121,22 +133,20 @@ export const DashboardPage = () => {
                   {incident.created_at
                     ? new Date(incident.created_at).toLocaleDateString()
                     : "Recently"}
+                  {incident.reference && ` • ${incident.reference}`}
                 </span>
                 <div
                   className='incident-card-actions'
                   onClick={(e) => e.stopPropagation()}
                 >
                   <button
-                    onClick={() => handleEdit(incident.id)}
+                    onClick={(e) => handleEdit(incident.id, e)}
                     className='btn btn-sm btn-secondary'
                   >
                     Edit
                   </button>
                   <button
-                    onClick={() => {
-                      setDeleteId(incident.id);
-                      setShowDeleteModal(true);
-                    }}
+                    onClick={(e) => handleDeleteClick(incident.id, e)}
                     className='btn btn-sm btn-danger'
                   >
                     Delete

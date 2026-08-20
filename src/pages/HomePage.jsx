@@ -11,8 +11,8 @@ import {
 export const HomePage = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
+  const isAdmin = user?.role === "admin";
 
-  // Mock recent activity with IDs for navigation
   const recentActivity = [
     {
       id: 1,
@@ -60,7 +60,11 @@ export const HomePage = () => {
   };
 
   const handleActivityClick = (id) => {
-    navigate(`/incidents/${id}`);
+    if (isAdmin) {
+      navigate(`/admin/incidents/${id}`);
+    } else {
+      navigate(`/incidents/${id}`);
+    }
   };
 
   return (
@@ -139,7 +143,6 @@ export const HomePage = () => {
                   key={item.id}
                   className='activity-item clickable'
                   onClick={() => handleActivityClick(item.id)}
-                  style={{ cursor: "pointer" }}
                 >
                   <div className='activity-item-header'>
                     <span className='activity-item-title'>{item.title}</span>
