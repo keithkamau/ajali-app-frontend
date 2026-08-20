@@ -1,200 +1,361 @@
-import React from "react";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import {
+  setStats,
+  setIncidents,
+} from "../../redux//slices/adminSlice";
+
 import "./AdminDashboard.css";
 
-function AdminDashboard() {
-  const stats = [
-    {
-      title: "Total Reports",
-      value: 128,
-      icon: "▣",
-    },
-    {
-      title: "In Progress",
-      value: 34,
-      icon: "◷",
-    },
-    {
-      title: "Resolved",
-      value: 94,
-      icon: "✓",
-    },
-    {
-      title: "SOS Alerts",
-      value: 12,
-      icon: "!",
-    },
-  ];
+const mockStats = {
+  total: 248,
+  resolved: 174,
+  inProgress: 52,
+  critical: 22,
+};
 
-  const recentReports = [
-    {
-      id: "AJ-2025-001234",
-      location: "Ngong Road",
-      status: "In Progress",
-      reportedAt: "Today, 10:24 AM",
-    },
-    {
-      id: "AJ-2025-001233",
-      location: "Waiyaki Way",
-      status: "Resolved",
-      reportedAt: "12 May 2025",
-    },
-    {
-      id: "AJ-2026-001232",
-      location: "Thika Road",
-      status: "Resolved",
-      reportedAt: "03 May 2026",
-    },
-    {
-      id: "AJ-2026-001231",
-      location: "Mombasa Road",
-      status: "In Progress",
-      reportedAt: "02 May 2026",
-    },
-  ];
+const mockRecentIncidents = [
+  {
+    id: "AJ-001",
+    title: "Road Accident",
+    location: "Ngong Road",
+    status: "Reported",
+    priority: "Critical",
+    time: "10:24 AM",
+  },
+  {
+    id: "AJ-002",
+    title: "Medical Emergency",
+    location: "Kilimani",
+    status: "In Progress",
+    priority: "High",
+    time: "09:45 AM",
+  },
+  {
+    id: "AJ-003",
+    title: "Building Fire",
+    location: "Westlands",
+    status: "In Progress",
+    priority: "Critical",
+    time: "08:30 AM",
+  },
+  {
+    id: "AJ-004",
+    title: "Traffic Accident",
+    location: "Thika Road",
+    status: "Resolved",
+    priority: "Medium",
+    time: "Yesterday",
+  },
+];
+
+function AdminDashboard() {
+  const dispatch = useDispatch();
+
+  const stats = useSelector(
+    (state) => state.admin.stats
+  );
+
+  const incidents = useSelector(
+    (state) => state.admin.incidents
+  );
+
+  useEffect(() => {
+    dispatch(setStats(mockStats));
+
+    dispatch(setIncidents(mockRecentIncidents));
+  }, [dispatch]);
+
+  const recentIncidents =
+    incidents.length > 0
+      ? incidents.slice(0, 4)
+      : mockRecentIncidents;
 
   return (
-      
-        <div className="admin-content">
-          {/* Statistics */}
-          <section className="admin-stats">
-            {stats.map((stat) => (
-              <div className="admin-stat-card" key={stat.title}>
-                <div className="stat-icon">{stat.icon}</div>
+    <div className="admin-dashboard">
 
-                <div>
-                  <p>{stat.title}</p>
-                  <h2>{stat.value}</h2>
+      {/*
+          HEADER
+     */}
+
+      <div className="admin-dashboard-header">
+        <div>
+          <h1>Admin Dashboard</h1>
+
+          <p>
+            Monitor and manage emergency incidents
+            across Ajali!
+          </p>
+        </div>
+
+        <div className="dashboard-date">
+          <span>Today</span>
+        </div>
+      </div>
+
+      {/*
+          STATISTICS
+     */}
+
+      <div className="admin-stats-grid">
+
+        <div className="admin-stat-card">
+          <div className="stat-card-top">
+            <span className="stat-label">
+              Total Incidents
+            </span>
+
+            <div className="stat-icon total">
+              #
+            </div>
+          </div>
+
+          <div className="stat-value">
+            {stats.total}
+          </div>
+
+          <div className="stat-description">
+            All reported incidents
+          </div>
+        </div>
+
+        <div className="admin-stat-card">
+          <div className="stat-card-top">
+            <span className="stat-label">
+              Resolved
+            </span>
+
+            <div className="stat-icon resolved">
+              ✓
+            </div>
+          </div>
+
+          <div className="stat-value">
+            {stats.resolved}
+          </div>
+
+          <div className="stat-description">
+            Successfully resolved
+          </div>
+        </div>
+
+        <div className="admin-stat-card">
+          <div className="stat-card-top">
+            <span className="stat-label">
+              In Progress
+            </span>
+
+            <div className="stat-icon progress">
+              ↻
+            </div>
+          </div>
+
+          <div className="stat-value">
+            {stats.inProgress}
+          </div>
+
+          <div className="stat-description">
+            Currently being handled
+          </div>
+        </div>
+
+        <div className="admin-stat-card">
+          <div className="stat-card-top">
+            <span className="stat-label">
+              Critical
+            </span>
+
+            <div className="stat-icon critical">
+              !
+            </div>
+          </div>
+
+          <div className="stat-value">
+            {stats.critical}
+          </div>
+
+          <div className="stat-description">
+            Require immediate attention
+          </div>
+        </div>
+
+      </div>
+
+      {/*
+          MAIN CONTENT
+     */}
+
+      <div className="admin-dashboard-content">
+
+        {/* Recent Incidents */}
+
+        <div className="dashboard-panel recent-panel">
+
+          <div className="panel-header">
+            <div>
+              <h2>Recent Incidents</h2>
+
+              <p>
+                Latest emergency reports
+              </p>
+            </div>
+
+            <a href="/admin/incidents">
+              View All
+            </a>
+          </div>
+
+          <div className="recent-incidents">
+
+            {recentIncidents.map((incident) => (
+              <div
+                className="recent-incident"
+                key={incident.id}
+              >
+
+                <div className="incident-main">
+
+                  <div className="incident-title">
+                    {incident.title}
+                  </div>
+
+                  <div className="incident-location">
+                    {incident.location ||
+                      incident.location_address ||
+                      "Unknown location"}
+                  </div>
+
                 </div>
+
+                <div className="incident-meta">
+
+                  <span
+                    className={`priority-badge ${String(
+                      incident.priority ||
+                        "Medium"
+                    ).toLowerCase()}`}
+                  >
+                    {incident.priority ||
+                      "Medium"}
+                  </span>
+
+                  <span
+                    className={`incident-status ${String(
+                      incident.status
+                    )
+                      .toLowerCase()
+                      .replace(" ", "-")}`}
+                  >
+                    {incident.status}
+                  </span>
+
+                  <span className="incident-time">
+                    {incident.time ||
+                      incident.created_at ||
+                      "—"}
+                  </span>
+
+                </div>
+
               </div>
             ))}
-          </section>
 
-          {/* Main Dashboard Grid */}
-          <section className="dashboard-grid">
-            {/* Recent Reports */}
-            <div className="dashboard-panel reports-panel">
-              <div className="panel-header">
-                <div>
-                  <h2>Recent Reports</h2>
-                  <p>Latest emergency reports submitted</p>
-                </div>
+          </div>
 
-                <button className="view-all-btn">View All</button>
-              </div>
-
-              <div className="table-wrapper">
-                <table className="reports-table">
-                  <thead>
-                    <tr>
-                      <th>Report ID</th>
-                      <th>Location</th>
-                      <th>Status</th>
-                      <th>Reported At</th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {recentReports.map((report) => (
-                      <tr key={report.id}>
-                        <td>{report.id}</td>
-                        <td>{report.location}</td>
-                        <td>
-                          <span
-                            className={`status-badge ${
-                              report.status === "Resolved"
-                                ? "resolved"
-                                : "progress"
-                            }`}
-                          >
-                            {report.status}
-                          </span>
-                        </td>
-                        <td>{report.reportedAt}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Status Chart */}
-            <div className="dashboard-panel chart-panel">
-              <div className="panel-header">
-                <div>
-                  <h2>Reports by Status</h2>
-                  <p>Current report distribution</p>
-                </div>
-              </div>
-
-              <div className="donut-container">
-                <div className="donut-chart">
-                  <div className="donut-center">
-                    <strong>128</strong>
-                    <span>Total</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="chart-legend">
-                <div className="legend-item">
-                  <span className="legend-dot progress-dot"></span>
-                  <span>In Progress</span>
-                  <strong>34</strong>
-                </div>
-
-                <div className="legend-item">
-                  <span className="legend-dot resolved-dot"></span>
-                  <span>Resolved</span>
-                  <strong>94</strong>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Quick Overview */}
-          <section className="dashboard-panel overview-panel">
-            <div className="panel-header">
-              <div>
-                <h2>Emergency Overview</h2>
-                <p>Quick summary of today's activity</p>
-              </div>
-            </div>
-
-            <div className="overview-items">
-              <div className="overview-item">
-                <span className="overview-icon accident">!</span>
-                <div>
-                  <strong>Road Accidents</strong>
-                  <span>42 reports</span>
-                </div>
-              </div>
-
-              <div className="overview-item">
-                <span className="overview-icon medical">+</span>
-                <div>
-                  <strong>Medical Emergencies</strong>
-                  <span>27 reports</span>
-                </div>
-              </div>
-
-              <div className="overview-item">
-                <span className="overview-icon fire">♨</span>
-                <div>
-                  <strong>Fire Incidents</strong>
-                  <span>18 reports</span>
-                </div>
-              </div>
-
-              <div className="overview-item">
-                <span className="overview-icon other">◉</span>
-                <div>
-                  <strong>Other Emergencies</strong>
-                  <span>41 reports</span>
-                </div>
-              </div>
-            </div>
-          </section>
         </div>
+
+        {/* Quick Overview */}
+
+        <div className="dashboard-panel overview-panel">
+
+          <div className="panel-header">
+            <div>
+              <h2>Incident Overview</h2>
+
+              <p>
+                Current incident distribution
+              </p>
+            </div>
+          </div>
+
+          <div className="overview-item">
+
+            <div className="overview-info">
+              <span>Resolved</span>
+              <strong>{stats.resolved}</strong>
+            </div>
+
+            <div className="overview-bar">
+              <div
+                className="overview-bar-fill resolved-bar"
+                style={{
+                  width: `${
+                    stats.total
+                      ? (stats.resolved /
+                          stats.total) *
+                        100
+                      : 0
+                  }%`,
+                }}
+              />
+            </div>
+
+          </div>
+
+          <div className="overview-item">
+
+            <div className="overview-info">
+              <span>In Progress</span>
+              <strong>{stats.inProgress}</strong>
+            </div>
+
+            <div className="overview-bar">
+              <div
+                className="overview-bar-fill progress-bar"
+                style={{
+                  width: `${
+                    stats.total
+                      ? (stats.inProgress /
+                          stats.total) *
+                        100
+                      : 0
+                  }%`,
+                }}
+              />
+            </div>
+
+          </div>
+
+          <div className="overview-item">
+
+            <div className="overview-info">
+              <span>Critical</span>
+              <strong>{stats.critical}</strong>
+            </div>
+
+            <div className="overview-bar">
+              <div
+                className="overview-bar-fill critical-bar"
+                style={{
+                  width: `${
+                    stats.total
+                      ? (stats.critical /
+                          stats.total) *
+                        100
+                      : 0
+                  }%`,
+                }}
+              />
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
   );
 }
 
