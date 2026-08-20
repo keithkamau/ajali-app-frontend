@@ -34,7 +34,7 @@ function AdminSidebar() {
           Reports
         </NavLink>
 
-        <NavLink
+        {/* <NavLink
           to="/admin/responders"
           className={({ isActive }) =>
             `admin-nav-item ${isActive ? "active" : ""}`
@@ -42,7 +42,7 @@ function AdminSidebar() {
         >
           <span className="nav-icon">♙</span>
           Responders
-        </NavLink>
+        </NavLink> */}
 
         <NavLink
           to="/admin/users"
@@ -54,7 +54,7 @@ function AdminSidebar() {
           Users
         </NavLink>
 
-        <NavLink
+        {/* <NavLink
           to="/admin/alerts"
           className={({ isActive }) =>
             `admin-nav-item ${isActive ? "active" : ""}`
@@ -62,7 +62,7 @@ function AdminSidebar() {
         >
           <span className="nav-icon">!</span>
           Alerts
-        </NavLink>
+        </NavLink> */}
 
         <NavLink
           to="/admin/analytics"

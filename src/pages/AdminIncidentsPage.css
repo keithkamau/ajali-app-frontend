@@ -144,9 +144,7 @@
   color: #89929f;
 }
 
-/* =========================
-   BULK ACTIONS
-========================= */
+/*BULK ACTIONS */
 
 .bulk-action-bar {
   background: #fff8f7;
@@ -220,6 +218,23 @@
   height: 14px;
   cursor: pointer;
   accent-color: #e53935;
+}
+
+.api-warning {
+  background: #fff8e6;
+  border: 1px solid #f1dfaa;
+  color: #806500;
+  border-radius: 7px;
+  padding: 10px 14px;
+  margin-bottom: 15px;
+  font-size: 11px;
+}
+
+.loading-message {
+  text-align: center;
+  padding: 30px;
+  color: #89929f;
+  font-size: 12px;
 }
 
 @media (max-width: 700px) {
