@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { HomeIcon, CreateIcon, ActivityIcon, BellIcon } from "../icons";
 
-export const Sidebar = () => {
+export const Sidebar = ({ isOpen }) => {
   const location = useLocation();
   const { user } = useSelector((state) => state.auth);
 
@@ -20,18 +20,14 @@ export const Sidebar = () => {
   };
 
   return (
-    <aside className='sidebar'>
-      <div className='sidebar-logo'>
-        <span>Ajali</span>
-      </div>
-
+    <aside className={`sidebar ${isOpen ? "sidebar-open" : "sidebar-closed"}`}>
       <nav className='sidebar-nav'>
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
           const Icon = item.icon;
           const color = isActive
-            ? "var(--color-surface)"
-            : "var(--color-ink-muted)";
+            ? "var(--color-navy)"
+            : "rgba(255,255,255,0.6)";
 
           return (
             <Link
@@ -42,7 +38,7 @@ export const Sidebar = () => {
               <span className='nav-icon'>
                 <Icon color={color} size={20} />
               </span>
-              <span>{item.label}</span>
+              <span className='nav-label'>{item.label}</span>
             </Link>
           );
         })}
@@ -51,7 +47,7 @@ export const Sidebar = () => {
       <div className='sidebar-bottom'>
         <div className='sidebar-user'>
           <div className='avatar avatar-sm'>{getInitials(user?.full_name)}</div>
-          <div>
+          <div className='sidebar-user-info'>
             <div className='sidebar-user-name'>{user?.full_name || "User"}</div>
             <div className='sidebar-user-email'>
               {user?.email || "user@email.com"}

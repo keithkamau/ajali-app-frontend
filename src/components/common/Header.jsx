@@ -3,8 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../redux/slices/authSlice";
 import { NotificationBell } from "../notifications/NotificationBell";
+import { LogoutIcon } from "../icons";
 
-export const Header = () => {
+export const Header = ({ onToggleSidebar, sidebarOpen }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
@@ -17,9 +18,34 @@ export const Header = () => {
   return (
     <header className='header'>
       <div className='header-container'>
-        <Link to='/home' className='header-logo'>
-          <span className='header-logo-text'>Ajali</span>
-        </Link>
+        <div className='header-left'>
+          <button
+            onClick={onToggleSidebar}
+            className='sidebar-toggle-btn'
+            aria-label={sidebarOpen ? "Close sidebar" : "Open sidebar"}
+          >
+            <svg
+              xmlns='http://www.w3.org/2000/svg'
+              viewBox='0 0 24 24'
+              width='24'
+              height='24'
+              fill='none'
+              stroke='currentColor'
+              strokeWidth='2'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+            >
+              {sidebarOpen ? (
+                <path d='M18 6L6 18M6 6l12 12' />
+              ) : (
+                <path d='M3 12h18M3 6h18M3 18h18' />
+              )}
+            </svg>
+          </button>
+          <Link to='/home' className='header-logo-text'>
+            Ajali
+          </Link>
+        </div>
 
         <div className='header-actions'>
           <NotificationBell />
@@ -29,7 +55,8 @@ export const Header = () => {
             title='Logout'
             aria-label='Logout'
           >
-            Logout
+            <LogoutIcon color='rgba(255,255,255,0.7)' size={18} />
+            <span className='logout-label'>Logout</span>
           </button>
         </div>
       </div>

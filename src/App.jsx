@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -45,6 +45,7 @@ const ProtectedRoute = ({ children }) => {
 function AppContent() {
   const location = useLocation();
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const authPages = [
     "/",
@@ -56,13 +57,20 @@ function AppContent() {
 
   const showNav = isAuthenticated && !authPages.includes(location.pathname);
 
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
     <div className='app-container'>
-      {showNav && <Header />}
-      {showNav && <Sidebar />}
-      <main className={`main-content ${showNav ? "with-nav" : ""}`}>
+      {showNav && (
+        <Header onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
+      )}
+      {showNav && <Sidebar isOpen={sidebarOpen} />}
+      <main
+        className={`main-content ${showNav ? "with-nav" : ""} ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}
+      >
         <Routes>
-          {/* Public Routes */}
           <Route path='/' element={<LandingPage />} />
           <Route path='/login' element={<LoginPage />} />
           <Route path='/register' element={<RegisterPage />} />
@@ -72,7 +80,6 @@ function AppContent() {
             element={<ResetPasswordPage />}
           />
 
-          {/* Protected Routes */}
           <Route
             path='/home'
             element={
