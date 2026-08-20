@@ -2,6 +2,8 @@
 import axios from "axios";
 import { AUTH_CONSTANTS } from "../utils/constants";
 
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true" || true;
+
 const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 const axiosInstance = axios.create({
@@ -15,6 +17,11 @@ const axiosInstance = axios.create({
 // Request interceptor - Add token
 axiosInstance.interceptors.request.use(
   (config) => {
+    // Skip auth header for mock mode
+    if (USE_MOCK) {
+      return config;
+    }
+
     const token = localStorage.getItem(AUTH_CONSTANTS.TOKEN_KEY);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -44,16 +51,19 @@ const processQueue = (error, token = null) => {
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Skip token refresh for mock mode
+    if (USE_MOCK) {
+      return Promise.reject(error);
+    }
+
     const originalRequest = error.config;
 
-    // If token expired and not already retrying
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
       originalRequest.url !== "/auth/refresh"
     ) {
       if (isRefreshing) {
-        // Queue request if refresh is in progress
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
@@ -84,20 +94,16 @@ axiosInstance.interceptors.response.use(
         const { access_token } = response.data;
         localStorage.setItem(AUTH_CONSTANTS.TOKEN_KEY, access_token);
 
-        // Process queued requests
         processQueue(null, access_token);
 
-        // Retry original request
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
         return axiosInstance(originalRequest);
       } catch (refreshError) {
-        // Refresh failed - logout user
         processQueue(refreshError, null);
         localStorage.removeItem(AUTH_CONSTANTS.TOKEN_KEY);
         localStorage.removeItem(AUTH_CONSTANTS.REFRESH_TOKEN_KEY);
         localStorage.removeItem(AUTH_CONSTANTS.USER_KEY);
 
-        // Redirect to login
         window.location.href = "/login";
         return Promise.reject(refreshError);
       } finally {
