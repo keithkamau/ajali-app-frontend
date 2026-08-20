@@ -63,7 +63,6 @@ export const IncidentDetailPage = () => {
     setShowStatusModal(false);
     setStatusComment("");
     setSelectedStatus("");
-    // Refresh status history
     dispatch(fetchStatusHistory(id));
   };
 
@@ -247,7 +246,6 @@ export const IncidentDetailPage = () => {
           </div>
         )}
 
-        {/* Status History - Admin Only */}
         {isAdmin && statusHistory && statusHistory.length > 0 && (
           <div className='card incident-detail-card'>
             <h3 className='heading-4' style={{ marginBottom: "0.5rem" }}>
