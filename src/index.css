@@ -1942,8 +1942,36 @@ select.input {
 }
 
 /* ============================================
-   PROFILE PAGE - Add these styles
+   PROFILE PAGE - Updated Styles
    ============================================ */
+.profile-menu-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--color-ink);
+  border-bottom: 1px solid var(--color-border);
+  transition: color 0.2s;
+}
+
+.profile-menu-item:last-of-type {
+  border-bottom: none;
+}
+
+.profile-menu-item:hover {
+  color: var(--color-navy);
+}
+
+.profile-menu-item.danger {
+  color: var(--color-red);
+}
+
+.profile-menu-item.danger:hover {
+  color: #b91c1c;
+}
+
 .profile-menu-arrow {
   display: flex;
   align-items: center;
@@ -1953,4 +1981,122 @@ select.input {
 
 .profile-menu-item:hover .profile-menu-arrow {
   transform: translateX(4px);
+}
+
+.profile-menu-item.danger:hover .profile-menu-arrow {
+  transform: translateX(4px);
+}
+
+.profile-menu-item:hover .profile-menu-arrow {
+  transform: translateX(4px);
+}
+
+/* ============================================
+   MODAL STYLES
+   ============================================ */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background-color: var(--color-surface);
+  border-radius: 0.75rem;
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal-header h3 {
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.modal-close:hover {
+  background-color: var(--color-ground);
+}
+
+.modal-body {
+  padding: 1.5rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.modal-actions .btn {
+  flex: 1;
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    margin: 0.5rem;
+    max-height: 95vh;
+  }
+
+  .modal-header {
+    padding: 1rem;
+  }
+
+  .modal-body {
+    padding: 1rem;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
 }
