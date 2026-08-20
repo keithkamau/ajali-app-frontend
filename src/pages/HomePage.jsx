@@ -60,6 +60,7 @@ export const HomePage = () => {
   };
 
   const handleActivityClick = (id) => {
+    // Regular users go to /incidents/:id, admins go to /admin/incidents/:id
     if (isAdmin) {
       navigate(`/admin/incidents/${id}`);
     } else {
