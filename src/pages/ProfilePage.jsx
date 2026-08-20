@@ -212,8 +212,6 @@ export const ProfilePage = () => {
             </span>
           </div>
 
-          <div className='divider'></div>
-
           <div className='profile-menu-item' onClick={handleLogout}>
             <span>Logout</span>
             <span className='profile-menu-arrow'>
