@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../../redux/slices/authSlice";
 import { NotificationBell } from "../notifications/NotificationBell";
-import { LogoutIcon } from "../icons";
 
 export const Header = () => {
   const navigate = useNavigate();
@@ -30,8 +29,7 @@ export const Header = () => {
             title='Logout'
             aria-label='Logout'
           >
-            <LogoutIcon color='var(--color-ink-muted)' size={18} />
-            <span>Logout</span>
+            Logout
           </button>
         </div>
       </div>
