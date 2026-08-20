@@ -29,6 +29,11 @@ import ActivityPage from "./pages/ActivityPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import ProfilePage from "./pages/ProfilePage";
 import AdminPage from "./pages/AdminPage";
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminDashboard from "./components/admin/AdminDashboard";
+import AdminIncidentsPage from "./pages/AdminIncidentsPage";
+import AdminIncidentDetailPage from "./pages/AdminIncidentDetailPage";
+import UserManagement from "./components/admin/UserManagement";
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
