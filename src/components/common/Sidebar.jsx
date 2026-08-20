@@ -16,8 +16,16 @@ export const Sidebar = () => {
 
   const getInitials = (name) => {
     if (!name) return "U";
-    return name.charAt(0).toUpperCase();
+    const parts = name.trim().split(" ");
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (
+      parts[0].charAt(0) + parts[parts.length - 1].charAt(0)
+    ).toUpperCase();
   };
+
+  const displayName = user?.full_name || "User";
+  const displayEmail = user?.email || "user@ajali.com";
+  const initials = getInitials(displayName);
 
   return (
     <aside className='sidebar'>
@@ -50,12 +58,10 @@ export const Sidebar = () => {
 
       <div className='sidebar-bottom'>
         <div className='sidebar-user'>
-          <div className='avatar avatar-sm'>{getInitials(user?.full_name)}</div>
-          <div>
-            <div className='sidebar-user-name'>{user?.full_name || "User"}</div>
-            <div className='sidebar-user-email'>
-              {user?.email || "user@email.com"}
-            </div>
+          <div className='sidebar-avatar'>{initials}</div>
+          <div className='sidebar-user-info'>
+            <div className='sidebar-user-name'>{displayName}</div>
+            <div className='sidebar-user-email'>{displayEmail}</div>
           </div>
         </div>
       </div>
