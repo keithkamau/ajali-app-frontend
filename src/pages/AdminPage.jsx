@@ -1,6 +1,5 @@
-// src/pages/AdminPage.jsx
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { mockIncidents, mockStats } from "../utils/mockData";
 import { formatDateTime } from "../utils/formatters";
@@ -75,7 +74,6 @@ export const AdminPage = () => {
 
       // Update stats
       const newStats = { ...stats };
-      // Recalculate stats
       const pending = updated.filter((i) => i.status === "pending").length;
       const inProgress = updated.filter(
         (i) => i.status === "under_investigation",
