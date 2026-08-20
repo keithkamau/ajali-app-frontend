@@ -1660,3 +1660,147 @@ select.input {
   flex-wrap: wrap;
   gap: 1rem;
 }
+
+/* ============================================
+   INCIDENT FORM STYLES
+   ============================================ */
+.incident-form-container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0.5rem 0;
+}
+
+.incident-form-header {
+  margin-bottom: 2rem;
+}
+
+.incident-form-header h1 {
+  margin-bottom: 0.25rem;
+}
+
+.incident-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.incident-form-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .incident-form-card {
+    padding: 2rem;
+  }
+}
+
+.incident-form-card .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.location-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 480px) {
+  .location-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.evidence-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 480px) {
+  .evidence-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.evidence-upload {
+  border: 2px dashed var(--color-border);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.evidence-upload:hover {
+  border-color: var(--color-navy);
+  background-color: var(--color-ground);
+}
+
+.evidence-upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  color: var(--color-ink-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.evidence-upload-label:hover {
+  color: var(--color-ink);
+}
+
+.evidence-files {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.evidence-file {
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+  background-color: var(--color-ground);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid var(--color-border);
+}
+
+.incident-form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.incident-form-actions .btn {
+  min-width: 120px;
+}
+
+@media (max-width: 480px) {
+  .incident-form-actions {
+    flex-direction: column;
+  }
+  .incident-form-actions .btn {
+    width: 100%;
+    min-width: unset;
+  }
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--color-ink);
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+  accent-color: var(--color-navy);
+}
