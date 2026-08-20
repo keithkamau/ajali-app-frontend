@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FiBell } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUnreadCount } from "../../redux/slices/notificationSlice";
 import NotificationList from "./NotificationList";
 
-export default function NotificationBell() {
+export const NotificationBell = () => {
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
-  const unread_count = useSelector((s) => s.notifications.unread_count);
+  const unread_count = useSelector((s) => s.notifications?.unread_count || 0);
   const panelRef = useRef(null);
 
   useEffect(() => {
@@ -27,47 +27,16 @@ export default function NotificationBell() {
   }, []);
 
   return (
-    <div ref={panelRef} style={{ position: "relative", display: "inline-block" }}>
+    <div ref={panelRef} className='notification-bell-wrapper'>
       <button
         onClick={() => setOpen((prev) => !prev)}
         aria-label={`Notifications${unread_count > 0 ? `, ${unread_count} unread` : ""}`}
         aria-expanded={open}
-        style={{
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          position: "relative",
-          padding: "8px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minWidth: "44px",
-          minHeight: "44px",
-          borderRadius: "50%",
-        }}
+        className='notification-bell-btn'
       >
         <FiBell size={22} />
         {unread_count > 0 && (
-          <span
-            aria-hidden="true"
-            style={{
-              position: "absolute",
-              top: "4px",
-              right: "4px",
-              background: "#e53935",
-              color: "white",
-              borderRadius: "50%",
-              minWidth: "16px",
-              height: "16px",
-              fontSize: "10px",
-              fontWeight: "bold",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "0 3px",
-              lineHeight: 1,
-            }}
-          >
+          <span className='notification-badge' aria-hidden='true'>
             {unread_count > 99 ? "99+" : unread_count}
           </span>
         )}
@@ -75,4 +44,6 @@ export default function NotificationBell() {
       {open && <NotificationList onClose={() => setOpen(false)} />}
     </div>
   );
-}
+};
+
+export default NotificationBell;
