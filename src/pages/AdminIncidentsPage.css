@@ -144,6 +144,84 @@
   color: #89929f;
 }
 
+/* =========================
+   BULK ACTIONS
+========================= */
+
+.bulk-action-bar {
+  background: #fff8f7;
+  border: 1px solid #f1d7d5;
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bulk-action-bar > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bulk-action-bar strong {
+  color: #0d182a;
+  font-size: 11px;
+}
+
+.clear-selection {
+  border: none;
+  background: transparent;
+  color: #e53935;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.bulk-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bulk-controls select {
+  border: 1px solid #dfe3e8;
+  background: white;
+  border-radius: 5px;
+  padding: 8px 10px;
+  font-size: 10px;
+  outline: none;
+}
+
+.bulk-update-btn {
+  border: none;
+  background: #e53935;
+  color: white;
+  border-radius: 5px;
+  padding: 8px 14px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.bulk-update-btn:hover {
+  background: #c62828;
+}
+
+/* Checkbox */
+
+.checkbox-column {
+  width: 40px;
+}
+
+.admin-incidents-table input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  accent-color: #e53935;
+}
+
 @media (max-width: 700px) {
   .admin-incidents-page {
     padding: 20px 15px;
@@ -155,5 +233,19 @@
 
   .incident-filters input {
     width: auto;
+  }
+
+  .bulk-action-bar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .bulk-controls {
+    width: 100%;
+  }
+
+  .bulk-controls select {
+    flex: 1;
   }
 }

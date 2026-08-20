@@ -2,13 +2,22 @@ import { useState } from "react";
 import "./AdminIncidentsPage.css";
 import { useNavigate } from "react-router-dom";
 import React from "react";
+import { useDispatch } from "react-redux";
+import {
+  bulkUpdateIncidentStatus,
+} from "../redux/slices/adminSlice";
+
 function AdminIncidentsPage() {
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [typeFilter, setTypeFilter] = useState("All");
   const navigate = useNavigate();
 
-  const incidents = [
+  const dispatch = useDispatch();
+  dispatch(
+  bulkUpdateIncidentStatus({
+    ids: selectedIds,
+    status: bulkStatus,
+  })
+  );
+  const [incidents, setIncidents] = useState([
     {
       id: "AJ-2026-001234",
       title: "Road Accident",
@@ -54,73 +63,223 @@ function AdminIncidentsPage() {
       priority: "Medium",
       reportedAt: "09 May 2024",
     },
-  ];
+  ]);
+
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [bulkStatus, setBulkStatus] = useState("");
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [typeFilter, setTypeFilter] = useState("All");
 
   const filteredIncidents = incidents.filter((incident) => {
+    const searchValue = search.toLowerCase();
+
     const matchesSearch =
-      incident.id.toLowerCase().includes(search.toLowerCase()) ||
-      incident.title.toLowerCase().includes(search.toLowerCase()) ||
-      incident.location.toLowerCase().includes(search.toLowerCase());
+      incident.id.toLowerCase().includes(searchValue) ||
+      incident.title.toLowerCase().includes(searchValue) ||
+      incident.location.toLowerCase().includes(searchValue);
 
     const matchesStatus =
-      statusFilter === "All" || incident.status === statusFilter;
+      statusFilter === "All" ||
+      incident.status === statusFilter;
 
-    const matchesType =
-      typeFilter === "All" || incident.type === typeFilter;
-
-    return matchesSearch && matchesStatus && matchesType;
+    return matchesSearch && matchesStatus;
   });
 
+  function handleSelectIncident(id) {
+    setSelectedIds((current) => {
+      if (current.includes(id)) {
+        return current.filter(
+          (selectedId) => selectedId !== id
+        );
+      }
+
+      return [...current, id];
+    });
+  }
+
+  function handleSelectAll() {
+    const visibleIds = filteredIncidents.map(
+      (incident) => incident.id
+    );
+
+    const allSelected = visibleIds.every((id) =>
+      selectedIds.includes(id)
+    );
+
+    if (allSelected) {
+      setSelectedIds((current) =>
+        current.filter(
+          (id) => !visibleIds.includes(id)
+        )
+      );
+    } else {
+      setSelectedIds((current) => [
+        ...new Set([...current, ...visibleIds]),
+      ]);
+    }
+  }
+
+  function handleBulkUpdate() {
+    if (!bulkStatus) {
+      alert("Please select a status.");
+      return;
+    }
+
+    if (selectedIds.length === 0) {
+      alert("Please select at least one incident.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Update ${selectedIds.length} incident(s) to "${bulkStatus}"?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setIncidents((currentIncidents) =>
+      currentIncidents.map((incident) =>
+        selectedIds.includes(incident.id)
+          ? {
+              ...incident,
+              status: bulkStatus,
+            }
+          : incident
+      )
+    );
+
+    setSelectedIds([]);
+    setBulkStatus("");
+  }
+
+  const visibleIds = filteredIncidents.map(
+    (incident) => incident.id
+  );
+
+  const allVisibleSelected =
+    visibleIds.length > 0 &&
+    visibleIds.every((id) =>
+      selectedIds.includes(id)
+    );
+
   return (
-    <div className="admin-incidents-page">
-      <div className="admin-incidents-header">
+    <div className="admin-incidents">
+      {/* Header */}
+
+      <div className="incidents-header">
         <div>
           <h1>Incident Reports</h1>
-          <p>View and manage all emergency reports.</p>
+
+          <p>
+            Manage and monitor all emergency reports.
+          </p>
+        </div>
+
+        <div className="incident-count">
+          {filteredIncidents.length} reports
         </div>
       </div>
+
+      {/* Search and filter */}
 
       <div className="incident-filters">
         <input
           type="text"
-          placeholder="Search reports..."
+          placeholder="Search incident ID, title or location..."
           value={search}
-          onChange={(event) => setSearch(event.target.value)}
+          onChange={(event) =>
+            setSearch(event.target.value)
+          }
         />
 
         <select
           value={statusFilter}
-          onChange={(event) => setStatusFilter(event.target.value)}
+          onChange={(event) =>
+            setStatusFilter(event.target.value)
+          }
         >
           <option value="All">All Statuses</option>
           <option value="Reported">Reported</option>
-          <option value="In Progress">In Progress</option>
+          <option value="In Progress">
+            In Progress
+          </option>
           <option value="Resolved">Resolved</option>
-        </select>
-
-        <select
-          value={typeFilter}
-          onChange={(event) => setTypeFilter(event.target.value)}
-        >
-          <option value="All">All Types</option>
-          <option value="Accident">Accident</option>
-          <option value="Fire">Fire</option>
-          <option value="Medical">Medical</option>
-          <option value="Other">Other</option>
         </select>
       </div>
 
-      <div className="admin-incidents-table-container">
+      {/* Bulk action bar */}
+
+      {selectedIds.length > 0 && (
+        <div className="bulk-action-bar">
+          <div>
+            <strong>
+              {selectedIds.length} selected
+            </strong>
+
+            <button
+              className="clear-selection"
+              onClick={() => setSelectedIds([])}
+            >
+              Clear
+            </button>
+          </div>
+
+          <div className="bulk-controls">
+            <select
+              value={bulkStatus}
+              onChange={(event) =>
+                setBulkStatus(event.target.value)
+              }
+            >
+              <option value="">
+                Change status to...
+              </option>
+
+              <option value="Reported">
+                Reported
+              </option>
+
+              <option value="In Progress">
+                In Progress
+              </option>
+
+              <option value="Resolved">
+                Resolved
+              </option>
+            </select>
+
+            <button
+              className="bulk-update-btn"
+              onClick={handleBulkUpdate}
+            >
+              Apply
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Table */}
+
+      <div className="incidents-table-container">
         <table className="admin-incidents-table">
           <thead>
             <tr>
-              <th>Report ID</th>
+              <th className="checkbox-column">
+                <input
+                  type="checkbox"
+                  checked={allVisibleSelected}
+                  onChange={handleSelectAll}
+                />
+              </th>
+
               <th>Incident</th>
-              <th>Location</th>
               <th>Type</th>
-              <th>Status</th>
+              <th>Location</th>
               <th>Priority</th>
-              <th>Reported</th>
+              <th>Status</th>
+              <th>Date</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -128,19 +287,45 @@ function AdminIncidentsPage() {
           <tbody>
             {filteredIncidents.map((incident) => (
               <tr key={incident.id}>
-                <td>{incident.id}</td>
-
                 <td>
-                  <strong>{incident.title}</strong>
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(
+                      incident.id
+                    )}
+                    onChange={() =>
+                      handleSelectIncident(
+                        incident.id
+                      )
+                    }
+                  />
                 </td>
 
-                <td>{incident.location}</td>
+                <td>
+                  <div className="incident-name">
+                    <strong>
+                      {incident.title}
+                    </strong>
+
+                    <span>{incident.id}</span>
+                  </div>
+                </td>
 
                 <td>{incident.type}</td>
 
+                <td>{incident.location}</td>
+
                 <td>
                   <span
-                    className={`admin-status ${incident.status
+                    className={`priority-badge ${incident.priority.toLowerCase()}`}
+                  >
+                    {incident.priority}
+                  </span>
+                </td>
+
+                <td>
+                  <span
+                    className={`incident-status ${incident.status
                       .toLowerCase()
                       .replace(" ", "-")}`}
                   >
@@ -148,23 +333,18 @@ function AdminIncidentsPage() {
                   </span>
                 </td>
 
-                <td>
-                  <span
-                    className={`admin-priority ${incident.priority.toLowerCase()}`}
-                  >
-                    {incident.priority}
-                  </span>
-                </td>
-
-                <td>{incident.reportedAt}</td>
+                <td>{incident.date}</td>
 
                 <td>
-                  <button className="view-incident-btn"
+                  <button
+                    className="view-incident-btn"
                     onClick={() =>
-                     navigate(`/admin/incidents/${incident.id}`)
+                      navigate(
+                        `/admin/incidents/${incident.id}`
+                      )
                     }
-                    >
-                     View
+                  >
+                    View
                   </button>
                 </td>
               </tr>
@@ -174,7 +354,7 @@ function AdminIncidentsPage() {
 
         {filteredIncidents.length === 0 && (
           <div className="no-incidents">
-            <p>No incidents found.</p>
+            No incidents found.
           </div>
         )}
       </div>

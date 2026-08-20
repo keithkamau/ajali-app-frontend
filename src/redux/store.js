@@ -4,6 +4,7 @@ import authReducer from "./slices/authSlice";
 import incidentReducer from "./slices/incidentSlice";
 import notificationReducer from "./slices/notificationSlice";
 import uiReducer from "./slices/uiSlice";
+import adminReducer from "../redux/slices/adminSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     incidents: incidentReducer,
     notifications: notificationReducer,
     ui: uiReducer,
+    admin: adminReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

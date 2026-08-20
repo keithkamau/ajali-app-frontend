@@ -1,18 +1,32 @@
-import { useState } from "react";
 import AnalyticsChart from "../components/admin/AnalyticsChart";
 import "./AdminAnalyticsPage.css";
 import React from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setStats } from "../redux/slices/adminSlice";
+import { getIncidentStats } from "../services/adminApi";
+
 function AdminAnalyticsPage() {
   const [period, setPeriod] = useState("7");
 
   // This will eventually come from:
   // GET /api/admin/incidents/stats
-  const stats = {
-    total: 248,
-    resolved: 174,
-    inProgress: 52,
-    critical: 22,
-  };
+
+  const dispatch = useDispatch();
+
+  const reduxStats = useSelector(
+  (state) => state.admin.stats
+);
+
+const stats =
+  reduxStats.total > 0
+    ? reduxStats
+    : {
+        total: 248,
+        resolved: 174,
+        inProgress: 52,
+        critical: 22,
+      };
 
   const trendData = [
     { label: "Mon", value: 18 },
@@ -37,6 +51,23 @@ function AdminAnalyticsPage() {
     { label: "In Progress", value: 52 },
     { label: "Reported", value: 22 },
   ];
+
+  useEffect(() => {
+  async function loadStats() {
+    try {
+      const response = await getIncidentStats();
+
+      dispatch(setStats(response.data));
+    } catch (error) {
+      console.error(
+        "Failed to load admin statistics:",
+        error
+      );
+    }
+  }
+
+  loadStats();
+}, [dispatch]);
 
   return (
     <div className="admin-analytics">
