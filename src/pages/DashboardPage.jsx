@@ -13,7 +13,7 @@ export const DashboardPage = () => {
   }, [dispatch]);
 
   return (
-    <section className='dashboard-page'>
+    <div className='dashboard-page'>
       <div className='page-heading'>
         <div>
           <p className='eyebrow'>My reports</p>
@@ -28,7 +28,7 @@ export const DashboardPage = () => {
       </div>
       {error && <div className='alert alert-error'>{error}</div>}
       <IncidentList incidents={items} loading={loading} />
-    </section>
+    </div>
   );
 };
 
