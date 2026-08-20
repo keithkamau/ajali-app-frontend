@@ -2168,3 +2168,265 @@ select.input {
 .recent-incident-type {
   text-transform: capitalize;
 }
+
+/* ============================================
+   INCIDENT DETAIL PAGE STYLES
+   ============================================ */
+.incident-detail-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0.5rem 0;
+}
+
+.incident-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.incident-detail-ref {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--color-ink-muted);
+}
+
+.incident-detail-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .incident-detail-card {
+    padding: 2rem;
+  }
+}
+
+.incident-detail-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.incident-detail-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.incident-detail-type {
+  font-size: 0.75rem;
+  text-transform: capitalize;
+  color: var(--color-ink-muted);
+  background-color: var(--color-ground);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.incident-detail-anonymous {
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+  background-color: var(--color-ground);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.incident-detail-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.incident-detail-title {
+  margin-bottom: 0.75rem;
+}
+
+.incident-detail-meta {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.incident-detail-meta > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.incident-detail-description {
+  margin-top: 0.5rem;
+}
+
+.incident-detail-description h3 {
+  margin-bottom: 0.5rem;
+}
+
+/* Location Section */
+.incident-location {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.location-coords {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.location-coord-text {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: var(--color-ink-muted);
+  margin-top: 0.25rem;
+}
+
+.location-address {
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+.location-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-left: 2.25rem;
+}
+
+/* Timeline */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 0.5rem 0;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 1rem;
+  position: relative;
+}
+
+.timeline-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 24px;
+  bottom: -0.75rem;
+  width: 2px;
+  background-color: var(--color-border);
+}
+
+.timeline-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background-color: var(--color-border);
+  border: 2px solid var(--color-surface);
+  flex-shrink: 0;
+  margin-top: 3px;
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-item.active .timeline-dot {
+  background-color: var(--color-navy);
+}
+
+.timeline-item.resolved .timeline-dot {
+  background-color: var(--color-green);
+}
+
+.timeline-item.rejected .timeline-dot {
+  background-color: var(--color-red);
+}
+
+.timeline-content {
+  flex: 1;
+}
+
+.timeline-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--color-ink);
+}
+
+.timeline-time {
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+  margin-top: 0.125rem;
+}
+
+.timeline-desc {
+  font-size: 0.875rem;
+  color: var(--color-ink-muted);
+  margin-top: 0.25rem;
+}
+
+/* Tracking Options */
+.tracking-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tracking-options .btn {
+  justify-content: center;
+}
+
+/* Map Modal */
+.modal-map .modal-content {
+  max-width: 600px;
+}
+
+.map-placeholder {
+  min-height: 300px;
+  background-color: var(--color-ground);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--color-border);
+}
+
+.map-placeholder-content {
+  text-align: center;
+  padding: 2rem;
+}
+
+.map-placeholder-address {
+  font-weight: 500;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.map-placeholder-coords {
+  font-size: 0.875rem;
+  color: var(--color-ink-muted);
+  margin-bottom: 1rem;
+}
+
+/* Loading State */
+.loading-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.empty-state .spinner {
+  margin: 0 auto 1rem;
+}
