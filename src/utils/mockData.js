@@ -149,3 +149,26 @@ export const mockNotifications = [
     link: "/incidents/4",
   },
 ];
+
+export const mockUsers = [
+  {
+    id: 1,
+    email: 'user@ajali.com',
+    password: 'Password123',
+    full_name: 'Test User',
+    phone_number: '0712345678',
+    role: 'user',
+    is_active: true,
+    is_verified: true,
+  },
+  {
+    id: 2,
+    email: 'admin@ajali.com',
+    password: 'Admin123',
+    full_name: 'Admin User',
+    phone_number: '0712345679',
+    role: 'admin',
+    is_active: true,
+    is_verified: true,
+  },
+];
