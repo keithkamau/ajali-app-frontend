@@ -1,4 +1,4 @@
-.admin-incidents-page {
+.admin-incidents{
   min-height: 100vh;
   background: #f4f6f8;
   padding: 30px 34px;
@@ -9,12 +9,13 @@
   margin-bottom: 24px;
 }
 
-.admin-incidents-header h1 {
+.incidents-header h1 {
   margin: 0;
+  color: #0d182a;
   font-size: 24px;
 }
 
-.admin-incidents-header p {
+.incidents-header p {
   margin-top: 6px;
   color: #7a8492;
   font-size: 13px;
@@ -24,6 +25,18 @@
   display: flex;
   gap: 12px;
   margin-bottom: 20px;
+}
+
+.incident-count {
+  background: #fff0ef;
+  color: #e53935;
+  border-radius: 20px;
+  padding: 8px 13px;
+  font-size: 11px;
+  font-weight: 600;
+  width:fit-content;
+  margin-top: 7px;
+  margin-bottom: 7px;
 }
 
 .incident-filters input,
@@ -46,14 +59,14 @@
   border-color: #e53935;
 }
 
-.admin-incidents-table-container {
+.incidents-table-container {
   background: white;
   border: 1px solid #e7eaee;
   border-radius: 10px;
   overflow-x: auto;
 }
 
-.admin-incidents-table {
+.incidents-table {
   width: 100%;
   min-width: 900px;
   border-collapse: collapse;
