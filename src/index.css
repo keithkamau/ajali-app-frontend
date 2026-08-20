@@ -1940,3 +1940,17 @@ select.input {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* ============================================
+   PROFILE PAGE - Add these styles
+   ============================================ */
+.profile-menu-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.profile-menu-item:hover .profile-menu-arrow {
+  transform: translateX(4px);
+}

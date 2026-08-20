@@ -1,7 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { CreateIcon, EmergencyIcon } from "../components/icons";
+import {
+  CreateIcon,
+  EmergencyIcon,
+  ReportsIcon,
+  ResolvedIcon,
+} from "../components/icons";
 
 export const HomePage = () => {
   const { user } = useSelector((state) => state.auth);
@@ -25,11 +30,15 @@ export const HomePage = () => {
           <span>Report Incident</span>
         </Link>
         <Link to='/dashboard' className='quick-action-btn'>
-          <span className='action-icon'>📋</span>
+          <span className='action-icon'>
+            <ReportsIcon color='var(--color-navy)' size={28} />
+          </span>
           <span>My Reports</span>
         </Link>
         <Link to='/activity' className='quick-action-btn'>
-          <span className='action-icon'>✅</span>
+          <span className='action-icon'>
+            <ResolvedIcon color='var(--color-green)' size={28} />
+          </span>
           <span>Resolved</span>
         </Link>
         <button className='quick-action-btn danger'>
