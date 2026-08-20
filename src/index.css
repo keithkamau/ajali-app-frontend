@@ -1953,3 +1953,105 @@ a:hover {
   padding: 0.5rem 0;
   width: 100%;
 }
+
+/* Admin Incidents Page */
+.admin-incidents-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.5rem 0;
+  width: 100%;
+}
+
+/* Priority Badges */
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+.priority-critical {
+  background-color: var(--color-red-light);
+  color: var(--color-red);
+}
+
+.priority-high {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.priority-medium {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+.priority-low {
+  background-color: var(--color-ground);
+  color: var(--color-ink-muted);
+}
+
+/* Incident Detail Grid */
+.incident-detail-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .incident-detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.incident-side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.incident-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 480px) {
+  .incident-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.incident-info-grid div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.incident-info-grid label {
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+}
+
+.incident-description {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.incident-location {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+}
+
+/* History Header */
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
