@@ -1,10 +1,12 @@
 import { useState } from "react";
 import "./AdminIncidentsPage.css";
+import { useNavigate } from "react-router-dom";
 import React from "react";
 function AdminIncidentsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [typeFilter, setTypeFilter] = useState("All");
+  const navigate = useNavigate();
 
   const incidents = [
     {
@@ -157,8 +159,12 @@ function AdminIncidentsPage() {
                 <td>{incident.reportedAt}</td>
 
                 <td>
-                  <button className="view-incident-btn">
-                    View
+                  <button className="view-incident-btn"
+                    onClick={() =>
+                     navigate(`/admin/incidents/${incident.id}`)
+                    }
+                    >
+                     View
                   </button>
                 </td>
               </tr>
