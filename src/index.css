@@ -2100,3 +2100,71 @@ select.input {
     flex-direction: column;
   }
 }
+
+/* ============================================
+   HOME PAGE - RECENT ACTIVITY STYLES
+   ============================================ */
+.home-recent-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.recent-incidents {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.recent-incident-item {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+}
+
+.recent-incident-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+  text-decoration: none;
+}
+
+.recent-incident-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.recent-incident-ref {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+}
+
+.recent-incident-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: var(--color-ink);
+  margin-bottom: 0.25rem;
+}
+
+.recent-incident-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+}
+
+.recent-incident-type {
+  text-transform: capitalize;
+}
