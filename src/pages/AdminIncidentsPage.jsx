@@ -1,7 +1,7 @@
-import { useState } from "react";
-import "./AdminIncidentsPage.css";
+// src/pages/AdminIncidentsPage.jsx
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import React from "react";
+
 function AdminIncidentsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
@@ -65,118 +65,140 @@ function AdminIncidentsPage() {
     const matchesStatus =
       statusFilter === "All" || incident.status === statusFilter;
 
-    const matchesType =
-      typeFilter === "All" || incident.type === typeFilter;
+    const matchesType = typeFilter === "All" || incident.type === typeFilter;
 
     return matchesSearch && matchesStatus && matchesType;
   });
 
+  const getStatusBadgeClass = (status) => {
+    const statusMap = {
+      Reported: "status-badge-pending",
+      "In Progress": "status-badge-under-investigation",
+      Resolved: "status-badge-resolved",
+      Rejected: "status-badge-rejected",
+    };
+    return statusMap[status] || "status-badge-pending";
+  };
+
+  const getPriorityClass = (priority) => {
+    const priorityMap = {
+      Critical: "priority-critical",
+      High: "priority-high",
+      Medium: "priority-medium",
+      Low: "priority-low",
+    };
+    return priorityMap[priority] || "priority-medium";
+  };
+
   return (
-    <div className="admin-incidents-page">
-      <div className="admin-incidents-header">
-        <div>
-          <h1>Incident Reports</h1>
-          <p>View and manage all emergency reports.</p>
+    <div className='admin-incidents-page'>
+      <div className='page-header'>
+        <h1 className='heading-2'>Incident Reports</h1>
+        <p className='body-small text-muted'>
+          View and manage all emergency reports.
+        </p>
+      </div>
+
+      <div className='admin-toolbar'>
+        <div className='admin-toolbar-left'>
+          <input
+            type='text'
+            className='input'
+            placeholder='Search reports...'
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </div>
+        <div className='admin-toolbar-right'>
+          <select
+            className='input'
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value)}
+            style={{ maxWidth: "150px" }}
+          >
+            <option value='All'>All Statuses</option>
+            <option value='Reported'>Reported</option>
+            <option value='In Progress'>In Progress</option>
+            <option value='Resolved'>Resolved</option>
+          </select>
+
+          <select
+            className='input'
+            value={typeFilter}
+            onChange={(event) => setTypeFilter(event.target.value)}
+            style={{ maxWidth: "150px" }}
+          >
+            <option value='All'>All Types</option>
+            <option value='Accident'>Accident</option>
+            <option value='Fire'>Fire</option>
+            <option value='Medical'>Medical</option>
+            <option value='Other'>Other</option>
+          </select>
         </div>
       </div>
 
-      <div className="incident-filters">
-        <input
-          type="text"
-          placeholder="Search reports..."
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-        />
+      <div className='admin-table-wrapper'>
+        <div className='card'>
+          {filteredIncidents.length === 0 ? (
+            <div className='empty-state'>
+              <p className='body-text text-muted'>No incidents found.</p>
+            </div>
+          ) : (
+            <div className='admin-table'>
+              <div className='admin-table-header'>
+                <span>Report ID</span>
+                <span>Incident</span>
+                <span>Location</span>
+                <span>Type</span>
+                <span>Status</span>
+                <span>Priority</span>
+                <span>Reported</span>
+                <span>Action</span>
+              </div>
 
-        <select
-          value={statusFilter}
-          onChange={(event) => setStatusFilter(event.target.value)}
-        >
-          <option value="All">All Statuses</option>
-          <option value="Reported">Reported</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Resolved">Resolved</option>
-        </select>
-
-        <select
-          value={typeFilter}
-          onChange={(event) => setTypeFilter(event.target.value)}
-        >
-          <option value="All">All Types</option>
-          <option value="Accident">Accident</option>
-          <option value="Fire">Fire</option>
-          <option value="Medical">Medical</option>
-          <option value="Other">Other</option>
-        </select>
-      </div>
-
-      <div className="admin-incidents-table-container">
-        <table className="admin-incidents-table">
-          <thead>
-            <tr>
-              <th>Report ID</th>
-              <th>Incident</th>
-              <th>Location</th>
-              <th>Type</th>
-              <th>Status</th>
-              <th>Priority</th>
-              <th>Reported</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {filteredIncidents.map((incident) => (
-              <tr key={incident.id}>
-                <td>{incident.id}</td>
-
-                <td>
-                  <strong>{incident.title}</strong>
-                </td>
-
-                <td>{incident.location}</td>
-
-                <td>{incident.type}</td>
-
-                <td>
+              {filteredIncidents.map((incident) => (
+                <div key={incident.id} className='admin-table-row'>
                   <span
-                    className={`admin-status ${incident.status
-                      .toLowerCase()
-                      .replace(" ", "-")}`}
+                    className='admin-table-reference'
+                    data-label='Report ID'
                   >
-                    {incident.status}
+                    {incident.id}
                   </span>
-                </td>
-
-                <td>
-                  <span
-                    className={`admin-priority ${incident.priority.toLowerCase()}`}
-                  >
-                    {incident.priority}
+                  <span data-label='Incident'>
+                    <strong>{incident.title}</strong>
                   </span>
-                </td>
-
-                <td>{incident.reportedAt}</td>
-
-                <td>
-                  <button className="view-incident-btn"
-                    onClick={() =>
-                     navigate(`/admin/incidents/${incident.id}`)
-                    }
+                  <span data-label='Location'>{incident.location}</span>
+                  <span data-label='Type'>{incident.type}</span>
+                  <span data-label='Status'>
+                    <span
+                      className={`status-badge ${getStatusBadgeClass(incident.status)}`}
                     >
-                     View
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {filteredIncidents.length === 0 && (
-          <div className="no-incidents">
-            <p>No incidents found.</p>
-          </div>
-        )}
+                      {incident.status}
+                    </span>
+                  </span>
+                  <span data-label='Priority'>
+                    <span
+                      className={`priority-badge ${getPriorityClass(incident.priority)}`}
+                    >
+                      {incident.priority}
+                    </span>
+                  </span>
+                  <span data-label='Reported'>{incident.reportedAt}</span>
+                  <span data-label='Action'>
+                    <button
+                      className='btn btn-sm btn-secondary'
+                      onClick={() =>
+                        navigate(`/admin/incidents/${incident.id}`)
+                      }
+                    >
+                      View
+                    </button>
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
