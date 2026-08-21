@@ -123,14 +123,14 @@ function AdminIncidentsPage() {
           <input
             type='text'
             className='input'
-            placeholder='Search by ID, title, location or user...'
+            placeholder='Search...'
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
         </div>
         <div className='admin-toolbar-right'>
           <select
-            className='input'
+            className='input admin-filter-select'
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
           >
@@ -142,7 +142,7 @@ function AdminIncidentsPage() {
           </select>
 
           <select
-            className='input'
+            className='input admin-filter-select'
             value={typeFilter}
             onChange={(event) => setTypeFilter(event.target.value)}
           >
