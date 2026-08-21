@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import "./AdminIncidentDetailPage.css";
 import React from "react";
+import StatusHistory from "../components/admin/StatusHistory";
+
 function AdminIncidentDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -37,6 +39,27 @@ function AdminIncidentDetailPage() {
       by: "System",
       comment: "Incident report submitted.",
     },
+  ];
+
+  const mockHistory = [
+  {
+    id: 1,
+    old_status: "Reported",
+    new_status: "In Progress",
+    changed_by: "Admin",
+    changed_at: "Today, 10:45 AM",
+    comment:
+      "Emergency response team has been dispatched.",
+  },
+  {
+    id: 2,
+    old_status: "In Progress",
+    new_status: "Resolved",
+    changed_by: "Admin",
+    changed_at: "Today, 11:30 AM",
+    comment:
+      "Incident successfully handled.",
+  },
   ];
 
   function handleStatusChange(event) {
@@ -171,9 +194,6 @@ function AdminIncidentDetailPage() {
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
       {/* Status history */}
       <div className="status-history-card">
         <div className="history-header">
@@ -202,6 +222,8 @@ function AdminIncidentDetailPage() {
           ))}
         </div>
       </div>
+        </div>
+
     </div>
   );
 }
