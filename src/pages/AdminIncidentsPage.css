@@ -1,0 +1,159 @@
+.admin-incidents-page {
+  min-height: 100vh;
+  background: #f4f6f8;
+  padding: 30px 34px;
+  color: #0d182a;
+}
+
+.admin-incidents-header {
+  margin-bottom: 24px;
+}
+
+.admin-incidents-header h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.admin-incidents-header p {
+  margin-top: 6px;
+  color: #7a8492;
+  font-size: 13px;
+}
+
+.incident-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.incident-filters input,
+.incident-filters select {
+  border: 1px solid #dfe3e8;
+  background: white;
+  border-radius: 7px;
+  padding: 11px 13px;
+  font-size: 13px;
+  outline: none;
+}
+
+.incident-filters input {
+  flex: 1;
+  min-width: 220px;
+}
+
+.incident-filters input:focus,
+.incident-filters select:focus {
+  border-color: #e53935;
+}
+
+.admin-incidents-table-container {
+  background: white;
+  border: 1px solid #e7eaee;
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.admin-incidents-table {
+  width: 100%;
+  min-width: 900px;
+  border-collapse: collapse;
+}
+
+.admin-incidents-table th {
+  background: #fafbfc;
+  color: #7c8693;
+  text-align: left;
+  font-size: 11px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e7eaee;
+}
+
+.admin-incidents-table td {
+  padding: 15px 16px;
+  border-bottom: 1px solid #edf0f3;
+  font-size: 12px;
+  color: #4c5664;
+}
+
+.admin-incidents-table tbody tr:hover {
+  background: #fafbfc;
+}
+
+.admin-incidents-table td:first-child {
+  color: #0d182a;
+  font-weight: 600;
+}
+
+.admin-status,
+.admin-priority {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.admin-status.reported {
+  background: #fff0ef;
+  color: #e53935;
+}
+
+.admin-status.in-progress {
+  background: #fff4df;
+  color: #c27a00;
+}
+
+.admin-status.resolved {
+  background: #e7f8ef;
+  color: #219653;
+}
+
+.admin-priority.critical {
+  background: #fff0ef;
+  color: #d32f2f;
+}
+
+.admin-priority.high {
+  background: #fff4df;
+  color: #c27a00;
+}
+
+.admin-priority.medium {
+  background: #eef2f7;
+  color: #526173;
+}
+
+.view-incident-btn {
+  border: 1px solid #0d182a;
+  background: white;
+  color: #0d182a;
+  border-radius: 5px;
+  padding: 6px 12px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.view-incident-btn:hover {
+  background: #0d182a;
+  color: white;
+}
+
+.no-incidents {
+  text-align: center;
+  padding: 40px;
+  color: #89929f;
+}
+
+@media (max-width: 700px) {
+  .admin-incidents-page {
+    padding: 20px 15px;
+  }
+
+  .incident-filters {
+    flex-direction: column;
+  }
+
+  .incident-filters input {
+    width: auto;
+  }
+}
