@@ -135,7 +135,7 @@ function AdminIncidentDetailPage() {
 
         {/* Admin controls */}
         <div className="incident-side-column">
-          <div className="admin-control-card">
+          {/* <div className="admin-control-card">
             <h2>Update Status</h2>
 
             <p>
@@ -157,7 +157,7 @@ function AdminIncidentDetailPage() {
             >
               Update Status
             </button>
-          </div>
+          </div> */}
 
           <div className="admin-control-card">
             <h2>Incident Priority</h2>

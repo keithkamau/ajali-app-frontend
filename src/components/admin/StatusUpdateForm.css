@@ -1,0 +1,126 @@
+.status-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 24, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.status-modal {
+  width: 100%;
+  max-width: 480px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+}
+
+.status-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  border-bottom: 1px solid #edf0f2;
+}
+
+.status-modal-header h2 {
+  margin: 0 0 5px;
+  font-size: 16px;
+  color: #0d182a;
+}
+
+.status-modal-header p {
+  margin: 0;
+  font-size: 10px;
+  color: #929ba7;
+}
+
+.close-button {
+  border: none;
+  background: none;
+  color: #7b8491;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.status-modal form {
+  padding: 20px;
+}
+
+.status-form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+}
+
+.status-form-group label {
+  margin-bottom: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #354052;
+}
+
+.status-form-group select,
+.status-form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #dfe3e8;
+  border-radius: 6px;
+  padding: 10px;
+  font-family: inherit;
+  font-size: 11px;
+  outline: none;
+}
+
+.status-form-group select:focus,
+.status-form-group textarea:focus {
+  border-color: #e53935;
+}
+
+.status-form-group textarea {
+  resize: vertical;
+}
+
+.status-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cancel-button,
+.update-button {
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancel-button {
+  background: #f0f2f4;
+  color: #4f5968;
+}
+
+.update-button {
+  background: #e53935;
+  color: #ffffff;
+}
+
+.update-button:hover {
+  background: #c62828;
+}
+
+.status-success {
+  background: #edf8f0;
+  border: 1px solid #ccebd3;
+
+  color: #26743a;
+  padding: 9px 12px;
+  border-radius: 5px;
+  font-size: 10px;
+}

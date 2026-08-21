@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import StatusUpdateForm from "../components/admin/StatusUpdateForm";
 
 import {
   setIncidents,
@@ -74,6 +75,7 @@ function AdminIncidentsPage() {
   const [bulkStatus, setBulkStatus] = useState("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
+  const [selectedIncident, setSelectedIncident] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
@@ -470,6 +472,11 @@ function AdminIncidentsPage() {
                   >
                     View
                   </button>
+                  <button
+                    onClick={() => setSelectedIncident(incident)}
+                  >
+                    Update Status
+                  </button>
                 </td>
               </tr>
             ))}
@@ -481,6 +488,12 @@ function AdminIncidentsPage() {
             <div className="no-incidents">
               No incidents found.
             </div>
+          )}
+          {selectedIncident && (
+            <StatusUpdateForm
+              incident={selectedIncident}
+              onClose={() => setSelectedIncident(null)}
+            />
           )}
       </div>
     </div>
