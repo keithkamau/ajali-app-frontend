@@ -133,7 +133,6 @@ function AdminIncidentsPage() {
             className='input'
             value={statusFilter}
             onChange={(event) => setStatusFilter(event.target.value)}
-            style={{ maxWidth: "150px" }}
           >
             <option value='All'>All Statuses</option>
             <option value='Reported'>Reported</option>
@@ -146,7 +145,6 @@ function AdminIncidentsPage() {
             className='input'
             value={typeFilter}
             onChange={(event) => setTypeFilter(event.target.value)}
-            style={{ maxWidth: "150px" }}
           >
             <option value='All'>All Types</option>
             <option value='Accident'>Accident</option>
@@ -158,57 +156,59 @@ function AdminIncidentsPage() {
       </div>
 
       <div className='admin-table-wrapper'>
-        <div className='card' style={{ overflow: "auto" }}>
-          {filteredIncidents.length === 0 ? (
-            <div className='empty-state'>
-              <p className='body-text text-muted'>No incidents found.</p>
-            </div>
-          ) : (
-            <table className='admin-table'>
-              <thead>
-                <tr>
-                  <th>Report ID</th>
-                  <th>Incident</th>
-                  <th>Location</th>
-                  <th>User</th>
-                  <th>Status</th>
-                  <th>Priority</th>
-                  <th>Reported</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredIncidents.map((incident) => (
-                  <tr
-                    key={incident.id}
-                    className='clickable-row'
-                    onClick={() => handleRowClick(incident.id)}
-                  >
-                    <td className='admin-table-reference'>{incident.id}</td>
-                    <td>
-                      <strong>{incident.title}</strong>
-                    </td>
-                    <td>{incident.location}</td>
-                    <td>{incident.user}</td>
-                    <td>
-                      <span
-                        className={`status-badge ${getStatusBadgeClass(incident.status)}`}
-                      >
-                        {incident.status}
-                      </span>
-                    </td>
-                    <td>
-                      <span
-                        className={`priority-badge ${getPriorityClass(incident.priority)}`}
-                      >
-                        {incident.priority}
-                      </span>
-                    </td>
-                    <td>{incident.reportedAt}</td>
+        <div className='card'>
+          <div className='admin-table-responsive'>
+            {filteredIncidents.length === 0 ? (
+              <div className='empty-state'>
+                <p className='body-text text-muted'>No incidents found.</p>
+              </div>
+            ) : (
+              <table className='admin-table'>
+                <thead>
+                  <tr>
+                    <th>Report ID</th>
+                    <th>Incident</th>
+                    <th>Location</th>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Reported</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+                </thead>
+                <tbody>
+                  {filteredIncidents.map((incident) => (
+                    <tr
+                      key={incident.id}
+                      className='clickable-row'
+                      onClick={() => handleRowClick(incident.id)}
+                    >
+                      <td className='admin-table-reference'>{incident.id}</td>
+                      <td>
+                        <strong>{incident.title}</strong>
+                      </td>
+                      <td>{incident.location}</td>
+                      <td>{incident.user}</td>
+                      <td>
+                        <span
+                          className={`status-badge ${getStatusBadgeClass(incident.status)}`}
+                        >
+                          {incident.status}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`priority-badge ${getPriorityClass(incident.priority)}`}
+                        >
+                          {incident.priority}
+                        </span>
+                      </td>
+                      <td>{incident.reportedAt}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
       </div>
     </div>

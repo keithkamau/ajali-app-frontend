@@ -119,48 +119,50 @@ export const AdminPage = () => {
           </div>
 
           <div className='admin-table-wrapper'>
-            <table className='admin-table'>
-              <thead>
-                <tr>
-                  <th>Report ID</th>
-                  <th>Incident</th>
-                  <th>User</th>
-                  <th>Status</th>
-                  <th>Priority</th>
-                  <th>Reported</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentIncidents.map((incident) => (
-                  <tr
-                    key={incident.id}
-                    className='clickable-row'
-                    onClick={() => handleRowClick(incident.id)}
-                  >
-                    <td className='admin-table-reference'>{incident.id}</td>
-                    <td>
-                      <strong>{incident.title}</strong>
-                    </td>
-                    <td>{incident.user}</td>
-                    <td>
-                      <span
-                        className={`status-badge ${getStatusBadgeClass(incident.status)}`}
-                      >
-                        {incident.status}
-                      </span>
-                    </td>
-                    <td>
-                      <span
-                        className={`priority-badge ${getPriorityClass(incident.priority)}`}
-                      >
-                        {incident.priority}
-                      </span>
-                    </td>
-                    <td>{incident.reportedAt}</td>
+            <div className='admin-table-responsive'>
+              <table className='admin-table'>
+                <thead>
+                  <tr>
+                    <th>Report ID</th>
+                    <th>Incident</th>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Reported</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {recentIncidents.map((incident) => (
+                    <tr
+                      key={incident.id}
+                      className='clickable-row'
+                      onClick={() => handleRowClick(incident.id)}
+                    >
+                      <td className='admin-table-reference'>{incident.id}</td>
+                      <td>
+                        <strong>{incident.title}</strong>
+                      </td>
+                      <td>{incident.user}</td>
+                      <td>
+                        <span
+                          className={`status-badge ${getStatusBadgeClass(incident.status)}`}
+                        >
+                          {incident.status}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`priority-badge ${getPriorityClass(incident.priority)}`}
+                        >
+                          {incident.priority}
+                        </span>
+                      </td>
+                      <td>{incident.reportedAt}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

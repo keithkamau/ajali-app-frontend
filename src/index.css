@@ -2188,6 +2188,136 @@ a:hover {
   }
 }
 
+/* ============================================
+   RESPONSIVE ADMIN TABLES - MOBILE FIRST
+   ============================================ */
+
+/* Wrapper for responsive tables */
+.admin-table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -0.5rem;
+  padding: 0 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .admin-table-responsive {
+    margin: 0;
+    padding: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .admin-table-wrapper .card {
+    padding: 0.5rem 0;
+  }
+  
+  .admin-table {
+    font-size: 0.75rem;
+    min-width: 650px;
+  }
+  
+  .admin-table thead th {
+    font-size: 0.65rem;
+    padding: 0.5rem 0.35rem;
+    white-space: nowrap;
+  }
+  
+  .admin-table tbody td {
+    padding: 0.5rem 0.35rem;
+    white-space: nowrap;
+  }
+  
+  .admin-table .admin-table-reference {
+    font-size: 0.6rem;
+  }
+  
+  .admin-table .status-badge,
+  .admin-table .priority-badge {
+    font-size: 0.6rem;
+    padding: 0.15rem 0.5rem;
+  }
+  
+  .admin-table .btn-sm {
+    font-size: 0.6rem;
+    padding: 0.2rem 0.5rem;
+  }
+  
+  .admin-table-wrapper .card::after {
+    content: '← Scroll →';
+    display: block;
+    text-align: center;
+    font-size: 0.6rem;
+    color: var(--color-ink-muted);
+    padding: 0.25rem 0 0;
+    opacity: 0.6;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-table {
+    font-size: 0.65rem;
+    min-width: 550px;
+  }
+  
+  .admin-table thead th {
+    font-size: 0.55rem;
+    padding: 0.4rem 0.25rem;
+  }
+  
+  .admin-table tbody td {
+    padding: 0.4rem 0.25rem;
+  }
+  
+  .admin-table .admin-table-reference {
+    font-size: 0.5rem;
+  }
+  
+  .admin-table .status-badge,
+  .admin-table .priority-badge {
+    font-size: 0.55rem;
+    padding: 0.1rem 0.4rem;
+  }
+  
+  .admin-table .btn-sm {
+    font-size: 0.55rem;
+    padding: 0.15rem 0.4rem;
+    margin: 0.1rem 0;
+  }
+  
+  .admin-table tbody td:last-child {
+    white-space: normal;
+  }
+  
+  .admin-table tbody td:last-child .btn {
+    display: inline-block;
+    margin-bottom: 0.15rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .admin-table {
+    font-size: 0.8rem;
+    min-width: 700px;
+  }
+  
+  .admin-table thead th {
+    font-size: 0.7rem;
+    padding: 0.6rem 0.4rem;
+  }
+  
+  .admin-table tbody td {
+    padding: 0.6rem 0.4rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .admin-table-wrapper .card::after {
+    display: none;
+  }
+}
+
 /* Mobile specific adjustments for admin pages */
 @media (max-width: 480px) {
   .admin-stats {
@@ -2197,20 +2327,6 @@ a:hover {
   
   .admin-table-wrapper .card {
     padding: 0.5rem;
-  }
-  
-  .admin-table {
-    font-size: 0.75rem;
-    min-width: 600px;
-  }
-  
-  .admin-table thead th,
-  .admin-table tbody td {
-    padding: 0.5rem 0.25rem;
-  }
-  
-  .admin-table .admin-table-reference {
-    font-size: 0.65rem;
   }
   
   .stat-card .stat-number {

@@ -103,7 +103,6 @@ function AdminUsersPage() {
             className='input'
             value={roleFilter}
             onChange={(event) => setRoleFilter(event.target.value)}
-            style={{ maxWidth: "150px" }}
           >
             <option value='All'>All Roles</option>
             <option value='admin'>Admin</option>
@@ -114,61 +113,65 @@ function AdminUsersPage() {
       </div>
 
       <div className='admin-table-wrapper'>
-        <div className='card' style={{ overflow: "auto" }}>
-          {filteredUsers.length === 0 ? (
-            <div className='empty-state'>
-              <p className='body-text text-muted'>No users found.</p>
-            </div>
-          ) : (
-            <table className='admin-table'>
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Status</th>
-                  <th>Incidents</th>
-                  <th>Joined</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map((user) => (
-                  <tr key={user.id}>
-                    <td>
-                      <strong>{user.name}</strong>
-                    </td>
-                    <td>{user.email}</td>
-                    <td>
-                      <span
-                        className={`status-badge ${getRoleBadgeClass(user.role)}`}
-                      >
-                        {user.role}
-                      </span>
-                    </td>
-                    <td>
-                      <span
-                        className={`status-badge ${getStatusBadgeClass(user.status)}`}
-                      >
-                        {user.status}
-                      </span>
-                    </td>
-                    <td>{user.incidents}</td>
-                    <td>{new Date(user.joined).toLocaleDateString()}</td>
-                    <td>
-                      <button className='btn btn-sm btn-secondary'>Edit</button>
-                      <button
-                        className='btn btn-sm btn-danger'
-                        style={{ marginLeft: "0.5rem" }}
-                      >
-                        Delete
-                      </button>
-                    </td>
+        <div className='card'>
+          <div className='admin-table-responsive'>
+            {filteredUsers.length === 0 ? (
+              <div className='empty-state'>
+                <p className='body-text text-muted'>No users found.</p>
+              </div>
+            ) : (
+              <table className='admin-table'>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Incidents</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+                </thead>
+                <tbody>
+                  {filteredUsers.map((user) => (
+                    <tr key={user.id}>
+                      <td>
+                        <strong>{user.name}</strong>
+                      </td>
+                      <td>{user.email}</td>
+                      <td>
+                        <span
+                          className={`status-badge ${getRoleBadgeClass(user.role)}`}
+                        >
+                          {user.role}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`status-badge ${getStatusBadgeClass(user.status)}`}
+                        >
+                          {user.status}
+                        </span>
+                      </td>
+                      <td>{user.incidents}</td>
+                      <td>{new Date(user.joined).toLocaleDateString()}</td>
+                      <td>
+                        <button className='btn btn-sm btn-secondary'>
+                          Edit
+                        </button>
+                        <button
+                          className='btn btn-sm btn-danger'
+                          style={{ marginLeft: "0.5rem" }}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
         </div>
       </div>
     </div>
