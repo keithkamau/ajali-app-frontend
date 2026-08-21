@@ -1,99 +1,168 @@
 import React from "react";
-
-// Mock admin data
-const mockIncidents = [
-  {
-    id: "A/J-2024-001234",
-    title: "Road accident on Mombasa Road",
-    status: "pending",
-    user: "John Doe",
-    created_at: "2024-01-15T10:30:00",
-  },
-  {
-    id: "A/J-2024-001233",
-    title: "Emergency medical response",
-    status: "resolved",
-    user: "Jane Smith",
-    created_at: "2024-01-14T14:20:00",
-  },
-  {
-    id: "A/J-2024-001231",
-    title: "Fire incident reported",
-    status: "under_investigation",
-    user: "Bob Johnson",
-    created_at: "2024-01-13T09:15:00",
-  },
-  {
-    id: "A/J-2024-001232",
-    title: "Accident on Thika Road",
-    status: "pending",
-    user: "Alice Brown",
-    created_at: "2024-01-12T16:45:00",
-  },
-  {
-    id: "A/J-2024-001230",
-    title: "Medical emergency",
-    status: "resolved",
-    user: "Charlie Wilson",
-    created_at: "2024-01-11T11:00:00",
-  },
-];
+import { useNavigate } from "react-router-dom";
 
 export const AdminPage = () => {
+  const navigate = useNavigate();
+
+  const stats = {
+    total: 128,
+    inProgress: 34,
+    resolved: 94,
+    sosAlerts: 12,
+  };
+
+  const recentIncidents = [
+    {
+      id: "AJ-2026-001234",
+      title: "Road Accident on Ngong Road",
+      status: "In Progress",
+      priority: "Critical",
+      reportedAt: "Today, 10:24 AM",
+      user: "John Doe",
+    },
+    {
+      id: "AJ-2026-001233",
+      title: "Building Fire at Waiyaki Way",
+      status: "Resolved",
+      priority: "High",
+      reportedAt: "12 May 2024",
+      user: "Jane Smith",
+    },
+    {
+      id: "AJ-2026-001232",
+      title: "Medical Emergency in Westlands",
+      status: "In Progress",
+      priority: "Critical",
+      reportedAt: "11 May 2024",
+      user: "Bob Johnson",
+    },
+    {
+      id: "AJ-2025-001231",
+      title: "Road Accident on Mombasa Road",
+      status: "Reported",
+      priority: "High",
+      reportedAt: "10 May 2025",
+      user: "Alice Brown",
+    },
+    {
+      id: "AJ-2025-001230",
+      title: "Flooding in Kasarani",
+      status: "Resolved",
+      priority: "Medium",
+      reportedAt: "09 May 2024",
+      user: "Charlie Wilson",
+    },
+  ];
+
+  const getStatusBadgeClass = (status) => {
+    const statusMap = {
+      Reported: "status-badge-pending",
+      "In Progress": "status-badge-under-investigation",
+      Resolved: "status-badge-resolved",
+      Rejected: "status-badge-rejected",
+    };
+    return statusMap[status] || "status-badge-pending";
+  };
+
+  const getPriorityClass = (priority) => {
+    const priorityMap = {
+      Critical: "priority-critical",
+      High: "priority-high",
+      Medium: "priority-medium",
+      Low: "priority-low",
+    };
+    return priorityMap[priority] || "priority-medium";
+  };
+
+  const handleRowClick = (id) => {
+    navigate(`/admin/incidents/${id}`);
+  };
+
   return (
     <div className='admin-page'>
       <div className='page-header'>
         <h1 className='heading-2'>Admin Dashboard</h1>
-        <p className='body-small text-muted'>Manage incidents and users</p>
+        <p className='body-small text-muted'>
+          Overview of all incidents and system activity
+        </p>
       </div>
 
       <div className='admin-stats'>
         <div className='stat-card'>
-          <div className='stat-number'>128</div>
+          <div className='stat-number'>{stats.total}</div>
           <div className='stat-label'>Total Reports</div>
         </div>
         <div className='stat-card'>
-          <div className='stat-number'>34</div>
+          <div className='stat-number'>{stats.inProgress}</div>
           <div className='stat-label'>In Progress</div>
         </div>
         <div className='stat-card'>
-          <div className='stat-number'>94</div>
+          <div className='stat-number'>{stats.resolved}</div>
           <div className='stat-label'>Resolved</div>
         </div>
         <div className='stat-card'>
-          <div className='stat-number'>12</div>
+          <div className='stat-number'>{stats.sosAlerts}</div>
           <div className='stat-label'>SOS Alerts</div>
         </div>
       </div>
 
-      <div className='admin-table-wrapper'>
+      <div className='admin-recent-section'>
         <div className='card'>
-          <h3 className='heading-4' style={{ marginBottom: "1rem" }}>
-            All Incidents
-          </h3>
-          <div className='admin-table'>
-            <div className='admin-table-header'>
-              <span>Reference</span>
-              <span>Title</span>
-              <span>User</span>
-              <span>Status</span>
-              <span>Date</span>
+          <div className='admin-section-header'>
+            <h2 className='heading-4'>Recent Incidents</h2>
+            <button
+              className='btn btn-sm btn-secondary'
+              onClick={() => navigate("/admin/incidents")}
+            >
+              View All
+            </button>
+          </div>
+
+          <div className='admin-table-wrapper'>
+            <div className='admin-table-responsive'>
+              <table className='admin-table'>
+                <thead>
+                  <tr>
+                    <th>Report ID</th>
+                    <th>Incident</th>
+                    <th>User</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Reported</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {recentIncidents.map((incident) => (
+                    <tr
+                      key={incident.id}
+                      className='clickable-row'
+                      onClick={() => handleRowClick(incident.id)}
+                    >
+                      <td className='admin-table-reference'>{incident.id}</td>
+                      <td>
+                        <strong>{incident.title}</strong>
+                      </td>
+                      <td>{incident.user}</td>
+                      <td>
+                        <span
+                          className={`status-badge ${getStatusBadgeClass(incident.status)}`}
+                        >
+                          {incident.status}
+                        </span>
+                      </td>
+                      <td>
+                        <span
+                          className={`priority-badge ${getPriorityClass(incident.priority)}`}
+                        >
+                          {incident.priority}
+                        </span>
+                      </td>
+                      <td>{incident.reportedAt}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            {mockIncidents.map((incident) => (
-              <div key={incident.id} className='admin-table-row'>
-                <span className='admin-table-reference'>{incident.id}</span>
-                <span>{incident.title}</span>
-                <span>{incident.user}</span>
-                <span
-                  className={`status-badge status-badge-${incident.status}`}
-                >
-                  {incident.status.replace("_", " ")}
-                </span>
-                <span>
-                  {new Date(incident.created_at).toLocaleDateString()}
-                </span>
-              </div>
-            ))}
           </div>
         </div>
       </div>
