@@ -10,48 +10,63 @@ function AdminIncidentsPage() {
   const incidents = [
     {
       id: "AJ-2026-001234",
-      title: "Road Accident",
+      title: "Road Accident on Ngong Road",
       type: "Accident",
-      location: "Ngong Road",
+      location: "Ngong Road, Nairobi",
       status: "In Progress",
       priority: "Critical",
       reportedAt: "Today, 10:24 AM",
+      user: "John Doe",
+      description:
+        "Multi-vehicle collision at Ngong Road junction. Three vehicles involved with minor injuries.",
     },
     {
       id: "AJ-2026-001233",
-      title: "Building Fire",
+      title: "Building Fire at Waiyaki Way",
       type: "Fire",
-      location: "Waiyaki Way",
+      location: "Waiyaki Way, Nairobi",
       status: "Resolved",
       priority: "High",
       reportedAt: "12 May 2024",
+      user: "Jane Smith",
+      description:
+        "Fire outbreak at a commercial building. Fire department responded and contained the fire.",
     },
     {
       id: "AJ-2026-001232",
-      title: "Medical Emergency",
+      title: "Medical Emergency in Westlands",
       type: "Medical",
-      location: "Westlands",
+      location: "Westlands, Nairobi",
       status: "In Progress",
       priority: "Critical",
       reportedAt: "11 May 2024",
+      user: "Bob Johnson",
+      description:
+        "Medical emergency at a residential area. Ambulance dispatched to the scene.",
     },
     {
       id: "AJ-2025-001231",
-      title: "Road Accident",
+      title: "Road Accident on Mombasa Road",
       type: "Accident",
-      location: "Mombasa Road",
+      location: "Mombasa Road, Nairobi",
       status: "Reported",
       priority: "High",
       reportedAt: "10 May 2025",
+      user: "Alice Brown",
+      description:
+        "Accident reported on Mombasa Road near the airport. Emergency services notified.",
     },
     {
       id: "AJ-2025-001230",
-      title: "Flooding",
+      title: "Flooding in Kasarani",
       type: "Other",
-      location: "Kasarani",
+      location: "Kasarani, Nairobi",
       status: "Resolved",
       priority: "Medium",
       reportedAt: "09 May 2024",
+      user: "Charlie Wilson",
+      description:
+        "Flooding reported in Kasarani area. Drainage teams dispatched to clear the blockage.",
     },
   ];
 
@@ -59,7 +74,8 @@ function AdminIncidentsPage() {
     const matchesSearch =
       incident.id.toLowerCase().includes(search.toLowerCase()) ||
       incident.title.toLowerCase().includes(search.toLowerCase()) ||
-      incident.location.toLowerCase().includes(search.toLowerCase());
+      incident.location.toLowerCase().includes(search.toLowerCase()) ||
+      incident.user.toLowerCase().includes(search.toLowerCase());
 
     const matchesStatus =
       statusFilter === "All" || incident.status === statusFilter;
@@ -96,9 +112,9 @@ function AdminIncidentsPage() {
   return (
     <div className='admin-incidents-page'>
       <div className='page-header'>
-        <h1 className='heading-2'>Incident Reports</h1>
+        <h1 className='heading-2'>All Incidents</h1>
         <p className='body-small text-muted'>
-          View and manage all emergency reports.
+          View and manage all incident reports
         </p>
       </div>
 
@@ -107,7 +123,7 @@ function AdminIncidentsPage() {
           <input
             type='text'
             className='input'
-            placeholder='Search reports...'
+            placeholder='Search by ID, title, location or user...'
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
@@ -123,6 +139,7 @@ function AdminIncidentsPage() {
             <option value='Reported'>Reported</option>
             <option value='In Progress'>In Progress</option>
             <option value='Resolved'>Resolved</option>
+            <option value='Rejected'>Rejected</option>
           </select>
 
           <select
@@ -153,11 +170,10 @@ function AdminIncidentsPage() {
                   <th>Report ID</th>
                   <th>Incident</th>
                   <th>Location</th>
-                  <th>Type</th>
+                  <th>User</th>
                   <th>Status</th>
                   <th>Priority</th>
                   <th>Reported</th>
-                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -172,7 +188,7 @@ function AdminIncidentsPage() {
                       <strong>{incident.title}</strong>
                     </td>
                     <td>{incident.location}</td>
-                    <td>{incident.type}</td>
+                    <td>{incident.user}</td>
                     <td>
                       <span
                         className={`status-badge ${getStatusBadgeClass(incident.status)}`}
@@ -188,17 +204,6 @@ function AdminIncidentsPage() {
                       </span>
                     </td>
                     <td>{incident.reportedAt}</td>
-                    <td>
-                      <button
-                        className='btn btn-sm btn-secondary'
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          navigate(`/admin/incidents/${incident.id}`);
-                        }}
-                      >
-                        View
-                      </button>
-                    </td>
                   </tr>
                 ))}
               </tbody>
