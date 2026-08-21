@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Ajali! Frontend
 
 Ajali is a web application for reporting accidents and emergencies to the appropriate authorities and the general public. This is the React client that talks to the [Ajali! Backend API](https://github.com/keithkamau/ajali-web-app-backend).
@@ -91,8 +92,49 @@ This starts Vite's dev server, by default at `http://localhost:5173`.
 5. Admins have access to a separate dashboard for moderating incidents, updating statuses, and managing users.
 
 ## Contributors
+=======
+# AJALI PROJECT
+
+Ajali is a web based application that is used to report any form iof accident and emergency that occurs to the appropriate authorities and also to the general public.
+
+## Technologies used
+
+Frontend
+
+- React Js
+- Redux Toolkit
+
+Wireframes
+
+- Figma
+
+Testing Framework
+
+- Jest
+- Minitests
+
+Database
+
+- PostgreSQl
+
+Backend
+
+- python Flask
+
+## Usage
+Once you enter the website, you will have to register an account and login to that same account to gain access to the web application.
+The home page will show you the recently posted accidents and emergency reports. it will aslo show the total number of reports in progress and the ones
+resolved. It is here where you can post any emergency that you have encountered.
+
+## Contribution
+>>>>>>> 1ce6bf9 (Updated README with project details)
 
 - Keith Kamau
 - Newton Mwangi
 - Ian Kinoti
+<<<<<<< HEAD
 - John Kingoo
+=======
+- John King'oo
+
+>>>>>>> 1ce6bf9 (Updated README with project details)
