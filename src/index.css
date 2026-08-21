@@ -1209,7 +1209,7 @@ a:hover {
   padding: 1rem;
 }
 
-/* Admin Toolbar */
+/* Admin Toolbar - Fixed select styling */
 .admin-toolbar {
   display: flex;
   justify-content: space-between;
@@ -1229,25 +1229,45 @@ a:hover {
 .admin-toolbar-right {
   display: flex;
   gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
-/* ============================================
-   ADMIN FILTER DROPDOWN FIXES
-   ============================================ */
-
-.admin-filter-select {
+.admin-toolbar .input {
   width: 100%;
   min-width: 120px;
   max-width: 100%;
-  box-sizing: border-box;
+  padding: 0.625rem 2.5rem 0.625rem 0.875rem;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--color-ink);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  line-height: 1.5;
+  appearance: auto;
+  -webkit-appearance: auto;
+  cursor: pointer;
+}
+
+.admin-toolbar .input:focus {
+  outline: none;
+  border-color: var(--color-navy);
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.1);
+}
+
+.admin-toolbar .input option {
+  padding: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  color: var(--color-ink);
+  background-color: var(--color-surface);
+}
+
+select.input {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.admin-filter-select option {
-  padding: 0.5rem;
-  font-size: 0.875rem;
 }
 
 @media (max-width: 768px) {
@@ -1255,70 +1275,45 @@ a:hover {
     flex-direction: column;
     align-items: stretch;
     gap: 0.75rem;
-    padding: 0;
   }
   
   .admin-toolbar-left {
     flex-direction: column;
-    width: 100%;
+    gap: 0.5rem;
     min-width: unset;
   }
   
   .admin-toolbar-left .input {
     max-width: 100% !important;
-    width: 100%;
+    min-width: unset;
   }
   
   .admin-toolbar-right {
     flex-direction: column;
-    width: 100%;
     gap: 0.5rem;
+    width: 100%;
   }
   
   .admin-toolbar-right .input {
     max-width: 100% !important;
-    width: 100%;
-  }
-  
-  .admin-filter-select {
     min-width: unset;
     width: 100%;
   }
+  
+  select.input {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
 }
 
-@media (min-width: 481px) and (max-width: 768px) {
+@media (max-width: 480px) {
+  .admin-toolbar .input {
+    font-size: 0.8rem;
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+  }
+  
   .admin-toolbar-right {
-    flex-direction: row;
     gap: 0.5rem;
-  }
-  
-  .admin-toolbar-right .input {
-    flex: 1;
-  }
-}
-
-@media (min-width: 769px) {
-  .admin-toolbar {
-    flex-direction: row;
-    align-items: center;
-  }
-  
-  .admin-toolbar-left {
-    flex: 1;
-    min-width: 200px;
-  }
-  
-  .admin-toolbar-left .input {
-    max-width: 300px !important;
-  }
-  
-  .admin-toolbar-right {
-    flex-direction: row;
-    gap: 0.75rem;
-  }
-  
-  .admin-toolbar-right .input {
-    max-width: 150px !important;
   }
 }
 
