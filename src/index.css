@@ -2102,6 +2102,155 @@ a:hover {
 }
 
 /* ============================================
+   FLOATING ACTION BUTTON - EMERGENCY
+   ============================================ */
+.fab-emergency {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: var(--color-red);
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 50;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.fab-emergency:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 24px rgba(220, 38, 38, 0.5);
+}
+
+.fab-emergency:active {
+  transform: scale(0.95);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
+  }
+  50% {
+    box-shadow: 0 4px 32px rgba(220, 38, 38, 0.6);
+  }
+  100% {
+    box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4);
+  }
+}
+
+@media (min-width: 1024px) {
+  .fab-emergency {
+    bottom: 40px;
+    right: 40px;
+    width: 72px;
+    height: 72px;
+  }
+  
+  .fab-emergency svg {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* Mobile bottom nav padding for FAB */
+@media (max-width: 1023px) {
+  .home-page {
+    padding-bottom: 20px;
+  }
+}
+
+/* ============================================
+   MOBILE ADMIN - Bottom Navigation Adjustments
+   ============================================ */
+@media (max-width: 1023px) {
+  .bottom-nav {
+    background-color: var(--color-surface);
+    border-top: 1px solid var(--color-border);
+  }
+  
+  .bottom-nav-item {
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .bottom-nav-item .nav-icon {
+    font-size: 1.25rem;
+  }
+  
+  .bottom-nav-item .nav-label {
+    font-size: 0.55rem;
+  }
+}
+
+/* Mobile specific adjustments for admin pages */
+@media (max-width: 480px) {
+  .admin-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .admin-table-wrapper .card {
+    padding: 0.5rem;
+  }
+  
+  .admin-table {
+    font-size: 0.75rem;
+    min-width: 600px;
+  }
+  
+  .admin-table thead th,
+  .admin-table tbody td {
+    padding: 0.5rem 0.25rem;
+  }
+  
+  .admin-table .admin-table-reference {
+    font-size: 0.65rem;
+  }
+  
+  .stat-card .stat-number {
+    font-size: 1.25rem;
+  }
+  
+  .stat-card .stat-label {
+    font-size: 0.65rem;
+  }
+  
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .fab-emergency {
+    width: 56px;
+    height: 56px;
+    bottom: 80px;
+    right: 16px;
+  }
+  
+  .fab-emergency svg {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 481px) and (max-width: 1023px) {
+  .admin-stats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  
+  .admin-table {
+    font-size: 0.8rem;
+    min-width: 700px;
+  }
+}
+
+/* ============================================
    UTILITIES
    ============================================ */
 .flex { display: flex; }
