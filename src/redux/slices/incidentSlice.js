@@ -1,135 +1,116 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import * as incidentApi from "../../api/incidentApi";
+import { incidentApi } from "../../api/incidentApi";
 
-// Async thunks
+const initialState = {
+  incidents: [],
+  currentIncident: null,
+  publicIncidents: [],
+  isLoading: false,
+  error: null,
+  pagination: {
+    count: 0,
+    next: null,
+    previous: null,
+    page: 1,
+    totalPages: 1,
+  },
+};
+
 export const fetchIncidents = createAsyncThunk(
-  "incidents/fetchIncidents",
-  async (params, { rejectWithValue }) => {
+  "incidents/fetch",
+  async (params = {}, { rejectWithValue }) => {
     try {
-      const response = await incidentApi.listIncidents(params);
-      return response.incidents || [];
+      const response = await incidentApi.getAll(params);
+      return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || "Failed to fetch incidents",
-      );
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  },
+);
+
+export const fetchPublicIncidents = createAsyncThunk(
+  "incidents/fetchPublic",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const response = await incidentApi.getPublic(params);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
 
 export const fetchIncidentById = createAsyncThunk(
-  "incidents/fetchIncidentById",
+  "incidents/fetchById",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await incidentApi.getIncident(id);
-      return response.incident;
+      const response = await incidentApi.getById(id);
+      return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || "Incident not found",
-      );
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
 
 export const createIncident = createAsyncThunk(
-  "incidents/createIncident",
+  "incidents/create",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await incidentApi.createIncident(data);
-      return response.incident;
+      const response = await incidentApi.create(data);
+      return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || "Failed to create incident",
-      );
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
 
 export const updateIncident = createAsyncThunk(
-  "incidents/updateIncident",
+  "incidents/update",
   async ({ id, data }, { rejectWithValue }) => {
     try {
-      const response = await incidentApi.updateIncident(id, data);
-      return response.incident;
+      const response = await incidentApi.update(id, data);
+      return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || "Failed to update incident",
-      );
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
 
 export const deleteIncident = createAsyncThunk(
-  "incidents/deleteIncident",
+  "incidents/delete",
   async (id, { rejectWithValue }) => {
     try {
-      await incidentApi.deleteIncident(id);
+      await incidentApi.delete(id);
       return id;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || "Failed to delete incident",
-      );
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
 
-export const fetchStatusHistory = createAsyncThunk(
-  "incidents/fetchStatusHistory",
-  async (id, { rejectWithValue }) => {
+export const uploadImage = createAsyncThunk(
+  "incidents/uploadImage",
+  async ({ id, file }, { rejectWithValue }) => {
     try {
-      const response = await incidentApi.getStatusHistory(id);
-      return response.history || [];
+      const response = await incidentApi.uploadImage(id, file);
+      return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || "Failed to fetch status history",
-      );
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
 
-export const uploadMedia = createAsyncThunk(
-  "incidents/uploadMedia",
-  async ({ id, mediaType, file }, { rejectWithValue }) => {
+export const uploadVideo = createAsyncThunk(
+  "incidents/uploadVideo",
+  async ({ id, file }, { rejectWithValue }) => {
     try {
-      const response = await incidentApi.uploadIncidentMedia(
-        id,
-        mediaType,
-        file,
-      );
-      return response.media;
+      const response = await incidentApi.uploadVideo(id, file);
+      return response.data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || "Failed to upload media",
-      );
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
-
-export const updateIncidentStatus = createAsyncThunk(
-  "incidents/updateIncidentStatus",
-  async ({ id, status, comment }, { rejectWithValue }) => {
-    try {
-      const response = await incidentApi.updateIncidentStatus(id, {
-        status,
-        comment,
-      });
-      return response.incident;
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || "Failed to update status",
-      );
-    }
-  },
-);
-
-const initialState = {
-  items: [],
-  currentIncident: null,
-  statusHistory: [],
-  loading: false,
-  error: null,
-  success: null,
-  uploading: false,
-};
 
 const incidentSlice = createSlice({
   name: "incidents",
@@ -138,173 +119,72 @@ const incidentSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-    clearSuccess: (state) => {
-      state.success = null;
-    },
-    setCurrentIncident: (state, action) => {
-      state.currentIncident = action.payload;
-    },
-    clearStatusHistory: (state) => {
-      state.statusHistory = [];
+    clearCurrentIncident: (state) => {
+      state.currentIncident = null;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Fetch all incidents
+      // Fetch Incidents
       .addCase(fetchIncidents.pending, (state) => {
-        state.loading = true;
+        state.isLoading = true;
         state.error = null;
       })
       .addCase(fetchIncidents.fulfilled, (state, action) => {
-        state.loading = false;
-        state.items = action.payload;
+        state.isLoading = false;
+        state.incidents = action.payload.results || [];
+        state.pagination = {
+          count: action.payload.count || 0,
+          next: action.payload.next || null,
+          previous: action.payload.previous || null,
+          page: action.payload.page || 1,
+          totalPages: action.payload.total_pages || 1,
+        };
+        state.error = null;
       })
       .addCase(fetchIncidents.rejected, (state, action) => {
-        state.loading = false;
+        state.isLoading = false;
         state.error = action.payload;
       })
-
-      // Fetch incident by id
-      .addCase(fetchIncidentById.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+      // Fetch Public Incidents
+      .addCase(fetchPublicIncidents.fulfilled, (state, action) => {
+        state.publicIncidents = action.payload.results || [];
       })
+      // Fetch Incident By ID
       .addCase(fetchIncidentById.fulfilled, (state, action) => {
-        state.loading = false;
         state.currentIncident = action.payload;
-      })
-      .addCase(fetchIncidentById.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
-      // Create incident
-      .addCase(createIncident.pending, (state) => {
-        state.loading = true;
         state.error = null;
-        state.success = null;
       })
+      // Create Incident
       .addCase(createIncident.fulfilled, (state, action) => {
-        state.loading = false;
-        state.items.unshift(action.payload);
-        state.currentIncident = action.payload;
-        state.success = "Incident reported successfully!";
-      })
-      .addCase(createIncident.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
-      // Update incident
-      .addCase(updateIncident.pending, (state) => {
-        state.loading = true;
+        state.incidents.unshift(action.payload);
         state.error = null;
-        state.success = null;
       })
+      // Update Incident
       .addCase(updateIncident.fulfilled, (state, action) => {
-        state.loading = false;
-        const index = state.items.findIndex(
-          (item) => item.id === action.payload.id,
+        const index = state.incidents.findIndex(
+          (i) => i.id === action.payload.id,
         );
         if (index !== -1) {
-          state.items[index] = { ...state.items[index], ...action.payload };
+          state.incidents[index] = action.payload;
         }
-        state.currentIncident = action.payload;
-        state.success = "Incident updated successfully!";
-      })
-      .addCase(updateIncident.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
-      // Delete incident
-      .addCase(deleteIncident.pending, (state) => {
-        state.loading = true;
+        if (state.currentIncident?.id === action.payload.id) {
+          state.currentIncident = action.payload;
+        }
         state.error = null;
-        state.success = null;
       })
+      // Delete Incident
       .addCase(deleteIncident.fulfilled, (state, action) => {
-        state.loading = false;
-        state.items = state.items.filter((item) => item.id !== action.payload);
+        state.incidents = state.incidents.filter(
+          (i) => i.id !== action.payload,
+        );
         if (state.currentIncident?.id === action.payload) {
           state.currentIncident = null;
         }
-        state.success = "Incident deleted successfully!";
-      })
-      .addCase(deleteIncident.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
-      // Fetch status history
-      .addCase(fetchStatusHistory.pending, (state) => {
-        state.loading = true;
         state.error = null;
-      })
-      .addCase(fetchStatusHistory.fulfilled, (state, action) => {
-        state.loading = false;
-        state.statusHistory = action.payload;
-      })
-      .addCase(fetchStatusHistory.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
-      // Upload media
-      .addCase(uploadMedia.pending, (state) => {
-        state.uploading = true;
-        state.error = null;
-      })
-      .addCase(uploadMedia.fulfilled, (state, action) => {
-        state.uploading = false;
-        if (state.currentIncident) {
-          const mediaType =
-            action.payload.media_type === "image" ? "images" : "videos";
-          if (!state.currentIncident[mediaType]) {
-            state.currentIncident[mediaType] = [];
-          }
-          state.currentIncident[mediaType].push(action.payload.url);
-        }
-        state.success = "Media uploaded successfully!";
-      })
-      .addCase(uploadMedia.rejected, (state, action) => {
-        state.uploading = false;
-        state.error = action.payload;
-      })
-
-      // Update incident status
-      .addCase(updateIncidentStatus.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.success = null;
-      })
-      .addCase(updateIncidentStatus.fulfilled, (state, action) => {
-        state.loading = false;
-        const index = state.items.findIndex(
-          (item) => item.id === action.payload.id,
-        );
-        if (index !== -1) {
-          state.items[index] = { ...state.items[index], ...action.payload };
-        }
-        if (state.currentIncident?.id === action.payload.id) {
-          state.currentIncident = {
-            ...state.currentIncident,
-            ...action.payload,
-          };
-        }
-        state.success = "Status updated successfully!";
-      })
-      .addCase(updateIncidentStatus.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
       });
   },
 });
 
-export const {
-  clearError,
-  clearSuccess,
-  setCurrentIncident,
-  clearStatusHistory,
-} = incidentSlice.actions;
+export const { clearError, clearCurrentIncident } = incidentSlice.actions;
 export default incidentSlice.reducer;
