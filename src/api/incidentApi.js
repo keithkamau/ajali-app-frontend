@@ -1,38 +1,39 @@
-import apiClient from "./axiosConfig";
+import axiosInstance from "./axiosConfig";
 
-const unwrap = (response) => response.data;
+export const incidentApi = {
+  getAll: (params) => {
+    return axiosInstance.get("/incidents/", { params });
+  },
 
-export const listIncidents = (params = {}) =>
-  apiClient.get("/incidents", { params }).then(unwrap);
+  getPublic: (params) => {
+    return axiosInstance.get("/incidents/public/", { params });
+  },
 
-export const getPublicIncidents = (params = {}) =>
-  apiClient.get("/incidents/public", { params }).then(unwrap);
+  getById: (id) => {
+    return axiosInstance.get(`/incidents/${id}/`);
+  },
 
-export const getIncident = (id) =>
-  apiClient.get(`/incidents/${id}`).then(unwrap);
+  create: (data) => {
+    return axiosInstance.post("/incidents/", data);
+  },
 
-export const createIncident = (payload) =>
-  apiClient.post("/incidents", payload).then(unwrap);
+  update: (id, data) => {
+    return axiosInstance.put(`/incidents/${id}/`, data);
+  },
 
-export const updateIncident = (id, payload) =>
-  apiClient.put(`/incidents/${id}`, payload).then(unwrap);
+  delete: (id) => {
+    return axiosInstance.delete(`/incidents/${id}/`);
+  },
 
-export const deleteIncident = (id) =>
-  apiClient.delete(`/incidents/${id}`).then(unwrap);
-
-export const getStatusHistory = (id) =>
-  apiClient.get(`/incidents/${id}/status-history`).then(unwrap);
-
-export const uploadIncidentMedia = (id, mediaType, file) => {
-  const formData = new FormData();
-  formData.append(mediaType, file);
-  return apiClient
-    .post(`/incidents/${id}/${mediaType}`, formData, {
+  uploadImage: (id, file) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    return axiosInstance.post(`/incidents/${id}/images/`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
-    })
-    .then(unwrap);
-};
+    });
+  },
 
+<<<<<<< HEAD
 // Admin endpoints
 export const updateIncidentStatus = (id, payload) =>
   apiClient.put(`/admin/incidents/${id}/status`, payload).then(unwrap);
@@ -43,3 +44,17 @@ export const reverseGeocode = (lat, lng) =>
 
 export const forwardGeocode = (address) =>
   apiClient.get("/incidents/geocode/forward", { params: { address } }).then(unwrap);
+=======
+  uploadVideo: (id, file) => {
+    const formData = new FormData();
+    formData.append("video", file);
+    return axiosInstance.post(`/incidents/${id}/videos/`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+
+  getStatusHistory: (id) => {
+    return axiosInstance.get(`/incidents/${id}/status-history/`);
+  },
+};
+>>>>>>> d9755c6 (feat: add API integration layer with axios)
