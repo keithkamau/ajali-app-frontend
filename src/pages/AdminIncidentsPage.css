@@ -1,11 +1,11 @@
-.admin-incidents{
+.admin-incidents-page{
   min-height: 100vh;
   background: #f4f6f8;
   padding: 30px 34px;
   color: #0d182a;
 }
 
-.admin-incidents-header {
+.page-header {
   margin-bottom: 24px;
 }
 

@@ -34,6 +34,8 @@ import AdminDashboard from "./components/admin/AdminDashboard";
 import AdminIncidentsPage from "./pages/AdminIncidentsPage";
 import AdminIncidentDetailPage from "./pages/AdminIncidentDetailPage";
 import UserManagement from "./components/admin/UserManagement";
+import AdminAnalyticsPage from "./pages/AdminAnalyticsPage";
+import AdminSettingsPage from "./pages/AdminSettingsPage";
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -137,14 +139,22 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
-          <Route
+          {/* <Route
             path='/admin'
             element={
               <ProtectedRoute>
                 <AdminPage />
-              </ProtectedRoute>
+              </ProtectedRoute> 
             }
-          />
+          /> */}
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="incidents" element={<AdminIncidentsPage />} />
+            <Route path="incidents/:id" element={<AdminIncidentDetailPage />} />
+            <Route path="users" element={<UserManagement />} />
+            <Route path="analytics" element={<AdminAnalyticsPage />} />
+            <Route path="settings" element={<AdminSettingsPage />} />
+          </Route>
         </Routes>
       </main>
       {showNav && <BottomNav />}

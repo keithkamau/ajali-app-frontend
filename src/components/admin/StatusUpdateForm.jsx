@@ -1,44 +1,91 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { updateIncidentStatus } from "../../redux/slices/adminSlice";
+import { useDispatch,useSelector } from "react-redux";
+import { changeIncidentStatus } from "../../redux/slices/adminSlice";
 import "./StatusUpdateForm.css"
 
 function StatusUpdateForm({
   incident,
   onClose,
+  onUpdated,
 }) {
   const dispatch = useDispatch();
 
+  const { loading, error } = useSelector(
+    (state) => state.admin
+  );
+
   const [status, setStatus] = useState(
-    incident?.status || "Reported"
+    incident?.status || "reported"
   );
 
   const [comment, setComment] = useState("");
-
   const [message, setMessage] = useState("");
 
-  function handleSubmit(event) {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!incident) {
-      return;
-    }
-
-    dispatch(
-      updateIncidentStatus({
-        id: incident.id,
-        status,
-      })
-    );
+    try {
+      const result = await dispatch(
+        changeIncidentStatus({
+          id: incident.id,
+          status,
+          comment,
+        })
+      ).unwrap();
 
     setMessage("Incident status updated successfully.");
 
-    setTimeout(() => {
+      if (onUpdated) {
+        onUpdated(result);
+      }
+
       if (onClose) {
         onClose();
       }
-    }, 1000);
-  }
+    } catch (error) {
+      console.error(
+        "Failed to update status:",
+        error
+      );
+    }
+  };
+// function StatusUpdateForm({
+//   incident,
+//   onClose,
+// }) {
+//   const dispatch = useDispatch();
+
+//   const [status, setStatus] = useState(
+//     incident?.status || "Reported"
+//   );
+
+//   const [comment, setComment] = useState("");
+
+//   const [message, setMessage] = useState("");
+
+  
+//   function handleSubmit(event) {
+//     event.preventDefault();
+
+//     if (!incident) {
+//       return;
+//     }
+
+//     dispatch(
+//       changeIncidentStatus({
+//         id: incident.id,
+//         status,
+//       })
+//     );
+
+//     setMessage("Incident status updated successfully.");
+
+//     setTimeout(() => {
+//       if (onClose) {
+//         onClose();
+//       }
+//     }, 1000);
+//   }
 
   return (
     <div className="status-modal-overlay">

@@ -1,52 +1,79 @@
-import React from "react";
-import "./StatusHistory.css"
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
-function StatusHistory({ history = [] }) {
-  if (!history.length) {
+import {
+  fetchIncidentStatusHistory,
+} from "../../redux/slices/adminSlice";
+
+function StatusHistory({ incidentId }) {
+  const dispatch = useDispatch();
+
+  const {
+    statusHistory,
+    loading,
+    error,
+  } = useSelector(
+    (state) => state.admin
+  );
+
+  useEffect(() => {
+    if (incidentId) {
+      dispatch(
+        fetchIncidentStatusHistory(
+          incidentId
+        )
+      );
+    }
+  }, [dispatch, incidentId]);
+
+  if (loading) {
+    return <p>Loading status history...</p>;
+  }
+
+  if (error) {
     return (
-      <div className="status-history-empty">
-        No status changes have been recorded yet.
-      </div>
+      <p className="error-message">
+        {error}
+      </p>
+    );
+  }
+
+  if (!statusHistory.length) {
+    return (
+      <p>
+        No status history available.
+      </p>
     );
   }
 
   return (
     <div className="status-history">
 
-      {history.map((item, index) => (
+      <h2>Status History</h2>
+
+      {statusHistory.map((item) => (
         <div
           className="status-history-item"
-          key={item.id || index}
+          key={item.id}
         >
 
-          <div className="status-history-dot" />
-
-          <div className="status-history-content">
-
-            <div className="status-history-top">
-
-              <strong>
-                {item.new_status}
-              </strong>
-
-              <span>
-                {item.changed_at}
-              </span>
-
-            </div>
-
-            <p>
-              Changed from{" "}
-              <strong>{item.old_status}</strong>{" "}
-              by {item.changed_by}
-            </p>
+          <div>
+            <strong>
+              {item.old_status
+                ? `${item.old_status} → `
+                : ""}
+              {item.new_status}
+            </strong>
 
             {item.comment && (
-              <div className="status-history-comment">
-                "{item.comment}"
-              </div>
+              <p>{item.comment}</p>
             )}
 
+            <small>
+              {new Date(
+                item.changed_at
+              ).toLocaleString()}
+            </small>
           </div>
 
         </div>

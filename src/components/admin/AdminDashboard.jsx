@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
-  setStats,
-  setIncidents,
-} from "../../redux//slices/adminSlice";
+  fetchAdminStats,
+  fetchRecentIncidents,
+} from "../../redux/slices/adminSlice";
 
 import "./AdminDashboard.css";
 
@@ -53,24 +53,22 @@ const mockRecentIncidents = [
 function AdminDashboard() {
   const dispatch = useDispatch();
 
-  const stats = useSelector(
-    (state) => state.admin.stats
-  );
-
-  const incidents = useSelector(
-    (state) => state.admin.incidents
-  );
+  const {
+  stats,
+  recentIncidents,
+  loading,
+  error,
+} = useSelector((state) => state.admin);
 
   useEffect(() => {
-    dispatch(setStats(mockStats));
+  dispatch(fetchAdminStats());
+  dispatch(fetchRecentIncidents());
+}, [dispatch]);
 
-    dispatch(setIncidents(mockRecentIncidents));
-  }, [dispatch]);
-
-  const recentIncidents =
-    incidents.length > 0
-      ? incidents.slice(0, 4)
-      : mockRecentIncidents;
+  // const recentIncidents =
+  //   incidents.length > 0
+  //     ? incidents.slice(0, 4)
+  //     : mockRecentIncidents;
 
   return (
     <div className="admin-dashboard">
