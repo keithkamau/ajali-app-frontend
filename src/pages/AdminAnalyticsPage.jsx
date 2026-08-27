@@ -3,7 +3,7 @@ import "./AdminAnalyticsPage.css";
 import React from "react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setStats } from "../redux/slices/adminSlice";
+// import { setStats } from "../redux/slices/adminSlice";
 import { getIncidentStats } from "../services/adminApi";
 
 function AdminAnalyticsPage() {

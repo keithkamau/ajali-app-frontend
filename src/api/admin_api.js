@@ -110,3 +110,93 @@ export const getIncidentStatusHistory = async (id) => {
 
   return response.data;
 };
+
+/* 
+   USERS
+ */
+
+export const getAdminUsers = async (params = {}) => {
+  const response = await axios.get(
+    `${API_URL}/users/`,
+    {
+      ...getAuthHeaders(),
+      params,
+    }
+  );
+
+  return response.data;
+};
+
+export const getAdminUser = async (id) => {
+  const response = await axios.get(
+    `${API_URL}/users/${id}/`,
+    getAuthHeaders()
+  );
+
+  return response.data;
+};
+
+export const updateUserRole = async (id, role) => {
+  const response = await axios.put(
+    `${API_URL}/users/${id}/role/`,
+    {
+      role,
+    },
+    getAuthHeaders()
+  );
+
+  return response.data;
+};
+
+export const updateUserStatus = async (
+  id,
+  isActive
+) => {
+  const response = await axios.put(
+    `${API_URL}/users/${id}/`,
+    {
+      is_active: isActive,
+    },
+    getAuthHeaders()
+  );
+
+  return response.data;
+};
+
+export const deleteAdminUser = async (id) => {
+  const response = await axios.delete(
+    `${API_URL}/users/${id}/`,
+    getAuthHeaders()
+  );
+
+  return response.data;
+};
+
+/* 
+   SEARCH / FILTER
+ */
+
+export const searchAdminIncidents = async (query) => {
+  const response = await axios.get(
+    `${API_URL}/incidents/search/`,
+    {
+      ...getAuthHeaders(),
+      params: {
+        search: query,
+      },
+    }
+  );
+
+  return response.data;
+};
+
+export const filterAdminIncidents = async (filters = {}) => {
+  const response = await axios.get(
+    `${API_URL}/incidents/filter/`,
+    {
+      ...getAuthHeaders(),
+      params: filters,
+    }
+  );
+  return response.data;
+};
