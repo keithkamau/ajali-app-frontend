@@ -1,33 +1,27 @@
-import apiClient from "./axiosConfig";
+import axiosInstance from "./axiosConfig";
 
-const unwrap = (res) => res.data;
+export const notificationApi = {
+  getAll: (params) => {
+    return axiosInstance.get("/notifications/", { params });
+  },
 
-export const getNotifications = (params = {}) =>
-  apiClient.get("/notifications/", { params }).then(unwrap);
+  markAsRead: (id) => {
+    return axiosInstance.put(`/notifications/${id}/read/`);
+  },
 
-export const getUnreadCount = () =>
-  apiClient.get("/notifications/unread-count").then(unwrap);
+  markAllAsRead: () => {
+    return axiosInstance.put("/notifications/read-all/");
+  },
 
-export const markAsRead = (id) =>
-  apiClient.put(`/notifications/${id}/read`).then(unwrap);
+  getUnreadCount: () => {
+    return axiosInstance.get("/notifications/unread-count/");
+  },
 
-export const markAllAsRead = () =>
-  apiClient.put("/notifications/read-all").then(unwrap);
+  getPreferences: () => {
+    return axiosInstance.get("/notifications/preferences/");
+  },
 
-export const getPreferences = () =>
-  apiClient.get("/notifications/preferences").then(unwrap);
-
-export const updatePreferences = (payload) =>
-  apiClient.put("/notifications/preferences", payload).then(unwrap);
-
-export const sendTestEmail = () =>
-  apiClient.post("/notifications/test-email").then(unwrap);
-
-export const sendTestSms = () =>
-  apiClient.post("/notifications/test-sms").then(unwrap);
-
-export const deleteNotification = (id) =>
-  apiClient.delete(`/notifications/${id}`).then(unwrap);
-
-export const deleteAllNotifications = () =>
-  apiClient.delete("/notifications/all").then(unwrap);
+  updatePreferences: (data) => {
+    return axiosInstance.put("/notifications/preferences/", data);
+  },
+};
