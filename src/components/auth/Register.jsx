@@ -124,13 +124,12 @@ export const Register = () => {
           </button>
         </form>
 
-        <div className='auth-divider'>
+        <div className='auth-footer'>
           <span>Already have an account?</span>
+          <Link to='/login' className='auth-link'>
+            Login
+          </Link>
         </div>
-
-        <Link to='/login' className='btn btn-secondary'>
-          Login
-        </Link>
       </div>
     </div>
   );
