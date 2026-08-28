@@ -27,35 +27,22 @@ export const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Validate
     const newErrors = {};
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password || formData.password.length < 8) {
       newErrors.password = "Password must be at least 8 characters";
     }
     if (!formData.full_name) newErrors.full_name = "Full name is required";
-
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-
     setErrors({});
     dispatch(clearError());
-
     const result = await dispatch(registerUser(formData));
-
     if (result.payload?.message) {
-      setFormData({
-        email: "",
-        password: "",
-        full_name: "",
-        phone_number: "",
-      });
-      setTimeout(() => {
-        navigate("/login");
-      }, 3000);
+      setFormData({ email: "", password: "", full_name: "", phone_number: "" });
+      setTimeout(() => navigate("/login"), 3000);
     }
   };
 
@@ -65,10 +52,12 @@ export const Register = () => {
       : error?.message || error?.error || "Registration failed";
 
   return (
-    <div className='register-container'>
-      <div className='register-card'>
-        <h1 className='heading-2'>Create Account</h1>
-        <p className='body-small'>Join Ajali! to report incidents</p>
+    <div className='auth-page'>
+      <div className='auth-card'>
+        <div className='auth-card-header'>
+          <h1 className='heading-2'>Create Account</h1>
+          <p className='body-small'>Join Ajali! to report incidents</p>
+        </div>
 
         {error && <div className='alert alert-error'>{errorMessage}</div>}
         {success && <div className='alert alert-success'>{success}</div>}
@@ -131,24 +120,25 @@ export const Register = () => {
 
           <button
             type='submit'
-            className='btn btn-primary'
+            className='btn btn-primary btn-lg'
+            style={{ width: "100%" }}
             disabled={isLoading}
           >
             {isLoading ? "Creating Account..." : "Register"}
           </button>
         </form>
 
-        <div className='divider'></div>
+        <div className='auth-divider'>
+          <span>Already have an account?</span>
+        </div>
 
-        <p className='body-small' style={{ textAlign: "center" }}>
-          Already have an account?{" "}
-          <Link
-            to='/login'
-            style={{ color: "var(--color-navy)", fontWeight: "600" }}
-          >
-            Login
-          </Link>
-        </p>
+        <Link
+          to='/login'
+          className='btn btn-secondary'
+          style={{ width: "100%", justifyContent: "center" }}
+        >
+          Login
+        </Link>
       </div>
     </div>
   );

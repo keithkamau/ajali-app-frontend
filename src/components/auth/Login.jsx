@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import {
   loginUser,
   clearError,
@@ -9,171 +9,109 @@ import {
 import { validateEmail } from "../../utils/validators";
 
 export const Login = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { isLoading, error, success, isAuthenticated } = useSelector(
-    (state) => state.auth,
-  );
+  const navigate = useNavigate();
+  const { isLoading, error, success } = useSelector((state) => state.auth);
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/home");
-    }
-  }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
-    if (success) {
-      const timer = setTimeout(() => {
-        dispatch(clearSuccess());
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [success, dispatch]);
-
-  useEffect(() => {
-    return () => {
-      dispatch(clearError());
-    };
-  }, [dispatch]);
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-    if (error) {
-      dispatch(clearError());
-    }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) return;
-
-    try {
-      await dispatch(loginUser(formData)).unwrap();
-      navigate("/home");
-    } catch (err) {
-      // Error handled by thunk
+    const newErrors = {};
+    if (!validateEmail(email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+    if (!password || password.length < 8) {
+      newErrors.password = "Password must be at least 8 characters";
+    }
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    setErrors({});
+    dispatch(clearError());
+    const result = await dispatch(loginUser({ email, password }));
+    if (result.payload?.user) {
+      navigate("/dashboard");
     }
   };
 
+  const errorMessage =
+    typeof error === "string"
+      ? error
+      : error?.message || error?.error || "Login failed";
+
   return (
-    <div className='auth-container'>
+    <div className='auth-page'>
       <div className='auth-card'>
-        <h1 className='auth-title'>Welcome Back</h1>
-        <p className='auth-subtitle'>Log in to your Ajali account</p>
+        <div className='auth-card-header'>
+          <h1 className='heading-2'>Welcome Back</h1>
+          <p className='body-small'>Login to your Ajali! account</p>
+        </div>
 
-        {error && (
-          <div className='alert alert-error' style={{ marginBottom: "1rem" }}>
-            {error}
-          </div>
-        )}
-
-        {success && (
-          <div className='alert alert-success' style={{ marginBottom: "1rem" }}>
-            {success}
-          </div>
-        )}
+        {error && <div className='alert alert-error'>{errorMessage}</div>}
+        {success && <div className='alert alert-success'>{success}</div>}
 
         <form onSubmit={handleSubmit}>
           <div className='form-group'>
             <label className='label label-required'>Email</label>
             <input
               type='email'
-              name='email'
               className={`input ${errors.email ? "input-error" : ""}`}
-              placeholder='your@email.com'
-              value={formData.email}
-              onChange={handleChange}
-              disabled={isLoading}
-              autoComplete='email'
+              placeholder='Enter your email'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
-            {errors.email && <div className='form-error'>{errors.email}</div>}
+            {errors.email && <span className='form-error'>{errors.email}</span>}
           </div>
 
           <div className='form-group'>
             <label className='label label-required'>Password</label>
-            <div style={{ position: "relative" }}>
-              <input
-                type={showPassword ? "text" : "password"}
-                name='password'
-                className={`input ${errors.password ? "input-error" : ""}`}
-                placeholder='Enter your password'
-                value={formData.password}
-                onChange={handleChange}
-                disabled={isLoading}
-                autoComplete='current-password'
-              />
-              <button
-                type='button'
-                onClick={togglePasswordVisibility}
-                className='password-toggle-btn'
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? "Hide" : "Show"}
-              </button>
-            </div>
+            <input
+              type='password'
+              className={`input ${errors.password ? "input-error" : ""}`}
+              placeholder='Enter your password'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
             {errors.password && (
-              <div className='form-error'>{errors.password}</div>
+              <span className='form-error'>{errors.password}</span>
             )}
           </div>
 
-          <div style={{ textAlign: "right", marginBottom: "1.25rem" }}>
-            <Link to='/forgot-password' className='auth-forgot-link'>
+          <div className='form-group' style={{ textAlign: "right" }}>
+            <Link
+              to='/forgot-password'
+              className='body-small'
+              style={{ color: "var(--color-navy)" }}
+            >
               Forgot password?
             </Link>
           </div>
 
           <button
             type='submit'
-            className='btn btn-primary btn-block btn-lg'
+            className='btn btn-primary btn-lg'
+            style={{ width: "100%" }}
             disabled={isLoading}
           >
-            {isLoading ? (
-              <>
-                <span className='spinner spinner-sm'></span>
-                Logging in...
-              </>
-            ) : (
-              "Log In"
-            )}
+            {isLoading ? "Logging in..." : "Login"}
           </button>
         </form>
 
-        <div className='auth-footer'>
-          Don't have an account? <Link to='/register'>Sign up</Link>
+        <div className='auth-divider'>
+          <span>Don't have an account?</span>
         </div>
+
+        <Link
+          to='/register'
+          className='btn btn-secondary'
+          style={{ width: "100%", justifyContent: "center" }}
+        >
+          Create Account
+        </Link>
       </div>
     </div>
   );
