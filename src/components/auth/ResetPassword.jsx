@@ -1,221 +1,161 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import {
   resetPassword,
   clearError,
   clearSuccess,
 } from "../../redux/slices/authSlice";
-import { getPasswordStrength } from "../../utils/validators";
+import {
+  validatePassword,
+  getPasswordStrength,
+  getPasswordStrengthColor,
+  getPasswordStrengthLabel,
+} from "../../utils/validators";
 
 export const ResetPassword = () => {
   const { token } = useParams();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { isLoading, error, success } = useSelector((state) => state.auth);
 
-  const [formData, setFormData] = useState({
-    password: "",
-    confirmPassword: "",
-  });
-  const [errors, setErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState({
-    level: "none",
-    score: 0,
-  });
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmError, setConfirmError] = useState("");
 
-  useEffect(() => {
-    if (success) {
-      const timer = setTimeout(() => {
-        dispatch(clearSuccess());
-        navigate("/login");
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [success, dispatch, navigate]);
-
-  useEffect(() => {
-    return () => {
-      dispatch(clearError());
-    };
-  }, [dispatch]);
-
-  useEffect(() => {
-    const strength = getPasswordStrength(formData.password);
-    setPasswordStrength(strength);
-  }, [formData.password]);
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password";
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+  const passwordStrength = getPasswordStrength(password);
+  const strengthColor = getPasswordStrengthColor(password);
+  const strengthLabel = getPasswordStrengthLabel(password);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
-
-    try {
-      await dispatch(
-        resetPassword({ token, newPassword: formData.password }),
-      ).unwrap();
-    } catch (err) {
-      // Error handled by thunk
+    // Validate password
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      setPasswordError(passwordValidation.message);
+      return;
     }
-  };
+    setPasswordError("");
 
-  const getStrengthLabel = () => {
-    switch (passwordStrength.level) {
-      case "strong":
-        return "Strong";
-      case "medium":
-        return "Medium";
-      case "weak":
-        return "Weak";
-      default:
-        return "";
+    // Validate confirm password
+    if (password !== confirmPassword) {
+      setConfirmError("Passwords do not match");
+      return;
     }
-  };
+    setConfirmError("");
 
-  const getStrengthClass = () => {
-    switch (passwordStrength.level) {
-      case "strong":
-        return "strong";
-      case "medium":
-        return "medium";
-      case "weak":
-        return "weak";
-      default:
-        return "";
+    // Reset password
+    const result = await dispatch(
+      resetPassword({ token, newPassword: password }),
+    );
+
+    if (result.payload && result.payload.message) {
+      setTimeout(() => {
+        navigate("/login");
+      }, 3000);
     }
   };
 
   return (
-    <div className='auth-container'>
-      <div className='auth-card'>
-        <h1 className='auth-title'>Create New Password</h1>
-        <p className='auth-subtitle'>Enter your new password below</p>
+    <div className='reset-password-container'>
+      <div className='reset-password-card'>
+        <h1 className='heading-2'>Reset Password</h1>
+        <p className='body-small'>Enter your new password</p>
 
         {error && (
-          <div className='alert alert-error' style={{ marginBottom: "1rem" }}>
-            {error}
-          </div>
+          <div className='alert alert-error'>{error.error || error}</div>
         )}
-
         {success && (
-          <div className='alert alert-success' style={{ marginBottom: "1rem" }}>
-            {success}
+          <div className='alert alert-success'>
+            {success} Redirecting to login...
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
           <div className='form-group'>
             <label className='label label-required'>New Password</label>
-            <div style={{ position: "relative" }}>
-              <input
-                type={showPassword ? "text" : "password"}
-                name='password'
-                className={`input ${errors.password ? "input-error" : ""}`}
-                placeholder='Enter new password'
-                value={formData.password}
-                onChange={handleChange}
-                disabled={isLoading}
-                autoComplete='new-password'
-              />
-              <button
-                type='button'
-                onClick={togglePasswordVisibility}
-                className='password-toggle-btn'
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? "Hide" : "Show"}
-              </button>
-            </div>
-
-            {formData.password && (
-              <>
-                <div className='password-strength'>
-                  {[1, 2, 3, 4].map((i) => (
-                    <div
-                      key={i}
-                      className={`password-strength-bar ${i <= passwordStrength.score ? getStrengthClass() : ""}`}
-                    />
-                  ))}
+            <input
+              type='password'
+              className={`input ${passwordError ? "input-error" : ""}`}
+              placeholder='Enter new password'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            {password && (
+              <div style={{ marginTop: "8px" }}>
+                <div
+                  style={{
+                    height: "4px",
+                    borderRadius: "2px",
+                    backgroundColor: "#e4e4e0",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      height: "100%",
+                      width:
+                        passwordStrength === "strong"
+                          ? "100%"
+                          : passwordStrength === "medium"
+                            ? "60%"
+                            : "30%",
+                      backgroundColor: strengthColor,
+                      transition: "width 0.3s ease",
+                    }}
+                  />
                 </div>
-                <div className={`password-strength-text ${getStrengthClass()}`}>
-                  Password strength: {getStrengthLabel()}
-                </div>
-              </>
+                <span
+                  style={{
+                    fontSize: "0.75rem",
+                    color: strengthColor,
+                    marginTop: "4px",
+                    display: "block",
+                  }}
+                >
+                  {strengthLabel}
+                </span>
+              </div>
             )}
-
-            {errors.password && (
-              <div className='form-error'>{errors.password}</div>
+            {passwordError && (
+              <span className='form-error'>{passwordError}</span>
             )}
           </div>
 
           <div className='form-group'>
-            <label className='label label-required'>Confirm New Password</label>
+            <label className='label label-required'>Confirm Password</label>
             <input
               type='password'
-              name='confirmPassword'
-              className={`input ${errors.confirmPassword ? "input-error" : ""}`}
-              placeholder='Confirm your password'
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              disabled={isLoading}
-              autoComplete='new-password'
+              className={`input ${confirmError ? "input-error" : ""}`}
+              placeholder='Confirm new password'
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            {errors.confirmPassword && (
-              <div className='form-error'>{errors.confirmPassword}</div>
-            )}
+            {confirmError && <span className='form-error'>{confirmError}</span>}
           </div>
 
           <button
             type='submit'
-            className='btn btn-primary btn-block btn-lg'
+            className='btn btn-primary'
             disabled={isLoading}
           >
-            {isLoading ? (
-              <>
-                <span className='spinner spinner-sm'></span>
-                Resetting...
-              </>
-            ) : (
-              "Reset Password"
-            )}
+            {isLoading ? "Resetting..." : "Reset Password"}
           </button>
         </form>
 
-        <div className='auth-footer'>
-          <Link to='/login'>Back to Log In</Link>
-        </div>
+        <div className='divider'></div>
+
+        <p className='body-small' style={{ textAlign: "center" }}>
+          Remember your password?{" "}
+          <Link
+            to='/login'
+            style={{ color: "var(--color-navy)", fontWeight: "600" }}
+          >
+            Login
+          </Link>
+        </p>
       </div>
     </div>
   );
