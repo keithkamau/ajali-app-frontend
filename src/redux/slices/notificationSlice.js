@@ -1,49 +1,114 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import * as notificationApi from "../../api/notificationApi";
-
-const getError = (error) =>
-  error.response?.data?.message || "Something went wrong. Please try again.";
-
-export const fetchNotifications = createAsyncThunk(
-  "notifications/fetch",
-  notificationApi.getNotifications
-);
-export const fetchUnreadCount = createAsyncThunk(
-  "notifications/fetchUnread",
-  notificationApi.getUnreadCount
-);
-export const markAsRead = createAsyncThunk(
-  "notifications/markRead",
-  notificationApi.markAsRead
-);
-export const markAllAsRead = createAsyncThunk(
-  "notifications/markAllRead",
-  notificationApi.markAllAsRead
-);
-export const fetchPreferences = createAsyncThunk(
-  "notifications/fetchPrefs",
-  notificationApi.getPreferences
-);
-export const updatePreferences = createAsyncThunk(
-  "notifications/updatePrefs",
-  notificationApi.updatePreferences
-);
-export const removeNotification = createAsyncThunk(
-  "notifications/remove",
-  notificationApi.deleteNotification
-);
-export const clearAllNotifications = createAsyncThunk(
-  "notifications/clearAll",
-  notificationApi.deleteAllNotifications
-);
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { notificationApi } from "../../api/notificationApi";
 
 const initialState = {
   notifications: [],
-  unread_count: 0,
-  preferences: { email_enabled: true, sms_enabled: true, push_enabled: false },
-  loading: false,
+  unreadCount: 0,
+  preferences: null,
+  isLoading: false,
   error: null,
+  success: null,
 };
+
+export const getNotifications = createAsyncThunk(
+  "notifications/getAll",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const response = await notificationApi.getNotifications(params);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  },
+);
+
+export const fetchNotifications = getNotifications;
+
+export const getUnreadCount = createAsyncThunk(
+  "notifications/getUnreadCount",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await notificationApi.getUnreadCount();
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  },
+);
+
+export const markAsRead = createAsyncThunk(
+  "notifications/markAsRead",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await notificationApi.markAsRead(id);
+      return { id, data: response.data };
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  },
+);
+
+export const markAllAsRead = createAsyncThunk(
+  "notifications/markAllAsRead",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await notificationApi.markAllAsRead();
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  },
+);
+
+export const getPreferences = createAsyncThunk(
+  "notifications/getPreferences",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await notificationApi.getPreferences();
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  },
+);
+
+export const updatePreferences = createAsyncThunk(
+  "notifications/updatePreferences",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await notificationApi.updatePreferences(data);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  },
+);
+
+export const deleteNotification = createAsyncThunk(
+  "notifications/delete",
+  async (id, { rejectWithValue }) => {
+    try {
+      await notificationApi.deleteNotification(id);
+      return id;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  },
+);
+
+export const deleteAllNotifications = createAsyncThunk(
+  "notifications/deleteAll",
+  async (_, { rejectWithValue }) => {
+    try {
+      await notificationApi.deleteAllNotifications();
+      return true;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  },
+);
+
+export const clearAllNotifications = deleteAllNotifications;
 
 const notificationSlice = createSlice({
   name: "notifications",
@@ -52,53 +117,90 @@ const notificationSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    clearSuccess: (state) => {
+      state.success = null;
+    },
+    resetState: () => initialState,
+    addNotification: (state, action) => {
+      state.notifications.unshift(action.payload);
+      state.unreadCount += 1;
+    },
+    removeNotification: (state, action) => {
+      state.notifications = state.notifications.filter(
+        (n) => n.id !== action.payload,
+      );
+      state.unreadCount = state.notifications.filter((n) => !n.read).length;
+    },
+    clearNotifications: (state) => {
+      state.notifications = [];
+      state.unreadCount = 0;
+    },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchNotifications.pending, (state) => {
-        state.loading = true;
+      .addCase(getNotifications.pending, (state) => {
+        state.isLoading = true;
         state.error = null;
       })
-      .addCase(fetchNotifications.fulfilled, (state, action) => {
-        state.loading = false;
-        state.notifications = action.payload.notifications || [];
+      .addCase(getNotifications.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.notifications = action.payload.results || action.payload || [];
+        state.unreadCount = state.notifications.filter((n) => !n.read).length;
+        state.error = null;
       })
-      .addCase(fetchNotifications.rejected, (state, action) => {
-        state.loading = false;
-        state.error = getError(action.error);
+      .addCase(getNotifications.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
       })
-      .addCase(fetchUnreadCount.fulfilled, (state, action) => {
-        state.unread_count = action.payload.unread_count ?? 0;
+      .addCase(getUnreadCount.fulfilled, (state, action) => {
+        state.unreadCount = action.payload.count || 0;
       })
       .addCase(markAsRead.fulfilled, (state, action) => {
-        const updated = action.payload.notification;
-        state.notifications = state.notifications.map((n) =>
-          n.id === updated.id ? updated : n
+        const notification = state.notifications.find(
+          (n) => n.id === action.payload.id,
         );
-        state.unread_count = Math.max(0, state.unread_count - 1);
+        if (notification) {
+          notification.read = true;
+          state.unreadCount = Math.max(0, state.unreadCount - 1);
+        }
       })
       .addCase(markAllAsRead.fulfilled, (state) => {
-        state.notifications = state.notifications.map((n) => ({ ...n, read: true }));
-        state.unread_count = 0;
+        state.notifications = state.notifications.map((n) => ({
+          ...n,
+          read: true,
+        }));
+        state.unreadCount = 0;
+        state.success = "All notifications marked as read";
       })
-      .addCase(fetchPreferences.fulfilled, (state, action) => {
-        state.preferences = action.payload.preferences || action.payload;
+      .addCase(getPreferences.fulfilled, (state, action) => {
+        state.preferences = action.payload;
       })
       .addCase(updatePreferences.fulfilled, (state, action) => {
-        state.preferences = action.payload.preferences || action.payload;
+        state.preferences = action.payload;
+        state.success = "Preferences updated successfully";
       })
-      .addCase(removeNotification.fulfilled, (state, action) => {
-        const id = action.meta.arg;
-        const wasUnread = state.notifications.find((n) => n.id === id && !n.read);
-        state.notifications = state.notifications.filter((n) => n.id !== id);
-        if (wasUnread) state.unread_count = Math.max(0, state.unread_count - 1);
+      .addCase(deleteNotification.fulfilled, (state, action) => {
+        state.notifications = state.notifications.filter(
+          (n) => n.id !== action.payload,
+        );
+        state.unreadCount = state.notifications.filter((n) => !n.read).length;
+        state.success = "Notification deleted";
       })
-      .addCase(clearAllNotifications.fulfilled, (state) => {
+      .addCase(deleteAllNotifications.fulfilled, (state) => {
         state.notifications = [];
-        state.unread_count = 0;
+        state.unreadCount = 0;
+        state.success = "All notifications cleared";
       });
   },
 });
 
-export const { clearError } = notificationSlice.actions;
+export const {
+  clearError,
+  clearSuccess,
+  resetState,
+  addNotification,
+  removeNotification,
+  clearNotifications,
+} = notificationSlice.actions;
+
 export default notificationSlice.reducer;
