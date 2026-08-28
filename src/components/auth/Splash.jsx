@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 export const Splash = () => {
   return (
     <div className='splash-container'>
-      <div className='splash-badge'>MVP</div>
 
       <div className='splash-logo'>Ajali</div>
       <p className='splash-tagline'>Smart. Fast. Verified.</p>
@@ -23,20 +22,6 @@ export const Splash = () => {
         </Link>
       </div>
 
-      <div className='splash-features'>
-        <div className='splash-feature'>
-          <div className='feature-icon'>⚡</div>
-          <div className='feature-label'>Fast Response</div>
-        </div>
-        <div className='splash-feature'>
-          <div className='feature-icon'>✓</div>
-          <div className='feature-label'>Verified</div>
-        </div>
-        <div className='splash-feature'>
-          <div className='feature-icon'>📍</div>
-          <div className='feature-label'>Tracked</div>
-        </div>
-      </div>
     </div>
   );
 };
