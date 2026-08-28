@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser, clearError } from "../../redux/slices/authSlice";
 import { validateEmail } from "../../utils/validators";
-import "../../styles/global.css";
 
 export const Login = () => {
     const dispatch = useDispatch();
