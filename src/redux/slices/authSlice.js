@@ -31,7 +31,7 @@ const MOCK_ACCESS_TOKEN = "mock-access-token-xyz123";
 const MOCK_REFRESH_TOKEN = "mock-refresh-token-xyz456";
 
 // Check if using mock mode
-const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true" || true;
+const USE_MOCK = import.meta.env.VITE_USE_MOCK === "false" || false;
 
 // Async thunks with mock support
 export const registerUser = createAsyncThunk(
@@ -329,26 +329,26 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isAuthenticated = true;
         state.user = action.payload.user;
-        state.token = action.payload.tokens.access_token;
-        state.refreshToken = action.payload.tokens.refresh_token;
+
+        state.token = action.payload.access_token;
+        state.refreshToken = action.payload.refresh_token;
+
         state.success = action.payload.message || "Login successful!";
 
         localStorage.setItem(
           AUTH_CONSTANTS.TOKEN_KEY,
-          action.payload.tokens.access_token,
+          action.payload.access_token,
         );
+
         localStorage.setItem(
           AUTH_CONSTANTS.REFRESH_TOKEN_KEY,
-          action.payload.tokens.refresh_token,
+          action.payload.refresh_token,
         );
+
         localStorage.setItem(
           AUTH_CONSTANTS.USER_KEY,
           JSON.stringify(action.payload.user),
         );
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload;
       })
 
       // Get Current User

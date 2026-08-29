@@ -1,67 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import {
-  getAdminStats,
-  getRecentIncidents,
-} from "../api/admin_api";
-
-import {
-  // setStats,
-  // setIncidents,
+  fetchAdminStats,
+  fetchRecentIncidents,
 } from "../redux/slices/adminSlice";
-import "./AdminAnalyticsPage.css"
+
+import "./AdminAnalyticsPage.css";
 
 function AdminAnalyticsPage() {
   const dispatch = useDispatch();
 
-  const stats = useSelector(
-    (state) => state.admin.stats
-  );
-
-  const incidents = useSelector(
-    (state) => state.admin.incidents
-  );
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const {
+    stats,
+    recentIncidents,
+    loading,
+    error,
+  } = useSelector((state) => state.admin);
 
   useEffect(() => {
-    loadAnalytics();
-  }, []);
+    dispatch(fetchAdminStats());
+    dispatch(fetchRecentIncidents());
+  }, [dispatch]);
 
-  async function loadAnalytics() {
-    try {
-      setLoading(true);
-      setError("");
+  const formatStatus = (status) => {
+    if (!status) return "Unknown";
 
-      const [statsData, recentData] =
-        await Promise.all([
-          getAdminStats(),
-          getRecentIncidents(),
-        ]);
-
-      dispatch(setStats(statsData));
-
-      dispatch(
-        setIncidents(
-          recentData.results || recentData
-        )
-      );
-    } catch (error) {
-      console.error(
-        "Failed to load analytics:",
-        error
-      );
-
-      setError(
-        error.response?.data?.detail ||
-          "Failed to load analytics."
-      );
-    } finally {
-      setLoading(false);
-    }
-  }
+    return status
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  };
 
   if (loading) {
     return (
@@ -78,7 +46,12 @@ function AdminAnalyticsPage() {
         <h1>Analytics</h1>
         <p>{error}</p>
 
-        <button onClick={loadAnalytics}>
+        <button
+          onClick={() => {
+            dispatch(fetchAdminStats());
+            dispatch(fetchRecentIncidents());
+          }}
+        >
           Try Again
         </button>
       </div>
@@ -88,6 +61,7 @@ function AdminAnalyticsPage() {
   return (
     <div className="admin-analytics">
 
+      {/* HEADER */}
       <div className="analytics-header">
         <h1>Analytics</h1>
 
@@ -97,51 +71,62 @@ function AdminAnalyticsPage() {
         </p>
       </div>
 
+      {/* STATISTICS */}
       <div className="analytics-stats">
 
         <div className="stat-card">
           <h3>Total Incidents</h3>
-          <strong>{stats.total}</strong>
+          <strong>{stats?.total ?? 0}</strong>
         </div>
 
         <div className="stat-card">
           <h3>Resolved</h3>
-          <strong>{stats.resolved}</strong>
+          <strong>{stats?.resolved ?? 0}</strong>
         </div>
 
         <div className="stat-card">
           <h3>In Progress</h3>
-          <strong>{stats.inProgress}</strong>
+          <strong>
+            {stats?.inProgress ??
+              stats?.in_progress ??
+              0}
+          </strong>
         </div>
 
         <div className="stat-card">
           <h3>Critical</h3>
-          <strong>{stats.critical}</strong>
+          <strong>{stats?.critical ?? 0}</strong>
         </div>
 
       </div>
 
+      {/* RECENT INCIDENTS */}
       <div className="recent-incidents">
 
         <h2>Recent Incidents</h2>
 
-        {incidents.length === 0 ? (
+        {!recentIncidents ||
+        recentIncidents.length === 0 ? (
           <p>No recent incidents.</p>
         ) : (
           <div>
-            {incidents.map((incident) => (
+            {recentIncidents.map((incident) => (
               <div
                 key={incident.id}
                 className="recent-incident"
               >
-                <h3>{incident.title}</h3>
+                <h3>
+                  {incident.title ||
+                    "Untitled Incident"}
+                </h3>
 
                 <p>
-                  {incident.location_address}
+                  {incident.location_address ||
+                    "Unknown location"}
                 </p>
 
                 <span>
-                  {incident.status}
+                  {formatStatus(incident.status)}
                 </span>
               </div>
             ))}

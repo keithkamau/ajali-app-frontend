@@ -4,7 +4,7 @@ import { AUTH_CONSTANTS } from "../utils/constants";
 
 const USE_MOCK = import.meta.env.VITE_USE_MOCK === "true" || true;
 
-const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8000/api";
 
 const axiosInstance = axios.create({
   baseURL,

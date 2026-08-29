@@ -8,75 +8,51 @@ import {
 
 import "./AdminDashboard.css";
 
-const mockStats = {
-  total: 248,
-  resolved: 174,
-  inProgress: 52,
-  critical: 22,
-};
-
-const mockRecentIncidents = [
-  {
-    id: "AJ-001",
-    title: "Road Accident",
-    location: "Ngong Road",
-    status: "Reported",
-    priority: "Critical",
-    time: "10:24 AM",
-  },
-  {
-    id: "AJ-002",
-    title: "Medical Emergency",
-    location: "Kilimani",
-    status: "In Progress",
-    priority: "High",
-    time: "09:45 AM",
-  },
-  {
-    id: "AJ-003",
-    title: "Building Fire",
-    location: "Westlands",
-    status: "In Progress",
-    priority: "Critical",
-    time: "08:30 AM",
-  },
-  {
-    id: "AJ-004",
-    title: "Traffic Accident",
-    location: "Thika Road",
-    status: "Resolved",
-    priority: "Medium",
-    time: "Yesterday",
-  },
-];
-
 function AdminDashboard() {
   const dispatch = useDispatch();
 
   const {
-  stats,
-  recentIncidents,
-  loading,
-  error,
-} = useSelector((state) => state.admin);
+    stats,
+    recentIncidents,
+    loading,
+    error,
+  } = useSelector((state) => state.admin);
 
   useEffect(() => {
-  dispatch(fetchAdminStats());
-  dispatch(fetchRecentIncidents());
-}, [dispatch]);
+    dispatch(fetchAdminStats());
+    dispatch(fetchRecentIncidents());
+  }, [dispatch]);
 
-  // const recentIncidents =
-  //   incidents.length > 0
-  //     ? incidents.slice(0, 4)
-  //     : mockRecentIncidents;
+  // Convert Django status values into readable text
+  // Example: "under_review" -> "Under Review"
+  const formatStatus = (status) => {
+    if (!status) return "Unknown";
+
+    return status
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  };
+
+  // Format the incident time
+  const formatTime = (date) => {
+    if (!date) return "—";
+
+    const incidentDate = new Date(date);
+
+    if (Number.isNaN(incidentDate.getTime())) {
+      return date;
+    }
+
+    return incidentDate.toLocaleString("en-KE", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  };
 
   return (
     <div className="admin-dashboard">
 
-      {/*
-          HEADER
-     */}
-
+      {/* HEADER */}
       <div className="admin-dashboard-header">
         <div>
           <h1>Admin Dashboard</h1>
@@ -92,12 +68,23 @@ function AdminDashboard() {
         </div>
       </div>
 
-      {/*
-          STATISTICS
-     */}
+      {/* LOADING / ERROR */}
+      {loading && (
+        <div className="dashboard-message">
+          Loading dashboard data...
+        </div>
+      )}
 
+      {error && (
+        <div className="dashboard-error">
+          {error}
+        </div>
+      )}
+
+      {/* STATISTICS */}
       <div className="admin-stats-grid">
 
+        {/* Total Incidents */}
         <div className="admin-stat-card">
           <div className="stat-card-top">
             <span className="stat-label">
@@ -110,7 +97,7 @@ function AdminDashboard() {
           </div>
 
           <div className="stat-value">
-            {stats.total}
+            {stats?.total ?? 0}
           </div>
 
           <div className="stat-description">
@@ -118,6 +105,7 @@ function AdminDashboard() {
           </div>
         </div>
 
+        {/* Resolved */}
         <div className="admin-stat-card">
           <div className="stat-card-top">
             <span className="stat-label">
@@ -130,7 +118,7 @@ function AdminDashboard() {
           </div>
 
           <div className="stat-value">
-            {stats.resolved}
+            {stats?.resolved ?? 0}
           </div>
 
           <div className="stat-description">
@@ -138,6 +126,7 @@ function AdminDashboard() {
           </div>
         </div>
 
+        {/* In Progress */}
         <div className="admin-stat-card">
           <div className="stat-card-top">
             <span className="stat-label">
@@ -150,7 +139,7 @@ function AdminDashboard() {
           </div>
 
           <div className="stat-value">
-            {stats.inProgress}
+            {stats?.inProgress ?? stats?.in_progress ?? 0}
           </div>
 
           <div className="stat-description">
@@ -158,6 +147,7 @@ function AdminDashboard() {
           </div>
         </div>
 
+        {/* Critical */}
         <div className="admin-stat-card">
           <div className="stat-card-top">
             <span className="stat-label">
@@ -170,7 +160,7 @@ function AdminDashboard() {
           </div>
 
           <div className="stat-value">
-            {stats.critical}
+            {stats?.critical ?? 0}
           </div>
 
           <div className="stat-description">
@@ -180,14 +170,10 @@ function AdminDashboard() {
 
       </div>
 
-      {/*
-          MAIN CONTENT
-     */}
-
+      {/* MAIN CONTENT */}
       <div className="admin-dashboard-content">
 
-        {/* Recent Incidents */}
-
+        {/* RECENT INCIDENTS */}
         <div className="dashboard-panel recent-panel">
 
           <div className="panel-header">
@@ -206,65 +192,72 @@ function AdminDashboard() {
 
           <div className="recent-incidents">
 
-            {recentIncidents.map((incident) => (
-              <div
-                className="recent-incident"
-                key={incident.id}
-              >
+            {recentIncidents && recentIncidents.length > 0 ? (
+              recentIncidents.map((incident) => (
+                <div
+                  className="recent-incident"
+                  key={incident.id}
+                >
 
-                <div className="incident-main">
+                  <div className="incident-main">
 
-                  <div className="incident-title">
-                    {incident.title}
+                    <div className="incident-title">
+                      {incident.title || "Untitled Incident"}
+                    </div>
+
+                    <div className="incident-location">
+                      {incident.location_address ||
+                        "Unknown location"}
+                    </div>
+
                   </div>
 
-                  <div className="incident-location">
-                    {incident.location ||
-                      incident.location_address ||
-                      "Unknown location"}
+                  <div className="incident-meta">
+
+                    {/* Priority */}
+                    <span
+                      className={`priority-badge ${String(
+                        incident.priority || "Medium"
+                      ).toLowerCase()}`}
+                    >
+                      {incident.priority || "Medium"}
+                    </span>
+
+                    {/* Status */}
+                    <span
+                      className={`incident-status ${String(
+                        incident.status || ""
+                      )
+                        .toLowerCase()
+                        .replace(/_/g, "-")}`}
+                    >
+                      {formatStatus(incident.status)}
+                    </span>
+
+                    {/* Time */}
+                    <span className="incident-time">
+                      {formatTime(
+                        incident.created_at
+                      )}
+                    </span>
+
                   </div>
 
                 </div>
-
-                <div className="incident-meta">
-
-                  <span
-                    className={`priority-badge ${String(
-                      incident.priority ||
-                        "Medium"
-                    ).toLowerCase()}`}
-                  >
-                    {incident.priority ||
-                      "Medium"}
-                  </span>
-
-                  <span
-                    className={`incident-status ${String(
-                      incident.status
-                    )
-                      .toLowerCase()
-                      .replace(" ", "-")}`}
-                  >
-                    {incident.status}
-                  </span>
-
-                  <span className="incident-time">
-                    {incident.time ||
-                      incident.created_at ||
-                      "—"}
-                  </span>
-
+              ))
+            ) : (
+              !loading && (
+                <div className="no-recent-incidents">
+                  No recent incidents found.
                 </div>
-
-              </div>
-            ))}
+              )
+            )}
 
           </div>
 
         </div>
 
-        {/* Quick Overview */}
-
+        {/* QUICK OVERVIEW */}
         <div className="dashboard-panel overview-panel">
 
           <div className="panel-header">
@@ -277,11 +270,14 @@ function AdminDashboard() {
             </div>
           </div>
 
+          {/* Resolved */}
           <div className="overview-item">
-
             <div className="overview-info">
               <span>Resolved</span>
-              <strong>{stats.resolved}</strong>
+
+              <strong>
+                {stats?.resolved ?? 0}
+              </strong>
             </div>
 
             <div className="overview-bar">
@@ -289,8 +285,8 @@ function AdminDashboard() {
                 className="overview-bar-fill resolved-bar"
                 style={{
                   width: `${
-                    stats.total
-                      ? (stats.resolved /
+                    stats?.total
+                      ? ((stats.resolved ?? 0) /
                           stats.total) *
                         100
                       : 0
@@ -298,14 +294,18 @@ function AdminDashboard() {
                 }}
               />
             </div>
-
           </div>
 
+          {/* In Progress */}
           <div className="overview-item">
-
             <div className="overview-info">
               <span>In Progress</span>
-              <strong>{stats.inProgress}</strong>
+
+              <strong>
+                {stats?.inProgress ??
+                  stats?.in_progress ??
+                  0}
+              </strong>
             </div>
 
             <div className="overview-bar">
@@ -313,8 +313,10 @@ function AdminDashboard() {
                 className="overview-bar-fill progress-bar"
                 style={{
                   width: `${
-                    stats.total
-                      ? (stats.inProgress /
+                    stats?.total
+                      ? ((stats?.inProgress ??
+                          stats?.in_progress ??
+                          0) /
                           stats.total) *
                         100
                       : 0
@@ -322,14 +324,16 @@ function AdminDashboard() {
                 }}
               />
             </div>
-
           </div>
 
+          {/* Critical */}
           <div className="overview-item">
-
             <div className="overview-info">
               <span>Critical</span>
-              <strong>{stats.critical}</strong>
+
+              <strong>
+                {stats?.critical ?? 0}
+              </strong>
             </div>
 
             <div className="overview-bar">
@@ -337,8 +341,8 @@ function AdminDashboard() {
                 className="overview-bar-fill critical-bar"
                 style={{
                   width: `${
-                    stats.total
-                      ? (stats.critical /
+                    stats?.total
+                      ? ((stats.critical ?? 0) /
                           stats.total) *
                         100
                       : 0
@@ -346,7 +350,6 @@ function AdminDashboard() {
                 }}
               />
             </div>
-
           </div>
 
         </div>
