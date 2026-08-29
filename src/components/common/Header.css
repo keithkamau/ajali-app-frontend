@@ -23,11 +23,11 @@
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    letter-spacing: 0.5px;
 }
 
-.header-logo-icon {
-    font-size: 1.5rem;
+.header-logo-text {
+    color: var(--color-navy);
 }
 
 .header-nav {
@@ -54,7 +54,6 @@
     font-weight: 600;
 }
 
-/* User section - separate from nav links */
 .header-user-section {
     display: flex;
     align-items: center;
@@ -64,7 +63,6 @@
     border-left: 1px solid var(--color-border);
 }
 
-/* User Avatar */
 .header-user-avatar {
     display: flex;
     align-items: center;
@@ -73,7 +71,7 @@
     height: 2.5rem;
     border-radius: 50%;
     background-color: var(--color-navy);
-    color: white;
+    color: #ffffff;
     text-decoration: none;
     font-weight: 600;
     font-size: 0.875rem;
@@ -91,13 +89,16 @@
     font-size: 0.8rem;
     font-weight: 600;
     font-family: var(--font-display);
+    color: #ffffff;
 }
 
 .avatar-icon {
-    font-size: 1.2rem;
+    font-size: 1rem;
+    font-weight: 600;
+    font-family: var(--font-display);
+    color: #ffffff;
 }
 
-/* User Name */
 .header-user-name {
     font-family: var(--font-body);
     font-weight: 500;
