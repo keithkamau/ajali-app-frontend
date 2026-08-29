@@ -8,7 +8,7 @@ import {
 import { useSelector } from "react-redux";
 
 // Components
-import { Header } from "./components/common/Header";
+import Header from "./components/common/Header";
 import { BottomNav } from "./components/common/BottomNav";
 import { Sidebar } from "./components/common/Sidebar";
 
