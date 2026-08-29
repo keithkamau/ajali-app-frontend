@@ -1,0 +1,142 @@
+.header {
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    padding: 0.75rem 1.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+.header-container {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header-logo {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--color-navy);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.header-logo-icon {
+    font-size: 1.5rem;
+}
+
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.header-nav-link {
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--color-ink-muted);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.header-nav-link:hover {
+    color: var(--color-ink);
+}
+
+.header-nav-link.active {
+    color: var(--color-navy);
+    font-weight: 600;
+}
+
+/* User section - separate from nav links */
+.header-user-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-left: 0.5rem;
+    padding-left: 0.75rem;
+    border-left: 1px solid var(--color-border);
+}
+
+/* User Avatar */
+.header-user-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background-color: var(--color-navy);
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.875rem;
+    transition: background-color 0.2s, transform 0.2s;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.header-user-avatar:hover {
+    background-color: #1a2a4a;
+    transform: scale(1.05);
+}
+
+.avatar-initials {
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: var(--font-display);
+}
+
+.avatar-icon {
+    font-size: 1.2rem;
+}
+
+/* User Name */
+.header-user-name {
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--color-ink);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.header-user-name:hover {
+    color: var(--color-navy);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .header-nav {
+        gap: 0.75rem;
+    }
+    
+    .header-user-name {
+        display: none;
+    }
+    
+    .header-user-section {
+        gap: 0.5rem;
+        padding-left: 0.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 0.5rem 1rem;
+    }
+    
+    .header-nav-link {
+        font-size: 0.75rem;
+    }
+    
+    .header-logo {
+        font-size: 1rem;
+    }
+}
