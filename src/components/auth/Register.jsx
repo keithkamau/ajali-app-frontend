@@ -24,29 +24,61 @@ export const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const newErrors = {};
+    if (!formData.full_name.trim())
+      newErrors.full_name = "Full name is required";
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password || formData.password.length < 8) {
       newErrors.password = "Password must be at least 8 characters";
     }
-    if (!formData.full_name) newErrors.full_name = "Full name is required";
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
+
     setErrors({});
     dispatch(clearError());
-    const result = await dispatch(registerUser(formData));
-    if (result.payload?.message) {
-      setFormData({ email: "", password: "", full_name: "", phone_number: "" });
-      setTimeout(() => navigate("/login"), 3000);
+
+    try {
+      const result = await dispatch(
+        registerUser({
+          email: formData.email.trim(),
+          password: formData.password,
+          full_name: formData.full_name.trim(),
+          phone_number: formData.phone_number.trim() || "",
+        }),
+      );
+
+      // Check if registration was successful
+      if (result.meta.requestStatus === "fulfilled") {
+        // Clear form
+        setFormData({
+          email: "",
+          password: "",
+          full_name: "",
+          phone_number: "",
+        });
+
+        // Navigate to login after 2 seconds
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      } else {
+        // Registration failed - error is already in Redux state
+        console.error("Registration failed:", result.payload);
+      }
+    } catch (err) {
+      console.error("Registration error:", err);
     }
   };
 
+  // Get error message properly
   const errorMessage =
     typeof error === "string"
       ? error
-      : error?.message || error?.error || "Registration failed";
+      : error?.message || error?.error || error?.email || "Registration failed";
 
   return (
     <div className='auth-page'>
