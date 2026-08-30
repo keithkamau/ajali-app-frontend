@@ -1,379 +1,345 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { MapPinIcon, CameraIcon, VideoIcon, CloseIcon } from "../icons";
-import IncidentMap from "./IncidentMap";
-import LocationSearch from "./LocationSearch";
-import { reverseGeocode as apiReverseGeocode } from "../../api/incidentApi";
+import { createIncident, updateIncident } from "../../redux/slices/incidentSlice";
+import "./IncidentForm.css";
 
-// Reverse-geocoding is proxied through our own authenticated backend
-// endpoint (which itself uses OpenStreetMap/Nominatim server-side), rather
-// than calling Nominatim directly from the browser.
-async function reverseGeocode(lat, lng) {
-  try {
-    const data = await apiReverseGeocode(lat, lng);
-    return data?.address || "";
-  } catch (err) {
-    console.error("Reverse geocode error:", err);
-    return "";
-  }
-}
+export const IncidentForm = ({ incident, isEditing }) => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { isLoading } = useSelector((state) => state.incidents);
+    const fileInputRef = useRef(null);
 
-export const IncidentForm = () => {
-  const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    type: "accident",
-    location: {
-      lat: -1.286389,
-      lng: 36.817223,
-      address: "",
-    },
-    isAnonymous: false,
-    images: [],
-    videos: [],
-  });
-  const [errors, setErrors] = useState({});
-  const [isLocating, setIsLocating] = useState(false);
+    const [formData, setFormData] = useState({
+        title: incident?.title || "",
+        description: incident?.description || "",
+        type: incident?.type || "accident",
+        location_lat: incident?.location_lat || "",
+        location_lng: incident?.location_lng || "",
+        location_address: incident?.location_address || "",
+        is_anonymous: incident?.is_anonymous || false,
+    });
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
+    const [files, setFiles] = useState([]);
+    const [imagePreviews, setImagePreviews] = useState([]);
+    const [videoPreviews, setVideoPreviews] = useState([]);
+    const [errors, setErrors] = useState({});
 
-  const handleLocationChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      location: { ...prev.location, [name]: value },
-    }));
-  };
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setFormData({
+            ...formData,
+            [name]: type === "checkbox" ? checked : value,
+        });
+        setErrors({ ...errors, [name]: "" });
+    };
 
-  // Called when the user clicks on the map to drop a pin.
-  const handleMapLocationChange = async ({ lat, lng }) => {
-    setFormData((prev) => ({
-      ...prev,
-      location: { ...prev.location, lat, lng },
-    }));
-    const address = await reverseGeocode(lat, lng);
-    if (address) {
-      setFormData((prev) => ({
-        ...prev,
-        location: { ...prev.location, address },
-      }));
-    }
-  };
+    const handleFileChange = (e) => {
+        const selectedFiles = Array.from(e.target.files);
+        const newImages = [];
+        const newVideos = [];
 
-  // Called when the user picks a result from the location search box.
-  const handleLocationSearchSelect = ({ lat, lng, address }) => {
-    setFormData((prev) => ({
-      ...prev,
-      location: { lat, lng, address },
-    }));
-  };
+        selectedFiles.forEach((file) => {
+            if (file.type.startsWith("image/")) {
+                newImages.push(file);
+            } else if (file.type.startsWith("video/")) {
+                newVideos.push(file);
+            }
+        });
 
-  // Uses the browser's built-in Geolocation API (free, no key required).
-  const handleUseMyLocation = () => {
-    if (!navigator.geolocation) {
-      setErrors((prev) => ({
-        ...prev,
-        location: "Your browser doesn't support geolocation",
-      }));
-      return;
-    }
-    setIsLocating(true);
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        setFormData((prev) => ({
-          ...prev,
-          location: { ...prev.location, lat: latitude, lng: longitude },
+        setFiles([...files, ...selectedFiles]);
+
+        // Create previews
+        const newImagePreviews = newImages.map((file) => ({
+            file,
+            url: URL.createObjectURL(file),
+            type: "image",
         }));
-        const address = await reverseGeocode(latitude, longitude);
-        if (address) {
-          setFormData((prev) => ({
-            ...prev,
-            location: { ...prev.location, address },
-          }));
+
+        const newVideoPreviews = newVideos.map((file) => ({
+            file,
+            url: URL.createObjectURL(file),
+            type: "video",
+        }));
+
+        setImagePreviews([...imagePreviews, ...newImagePreviews]);
+        setVideoPreviews([...videoPreviews, ...newVideoPreviews]);
+
+        // Reset input
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
         }
-        setIsLocating(false);
-      },
-      (error) => {
-        console.error("Geolocation error:", error);
-        setErrors((prev) => ({
-          ...prev,
-          location: "Couldn't detect your location. Please allow location access or enter it manually.",
-        }));
-        setIsLocating(false);
-      }
+    };
+
+    const removeFile = (index, type) => {
+        if (type === "image") {
+            const newPreviews = imagePreviews.filter((_, i) => i !== index);
+            setImagePreviews(newPreviews);
+            // Also remove from files
+            const fileIndex = files.findIndex((f) => f === imagePreviews[index].file);
+            if (fileIndex !== -1) {
+                const newFiles = [...files];
+                newFiles.splice(fileIndex, 1);
+                setFiles(newFiles);
+            }
+        } else {
+            const newPreviews = videoPreviews.filter((_, i) => i !== index);
+            setVideoPreviews(newPreviews);
+            const fileIndex = files.findIndex((f) => f === videoPreviews[index].file);
+            if (fileIndex !== -1) {
+                const newFiles = [...files];
+                newFiles.splice(fileIndex, 1);
+                setFiles(newFiles);
+            }
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Validation
+        const newErrors = {};
+        if (!formData.title.trim()) newErrors.title = "Title is required";
+        if (!formData.description.trim()) newErrors.description = "Description is required";
+        if (!formData.type) newErrors.type = "Incident type is required";
+        if (!formData.location_lat || !formData.location_lng) {
+            newErrors.location = "Location coordinates are required";
+        }
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
+        const submitData = {
+            ...formData,
+            location_lat: parseFloat(formData.location_lat),
+            location_lng: parseFloat(formData.location_lng),
+        };
+
+        if (isEditing) {
+            await dispatch(updateIncident({ id: incident.id, data: submitData }));
+        } else {
+            await dispatch(createIncident(submitData));
+        }
+
+        navigate("/dashboard");
+    };
+
+    return (
+        <div className="incident-form-container">
+            <form onSubmit={handleSubmit} className="incident-form">
+                <div className="incident-form-header">
+                    <h2>{isEditing ? "Edit Incident" : "Report New Incident"}</h2>
+                    <p className="body-small">Fill in the details below to submit a report</p>
+                </div>
+
+                {/* Basic Information */}
+                <div className="form-section">
+                    <h3 className="form-section-title">Basic Information</h3>
+                    
+                    <div className="form-group">
+                        <label className="label label-required">Title</label>
+                        <input
+                            type="text"
+                            name="title"
+                            className={`input ${errors.title ? "input-error" : ""}`}
+                            placeholder="Enter incident title"
+                            value={formData.title}
+                            onChange={handleChange}
+                        />
+                        {errors.title && <span className="form-error">{errors.title}</span>}
+                    </div>
+
+                    <div className="form-group">
+                        <label className="label label-required">Description</label>
+                        <textarea
+                            name="description"
+                            className={`input ${errors.description ? "input-error" : ""}`}
+                            rows="4"
+                            placeholder="Describe the incident in detail"
+                            value={formData.description}
+                            onChange={handleChange}
+                        />
+                        {errors.description && <span className="form-error">{errors.description}</span>}
+                    </div>
+
+                    <div className="form-group">
+                        <label className="label label-required">Incident Type</label>
+                        <select
+                            name="type"
+                            className={`input ${errors.type ? "input-error" : ""}`}
+                            value={formData.type}
+                            onChange={handleChange}
+                        >
+                            <option value="accident">Accident</option>
+                            <option value="emergency">Emergency</option>
+                        </select>
+                        {errors.type && <span className="form-error">{errors.type}</span>}
+                    </div>
+                </div>
+
+                {/* Location Section */}
+                <div className="form-section">
+                    <h3 className="form-section-title">Location</h3>
+                    
+                    <div className="form-group">
+                        <label className="label">Address</label>
+                        <input
+                            type="text"
+                            name="location_address"
+                            className="input"
+                            placeholder="Enter location address"
+                            value={formData.location_address}
+                            onChange={handleChange}
+                        />
+                    </div>
+
+                    <div className="form-row">
+                        <div className="form-group half">
+                            <label className="label label-required">Latitude</label>
+                            <input
+                                type="number"
+                                name="location_lat"
+                                className={`input ${errors.location ? "input-error" : ""}`}
+                                placeholder="e.g., -1.286389"
+                                step="any"
+                                value={formData.location_lat}
+                                onChange={handleChange}
+                            />
+                        </div>
+                        <div className="form-group half">
+                            <label className="label label-required">Longitude</label>
+                            <input
+                                type="number"
+                                name="location_lng"
+                                className={`input ${errors.location ? "input-error" : ""}`}
+                                placeholder="e.g., 36.817223"
+                                step="any"
+                                value={formData.location_lng}
+                                onChange={handleChange}
+                            />
+                        </div>
+                    </div>
+                    {errors.location && <span className="form-error">{errors.location}</span>}
+                    
+                    <div className="map-placeholder">
+                        <div className="map-placeholder-content">
+                            <span>🗺️</span>
+                            <p>Map will be displayed here</p>
+                            <span className="body-small">Click on the map to select location</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Media Upload Section - FIXED STYLING */}
+                <div className="form-section">
+                    <h3 className="form-section-title">Upload Photos & Videos</h3>
+                    <p className="body-small" style={{ marginBottom: "1rem" }}>
+                        Upload images or videos to support your report
+                    </p>
+
+                    <div className="upload-area">
+                        <div 
+                            className="upload-dropzone"
+                            onClick={() => fileInputRef.current?.click()}
+                        >
+                            <div className="upload-icon">📸</div>
+                            <p className="upload-text">Click to upload or drag and drop</p>
+                            <span className="upload-hint">Images (JPG, PNG, GIF) or Videos (MP4, MOV)</span>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                accept="image/*,video/*"
+                                multiple
+                                style={{ display: "none" }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Image Previews */}
+                    {imagePreviews.length > 0 && (
+                        <div className="previews-section">
+                            <h4 className="previews-title">Images ({imagePreviews.length})</h4>
+                            <div className="previews-grid">
+                                {imagePreviews.map((preview, index) => (
+                                    <div key={index} className="preview-item image-preview">
+                                        <img src={preview.url} alt={`Upload ${index + 1}`} />
+                                        <button
+                                            type="button"
+                                            className="preview-remove"
+                                            onClick={() => removeFile(index, "image")}
+                                        >
+                                            ×
+                                        </button>
+                                        <span className="preview-label">Image</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Video Previews */}
+                    {videoPreviews.length > 0 && (
+                        <div className="previews-section">
+                            <h4 className="previews-title">Videos ({videoPreviews.length})</h4>
+                            <div className="previews-grid">
+                                {videoPreviews.map((preview, index) => (
+                                    <div key={index} className="preview-item video-preview">
+                                        <video src={preview.url} controls />
+                                        <button
+                                            type="button"
+                                            className="preview-remove"
+                                            onClick={() => removeFile(index, "video")}
+                                        >
+                                            ×
+                                        </button>
+                                        <span className="preview-label">Video</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+
+                {/* Anonymous Option */}
+                <div className="form-section">
+                    <div className="form-group checkbox-group">
+                        <label className="checkbox-label">
+                            <input
+                                type="checkbox"
+                                name="is_anonymous"
+                                checked={formData.is_anonymous}
+                                onChange={handleChange}
+                            />
+                            <span>Report anonymously</span>
+                        </label>
+                        <span className="body-small">Your name will not be shown</span>
+                    </div>
+                </div>
+
+                {/* Submit Buttons */}
+                <div className="form-actions">
+                    <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => navigate("/dashboard")}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={isLoading}
+                    >
+                        {isLoading 
+                            ? (isEditing ? "Updating..." : "Submitting...") 
+                            : (isEditing ? "Update Report" : "Submit Report")
+                        }
+                    </button>
+                </div>
+            </form>
+        </div>
     );
-  };
-
-  const handleFileChange = (e) => {
-    const { name, files } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: Array.from(files),
-    }));
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Validation
-    const newErrors = {};
-    if (!formData.title) newErrors.title = "Title is required";
-    if (!formData.description)
-      newErrors.description = "Description is required";
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-    // Submit logic here
-    console.log("Form submitted:", formData);
-  };
-
-  return (
-    <div className='incident-form-container'>
-      <div className='incident-form-header'>
-        <h1 className='heading-2'>Report an Incident</h1>
-        <p className='body-small text-muted'>
-          Tell us what happened. Share the details responders need to act
-          quickly.
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className='incident-form'>
-        <div className='incident-form-card'>
-          <h2 className='heading-4' style={{ marginBottom: "1.5rem" }}>
-            Incident Details
-          </h2>
-
-          <div className='form-group'>
-            <label className='label label-required' htmlFor='title'>Title</label>
-            <input
-              id='title'
-              type='text'
-              name='title'
-              className={`input ${errors.title ? "input-error" : ""}`}
-              placeholder='e.g., Two-car collision on Thika Road'
-              value={formData.title}
-              onChange={handleChange}
-            />
-            {errors.title && <div className='form-error'>{errors.title}</div>}
-            <div className='form-hint'>
-              Give a clear description of what you saw
-            </div>
-          </div>
-
-          <div className='form-group'>
-            <label className='label label-required' htmlFor='description'>What happened?</label>
-            <textarea
-              id='description'
-              name='description'
-              className={`input ${errors.description ? "input-error" : ""}`}
-              placeholder='Describe the incident in detail...'
-              rows='4'
-              value={formData.description}
-              onChange={handleChange}
-            />
-            {errors.description && (
-              <div className='form-error'>{errors.description}</div>
-            )}
-          </div>
-
-          <div className='form-group'>
-            <label className='label label-required' htmlFor='type'>Incident Type</label>
-            <select
-              id='type'
-              name='type'
-              className='input'
-              value={formData.type}
-              onChange={handleChange}
-            >
-              <option value='accident'>Accident</option>
-              <option value='emergency'>Emergency</option>
-              <option value='fire'>Fire</option>
-              <option value='crime'>Crime</option>
-              <option value='other'>Other</option>
-            </select>
-          </div>
-        </div>
-
-        <div className='incident-form-card'>
-          <h2 className='heading-4' style={{ marginBottom: "1.5rem" }}>
-            Location
-          </h2>
-
-          <div className='form-group'>
-            <label className='label'>Where is it happening?</label>
-            <LocationSearch onSelect={handleLocationSearchSelect} />
-            <button
-              type='button'
-              className='btn btn-secondary btn-block'
-              onClick={handleUseMyLocation}
-              disabled={isLocating}
-              style={{ marginTop: "0.75rem" }}
-            >
-              {isLocating ? "Detecting..." : "Use my location"}
-            </button>
-            <div className='form-hint' style={{ marginTop: "0.5rem" }}>
-              We'll detect your current location, or search / click on the
-              map below
-            </div>
-            {errors.location && (
-              <div className='form-error'>{errors.location}</div>
-            )}
-          </div>
-
-          <div className='form-group'>
-            <IncidentMap
-              location={{
-                lat: Number(formData.location.lat),
-                lng: Number(formData.location.lng),
-              }}
-              onLocationChange={handleMapLocationChange}
-            />
-          </div>
-
-          <div className='location-grid'>
-            <div className='form-group'>
-              <label className='label' htmlFor='lat'>Latitude</label>
-              <input
-                id='lat'
-                type='text'
-                name='lat'
-                className='input'
-                value={formData.location.lat}
-                onChange={handleLocationChange}
-              />
-            </div>
-            <div className='form-group'>
-              <label className='label' htmlFor='lng'>Longitude</label>
-              <input
-                id='lng'
-                type='text'
-                name='lng'
-                className='input'
-                value={formData.location.lng}
-                onChange={handleLocationChange}
-              />
-            </div>
-          </div>
-
-          <div className='form-group'>
-            <label className='label' htmlFor='address'>Address or Landmark</label>
-            <input
-              id='address'
-              type='text'
-              name='address'
-              className='input'
-              placeholder='e.g., Near Kenyatta Avenue'
-              value={formData.location.address}
-              onChange={handleLocationChange}
-            />
-          </div>
-        </div>
-
-        <div className='incident-form-card'>
-          <h2 className='heading-4' style={{ marginBottom: "1rem" }}>
-            Evidence
-          </h2>
-          <p
-            className='body-small text-muted'
-            style={{ marginBottom: "1.5rem" }}
-          >
-            Images and videos help responders verify the report.
-          </p>
-
-          <div className='evidence-grid'>
-            <div className='evidence-upload'>
-              <label className='evidence-upload-label'>
-                <CameraIcon color='var(--color-ink-muted)' size={24} />
-                <span>Upload Images</span>
-                <input
-                  type='file'
-                  name='images'
-                  accept='image/*'
-                  multiple
-                  onChange={handleFileChange}
-                  style={{ display: "none" }}
-                />
-              </label>
-              {formData.images.length > 0 && (
-                <div className='evidence-files'>
-                  {formData.images.map((file, index) => (
-                    <span key={index} className='evidence-file'>
-                      {file.name}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className='evidence-upload'>
-              <label className='evidence-upload-label'>
-                <VideoIcon color='var(--color-ink-muted)' size={24} />
-                <span>Upload Videos</span>
-                <input
-                  type='file'
-                  name='videos'
-                  accept='video/*'
-                  multiple
-                  onChange={handleFileChange}
-                  style={{ display: "none" }}
-                />
-              </label>
-              {formData.videos.length > 0 && (
-                <div className='evidence-files'>
-                  {formData.videos.map((file, index) => (
-                    <span key={index} className='evidence-file'>
-                      {file.name}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className='incident-form-card'>
-          <div className='form-group'>
-            <label className='checkbox-label'>
-              <input
-                type='checkbox'
-                name='isAnonymous'
-                checked={formData.isAnonymous}
-                onChange={handleChange}
-              />
-              <span>Submit anonymously</span>
-            </label>
-            <div className='form-hint'>
-              Your identity will be hidden from the public report
-            </div>
-          </div>
-        </div>
-
-        <div className='incident-form-actions'>
-          <button
-            type='button'
-            className='btn btn-secondary'
-            onClick={() => navigate(-1)}
-          >
-            Cancel
-          </button>
-          <button type='submit' className='btn btn-primary'>
-            Submit Report
-          </button>
-        </div>
-      </form>
-    </div>
-  );
 };
-
-export default IncidentForm;
