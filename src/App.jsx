@@ -1,19 +1,20 @@
+// src/App.jsx
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Header from "./components/common/Header";
-import { HomePage } from "./pages/HomePage";
-import { LoginPage } from "./pages/LoginPage";
-import { RegisterPage } from "./pages/RegisterPage";
-import { DashboardPage } from "./pages/DashboardPage";
-import { CreateIncidentPage } from "./pages/CreateIncidentPage";
-import { EditIncidentPage } from "./pages/EditIncidentPage";
-import { IncidentDetailPage } from "./pages/IncidentDetailPage";
-import { ProfilePage } from "./pages/ProfilePage";
-import { AdminPage } from "./pages/AdminPage";
-import { NotificationsPage } from "./pages/NotificationsPage";
-import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
-import { ResetPasswordPage } from "./pages/ResetPasswordPage";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import DashboardPage from "./pages/DashboardPage";
+import CreateIncidentPage from "./pages/CreateIncidentPage";
+import EditIncidentPage from "./pages/EditIncidentPage";
+import IncidentDetailPage from "./pages/IncidentDetailPage";
+import ProfilePage from "./pages/ProfilePage";
+import AdminPage from "./pages/AdminPage";
+import NotificationsPage from "./pages/NotificationsPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated } = useSelector((state) => state.auth);
