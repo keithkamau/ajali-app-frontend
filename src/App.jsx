@@ -3,6 +3,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Header from "./components/common/Header";
+import Sidebar from "./components/common/Sidebar";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -29,82 +30,87 @@ const AdminRoute = ({ children }) => {
 };
 
 function App() {
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
   return (
     <BrowserRouter>
       <Header />
-      <main className='main-content'>
-        <Routes>
-          {/* Public Routes */}
-          <Route path='/' element={<Navigate to='/dashboard' />} />
-          <Route path='/login' element={<LoginPage />} />
-          <Route path='/register' element={<RegisterPage />} />
-          <Route path='/forgot-password' element={<ForgotPasswordPage />} />
-          <Route
-            path='/reset-password/:token'
-            element={<ResetPasswordPage />}
-          />
+      <div className='app-layout'>
+        {isAuthenticated && <Sidebar />}
+        <main className='main-content'>
+          <Routes>
+            {/* Public Routes */}
+            <Route path='/' element={<Navigate to='/dashboard' />} />
+            <Route path='/login' element={<LoginPage />} />
+            <Route path='/register' element={<RegisterPage />} />
+            <Route path='/forgot-password' element={<ForgotPasswordPage />} />
+            <Route
+              path='/reset-password/:token'
+              element={<ResetPasswordPage />}
+            />
 
-          {/* Protected Routes */}
-          <Route
-            path='/dashboard'
-            element={
-              <PrivateRoute>
-                <DashboardPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path='/profile'
-            element={
-              <PrivateRoute>
-                <ProfilePage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path='/incidents/create'
-            element={
-              <PrivateRoute>
-                <CreateIncidentPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path='/incidents/:id'
-            element={
-              <PrivateRoute>
-                <IncidentDetailPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path='/incidents/:id/edit'
-            element={
-              <PrivateRoute>
-                <EditIncidentPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path='/notifications'
-            element={
-              <PrivateRoute>
-                <NotificationsPage />
-              </PrivateRoute>
-            }
-          />
+            {/* Protected Routes */}
+            <Route
+              path='/dashboard'
+              element={
+                <PrivateRoute>
+                  <DashboardPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/profile'
+              element={
+                <PrivateRoute>
+                  <ProfilePage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/incidents/create'
+              element={
+                <PrivateRoute>
+                  <CreateIncidentPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/incidents/:id'
+              element={
+                <PrivateRoute>
+                  <IncidentDetailPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/incidents/:id/edit'
+              element={
+                <PrivateRoute>
+                  <EditIncidentPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path='/notifications'
+              element={
+                <PrivateRoute>
+                  <NotificationsPage />
+                </PrivateRoute>
+              }
+            />
 
-          {/* Admin Routes */}
-          <Route
-            path='/admin'
-            element={
-              <AdminRoute>
-                <AdminPage />
-              </AdminRoute>
-            }
-          />
-        </Routes>
-      </main>
+            {/* Admin Routes */}
+            <Route
+              path='/admin'
+              element={
+                <AdminRoute>
+                  <AdminPage />
+                </AdminRoute>
+              }
+            />
+          </Routes>
+        </main>
+      </div>
     </BrowserRouter>
   );
 }
