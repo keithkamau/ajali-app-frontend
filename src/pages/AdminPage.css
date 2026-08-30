@@ -1,0 +1,163 @@
+.admin-page {
+    padding: 1.5rem 0;
+}
+
+.admin-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    text-align: center;
+}
+
+.stat-value {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-navy);
+}
+
+.stat-label {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--color-ink-muted);
+    margin-top: 0.25rem;
+}
+
+.admin-filters {
+    margin-bottom: 1.5rem;
+}
+
+.admin-filters .input {
+    max-width: 240px;
+}
+
+.admin-incident-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.admin-incident-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.admin-incident-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.admin-incident-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.admin-incident-header h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-ink);
+    margin: 0;
+}
+
+.admin-incident-description {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-ink-muted);
+    margin: 0.5rem 0;
+}
+
+.admin-incident-meta {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--color-ink-muted);
+    margin: 0.5rem 0;
+    flex-wrap: wrap;
+}
+
+.admin-incident-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.status-update-form {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.status-update-form .input {
+    flex: 1;
+    min-width: 150px;
+}
+
+.admin-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    gap: 1rem;
+}
+
+/* Badge colors */
+.badge-pending {
+    background: var(--color-amber-light);
+    color: var(--color-amber);
+}
+
+.badge-under-investigation {
+    background: var(--color-red-light);
+    color: var(--color-red);
+}
+
+.badge-resolved {
+    background: var(--color-green-light);
+    color: var(--color-green);
+}
+
+.badge-rejected {
+    background: var(--color-ground);
+    color: var(--color-ink-muted);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .admin-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .admin-incident-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .status-update-form {
+        flex-direction: column;
+    }
+    
+    .status-update-form .input {
+        min-width: 100%;
+    }
+}
