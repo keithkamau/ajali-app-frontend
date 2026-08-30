@@ -5,30 +5,14 @@ import {
   createIncident,
   updateIncident,
 } from "../../redux/slices/incidentSlice";
-import "./IncidentForm.css";
 import { LocationPicker } from "./LocationPicker";
+import "./IncidentForm.css";
 
 export const IncidentForm = ({ incident, isEditing }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isLoading } = useSelector((state) => state.incidents);
   const fileInputRef = useRef(null);
-
-  const [location, setLocation] = useState({
-    lat: formData.location_lat || "",
-    lng: formData.location_lng || "",
-    address: formData.location_address || "",
-  });
-
-  const handleLocationSelect = (locationData) => {
-    setLocation(locationData);
-    setFormData({
-      ...formData,
-      location_lat: locationData.lat,
-      location_lng: locationData.lng,
-      location_address: locationData.address || formData.location_address,
-    });
-  };
 
   const [formData, setFormData] = useState({
     title: incident?.title || "",
@@ -44,6 +28,11 @@ export const IncidentForm = ({ incident, isEditing }) => {
   const [imagePreviews, setImagePreviews] = useState([]);
   const [videoPreviews, setVideoPreviews] = useState([]);
   const [errors, setErrors] = useState({});
+  const [location, setLocation] = useState({
+    lat: incident?.location_lat || "",
+    lng: incident?.location_lng || "",
+    address: incident?.location_address || "",
+  });
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -52,6 +41,16 @@ export const IncidentForm = ({ incident, isEditing }) => {
       [name]: type === "checkbox" ? checked : value,
     });
     setErrors({ ...errors, [name]: "" });
+  };
+
+  const handleLocationSelect = (locationData) => {
+    setLocation(locationData);
+    setFormData({
+      ...formData,
+      location_lat: locationData.lat,
+      location_lng: locationData.lng,
+      location_address: locationData.address || formData.location_address,
+    });
   };
 
   const handleFileChange = (e) => {
@@ -69,7 +68,6 @@ export const IncidentForm = ({ incident, isEditing }) => {
 
     setFiles([...files, ...selectedFiles]);
 
-    // Create previews
     const newImagePreviews = newImages.map((file) => ({
       file,
       url: URL.createObjectURL(file),
@@ -85,7 +83,6 @@ export const IncidentForm = ({ incident, isEditing }) => {
     setImagePreviews([...imagePreviews, ...newImagePreviews]);
     setVideoPreviews([...videoPreviews, ...newVideoPreviews]);
 
-    // Reset input
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
@@ -95,7 +92,6 @@ export const IncidentForm = ({ incident, isEditing }) => {
     if (type === "image") {
       const newPreviews = imagePreviews.filter((_, i) => i !== index);
       setImagePreviews(newPreviews);
-      // Also remove from files
       const fileIndex = files.findIndex((f) => f === imagePreviews[index].file);
       if (fileIndex !== -1) {
         const newFiles = [...files];
@@ -117,7 +113,6 @@ export const IncidentForm = ({ incident, isEditing }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validation
     const newErrors = {};
     if (!formData.title.trim()) newErrors.title = "Title is required";
     if (!formData.description.trim())
@@ -223,9 +218,9 @@ export const IncidentForm = ({ incident, isEditing }) => {
           {/* Map/Location Picker */}
           <LocationPicker
             onLocationSelect={handleLocationSelect}
-            initialLat={formData.location_lat}
-            initialLng={formData.location_lng}
-            address={formData.location_address}
+            initialLat={location.lat}
+            initialLng={location.lng}
+            address={location.address}
           />
 
           {errors.location && (
@@ -233,7 +228,7 @@ export const IncidentForm = ({ incident, isEditing }) => {
           )}
         </div>
 
-        {/* Media Upload Section - FIXED STYLING */}
+        {/* Media Upload Section */}
         <div className='form-section'>
           <h3 className='form-section-title'>Upload Photos & Videos</h3>
           <p className='body-small' style={{ marginBottom: "1rem" }}>
@@ -244,6 +239,15 @@ export const IncidentForm = ({ incident, isEditing }) => {
             <div
               className='upload-dropzone'
               onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                const droppedFiles = Array.from(e.dataTransfer.files);
+                if (droppedFiles.length > 0) {
+                  const event = { target: { files: droppedFiles } };
+                  handleFileChange(event);
+                }
+              }}
             >
               <div className='upload-icon'>📸</div>
               <p className='upload-text'>Click to upload or drag and drop</p>
