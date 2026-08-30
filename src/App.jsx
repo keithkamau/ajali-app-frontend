@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Header from "./components/common/Header";
 import Sidebar from "./components/common/Sidebar";
-import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -31,21 +30,13 @@ const AdminRoute = ({ children }) => {
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
     <BrowserRouter>
       <Header />
       <div className='app-layout'>
-        {isAuthenticated && (
-          <Sidebar
-            collapsed={sidebarCollapsed}
-            onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-          />
-        )}
-        <main
-          className={`main-content ${isAuthenticated ? "with-sidebar" : ""}`}
-        >
+        {isAuthenticated && <Sidebar />}
+        <main className='main-content'>
           <Routes>
             <Route path='/' element={<Navigate to='/dashboard' />} />
             <Route path='/login' element={<LoginPage />} />
