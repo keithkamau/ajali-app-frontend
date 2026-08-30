@@ -353,3 +353,5 @@ export const IncidentForm = ({ incident, isEditing }) => {
     </div>
   );
 };
+
+export default IncidentForm;
