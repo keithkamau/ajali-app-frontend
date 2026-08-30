@@ -15,7 +15,7 @@ const mapContainerStyle = {
 
 const defaultCenter = {
   lat: -1.286389,
-  lng: 36.817223, // Nairobi, Kenya
+  lng: 36.817223,
 };
 
 const options = {
@@ -33,13 +33,16 @@ export const LocationPicker = ({
   address = "",
 }) => {
   const [map, setMap] = useState(null);
-  const [marker, setMarker] = useState(null);
+  const [marker, setMarker] = useState(
+    initialLat && initialLng
+      ? { lat: parseFloat(initialLat), lng: parseFloat(initialLng) }
+      : null,
+  );
   const [center, setCenter] = useState(
     initialLat && initialLng
       ? { lat: parseFloat(initialLat), lng: parseFloat(initialLng) }
       : defaultCenter,
   );
-  const [searchBox, setSearchBox] = useState(null);
   const [locationAddress, setLocationAddress] = useState(address);
   const autocompleteRef = useRef(null);
   const inputRef = useRef(null);
@@ -79,7 +82,6 @@ export const LocationPicker = ({
       setMarker({ lat, lng });
       setCenter({ lat, lng });
 
-      // Reverse geocode to get address
       if (map) {
         const geocoder = new window.google.maps.Geocoder();
         geocoder.geocode({ location: { lat, lng } }, (results, status) => {
@@ -108,7 +110,6 @@ export const LocationPicker = ({
       setMarker({ lat, lng });
       setCenter({ lat, lng });
 
-      // Reverse geocode
       const geocoder = new window.google.maps.Geocoder();
       geocoder.geocode({ location: { lat, lng } }, (results, status) => {
         if (status === "OK" && results[0]) {
@@ -126,13 +127,6 @@ export const LocationPicker = ({
     },
     [onLocationSelect],
   );
-
-  const onZoomChanged = useCallback(() => {
-    if (map) {
-      const newZoom = map.getZoom();
-      // Optional: handle zoom changes
-    }
-  }, [map]);
 
   const handleSearchInput = (e) => {
     // Pass through
@@ -181,7 +175,6 @@ export const LocationPicker = ({
               options={options}
               onLoad={onLoad}
               onClick={onMapClick}
-              onZoomChanged={onZoomChanged}
             >
               <Autocomplete
                 onLoad={onSearchLoad}
@@ -248,3 +241,5 @@ export const LocationPicker = ({
     </div>
   );
 };
+
+export default LocationPicker;
