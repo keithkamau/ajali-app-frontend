@@ -1,5 +1,4 @@
-// src/App.jsx
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Header from "./components/common/Header";
@@ -16,6 +15,7 @@ import AdminPage from "./pages/AdminPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import "./App.css";
 
 const PrivateRoute = ({ children }) => {
   const { isAuthenticated } = useSelector((state) => state.auth);
@@ -31,15 +31,22 @@ const AdminRoute = ({ children }) => {
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
     <BrowserRouter>
       <Header />
       <div className='app-layout'>
-        {isAuthenticated && <Sidebar />}
-        <main className='main-content'>
+        {isAuthenticated && (
+          <Sidebar
+            collapsed={sidebarCollapsed}
+            onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+          />
+        )}
+        <main
+          className={`main-content ${isAuthenticated ? "with-sidebar" : ""}`}
+        >
           <Routes>
-            {/* Public Routes */}
             <Route path='/' element={<Navigate to='/dashboard' />} />
             <Route path='/login' element={<LoginPage />} />
             <Route path='/register' element={<RegisterPage />} />
@@ -49,7 +56,6 @@ function App() {
               element={<ResetPasswordPage />}
             />
 
-            {/* Protected Routes */}
             <Route
               path='/dashboard'
               element={
@@ -99,7 +105,6 @@ function App() {
               }
             />
 
-            {/* Admin Routes */}
             <Route
               path='/admin'
               element={
