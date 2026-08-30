@@ -121,7 +121,6 @@
     gap: 1rem;
 }
 
-/* Badge colors */
 .badge-pending {
     background: var(--color-amber-light);
     color: var(--color-amber);
@@ -142,7 +141,6 @@
     color: var(--color-ink-muted);
 }
 
-/* Responsive */
 @media (max-width: 640px) {
     .admin-stats {
         grid-template-columns: repeat(2, 1fr);
