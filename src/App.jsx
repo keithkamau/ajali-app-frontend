@@ -1,89 +1,40 @@
-import React, { useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useLocation,
-} from "react-router-dom";
+import React from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { Header } from "./components/common/Header";
+import { HomePage } from "./pages/HomePage";
+import { LoginPage } from "./pages/LoginPage";
+import { RegisterPage } from "./pages/RegisterPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { CreateIncidentPage } from "./pages/CreateIncidentPage";
+import { EditIncidentPage } from "./pages/EditIncidentPage";
+import { IncidentDetailPage } from "./pages/IncidentDetailPage";
+import { ProfilePage } from "./pages/ProfilePage";
+import { AdminPage } from "./pages/AdminPage";
+import { NotificationsPage } from "./pages/NotificationsPage";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
 
-// Components
-import Header from "./components/common/Header";
-import { BottomNav } from "./components/common/BottomNav";
-import { Sidebar } from "./components/common/Sidebar";
+const PrivateRoute = ({ children }) => {
+  const { isAuthenticated } = useSelector((state) => state.auth);
+  return isAuthenticated ? children : <Navigate to='/login' />;
+};
 
-// Auth Pages
-import LandingPage from "./pages/LandingPage";
-import LoginPage from "./pages/LoginPage";
-import RegisterPage from "./pages/RegisterPage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-
-// App Pages
-import HomePage from "./pages/HomePage";
-import DashboardPage from "./pages/DashboardPage";
-import CreateIncidentPage from "./pages/CreateIncidentPage";
-import IncidentDetailPage from "./pages/IncidentDetailPage";
-import EditIncidentPage from "./pages/EditIncidentPage";
-import ActivityPage from "./pages/ActivityPage";
-import NotificationsPage from "./pages/NotificationsPage";
-import ProfilePage from "./pages/ProfilePage";
-import AdminPage from "./pages/AdminPage";
-import AdminIncidentsPage from "./pages/AdminIncidentsPage";
-import AdminUsersPage from "./pages/AdminUsersPage";
-import AdminIncidentDetailPage from "./pages/AdminIncidentDetailPage";
-
-// Protected Route Wrapper
-const ProtectedRoute = ({ children, adminOnly = false }) => {
+const AdminRoute = ({ children }) => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
-  const location = useLocation();
-
-  if (!isAuthenticated) {
-    window.location.href = `/login?redirect=${encodeURIComponent(location.pathname)}`;
-    return null;
-  }
-
-  if (adminOnly && user?.role !== "admin") {
-    window.location.href = "/home";
-    return null;
-  }
-
+  if (!isAuthenticated) return <Navigate to='/login' />;
+  if (user?.role !== "admin") return <Navigate to='/dashboard' />;
   return children;
 };
 
-function AppContent() {
-  const location = useLocation();
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-
-  const authPages = [
-    "/",
-    "/login",
-    "/register",
-    "/forgot-password",
-    "/reset-password",
-  ];
-
-  const showNav = isAuthenticated && !authPages.includes(location.pathname);
-
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  const isAdmin = user?.role === "admin";
-
+function App() {
   return (
-    <div className='app-container'>
-      {showNav && (
-        <Header onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
-      )}
-      {showNav && <Sidebar isOpen={sidebarOpen} />}
-      <main
-        className={`main-content ${showNav ? "with-nav" : ""} ${sidebarOpen ? "sidebar-open" : "sidebar-closed"}`}
-      >
+    <BrowserRouter>
+      <Header />
+      <main className='main-content'>
         <Routes>
           {/* Public Routes */}
-          <Route path='/' element={<LandingPage />} />
+          <Route path='/' element={<Navigate to='/dashboard' />} />
           <Route path='/login' element={<LoginPage />} />
           <Route path='/register' element={<RegisterPage />} />
           <Route path='/forgot-password' element={<ForgotPasswordPage />} />
@@ -92,117 +43,68 @@ function AppContent() {
             element={<ResetPasswordPage />}
           />
 
-          {/* Protected Routes - User */}
-          <Route
-            path='/home'
-            element={
-              <ProtectedRoute>
-                <HomePage />
-              </ProtectedRoute>
-            }
-          />
+          {/* Protected Routes */}
           <Route
             path='/dashboard'
             element={
-              <ProtectedRoute>
+              <PrivateRoute>
                 <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/incidents/create'
-            element={
-              <ProtectedRoute>
-                <CreateIncidentPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/incidents/:id'
-            element={
-              <ProtectedRoute>
-                <IncidentDetailPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/incidents/:id/edit'
-            element={
-              <ProtectedRoute>
-                <EditIncidentPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/activity'
-            element={
-              <ProtectedRoute>
-                <ActivityPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/notifications'
-            element={
-              <ProtectedRoute>
-                <NotificationsPage />
-              </ProtectedRoute>
+              </PrivateRoute>
             }
           />
           <Route
             path='/profile'
             element={
-              <ProtectedRoute>
+              <PrivateRoute>
                 <ProfilePage />
-              </ProtectedRoute>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path='/incidents/create'
+            element={
+              <PrivateRoute>
+                <CreateIncidentPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path='/incidents/:id'
+            element={
+              <PrivateRoute>
+                <IncidentDetailPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path='/incidents/:id/edit'
+            element={
+              <PrivateRoute>
+                <EditIncidentPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path='/notifications'
+            element={
+              <PrivateRoute>
+                <NotificationsPage />
+              </PrivateRoute>
             }
           />
 
-          {/* Admin Routes - Admin Only */}
+          {/* Admin Routes */}
           <Route
             path='/admin'
             element={
-              <ProtectedRoute adminOnly={true}>
+              <AdminRoute>
                 <AdminPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/admin/incidents'
-            element={
-              <ProtectedRoute adminOnly={true}>
-                <AdminIncidentsPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/admin/incidents/:id'
-            element={
-              <ProtectedRoute adminOnly={true}>
-                <AdminIncidentDetailPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path='/admin/users'
-            element={
-              <ProtectedRoute adminOnly={true}>
-                <AdminUsersPage />
-              </ProtectedRoute>
+              </AdminRoute>
             }
           />
         </Routes>
       </main>
-      {showNav && <BottomNav />}
-    </div>
-  );
-}
-
-function App() {
-  return (
-    <Router>
-      <AppContent />
-    </Router>
+    </BrowserRouter>
   );
 }
 
