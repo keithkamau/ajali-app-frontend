@@ -10,7 +10,7 @@ Ajali is a web application for reporting accidents and emergencies to the approp
 - Vite (build tool / dev server)
 - Axios (API calls, with automatic JWT refresh)
 - React Hook Form + Yup (form validation)
-- Google Maps API (`@react-google-maps/api`) for incident location
+-Leaflet + OpenStreetMap for incident location
 - Tailwind CSS
 - Jest + React Testing Library (tests)
 

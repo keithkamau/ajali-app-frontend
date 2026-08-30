@@ -1,6 +1,29 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapPinIcon, CameraIcon, VideoIcon, CloseIcon } from "../icons";
+import IncidentMap from "./IncidentMap";
+import LocationSearch from "./LocationSearch";
+
+// Free reverse-geocoding via OpenStreetMap's Nominatim API (no key needed).
+async function reverseGeocode(lat, lng) {
+  try {
+    const params = new URLSearchParams({
+      lat: String(lat),
+      lon: String(lng),
+      format: "json",
+    });
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?${params.toString()}`,
+      { headers: { Accept: "application/json" } }
+    );
+    if (!response.ok) return "";
+    const data = await response.json();
+    return data.display_name || "";
+  } catch (err) {
+    console.error("Reverse geocode error:", err);
+    return "";
+  }
+}
 
 export const IncidentForm = () => {
   const navigate = useNavigate();
@@ -18,6 +41,7 @@ export const IncidentForm = () => {
     videos: [],
   });
   const [errors, setErrors] = useState({});
+  const [isLocating, setIsLocating] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -36,6 +60,66 @@ export const IncidentForm = () => {
       ...prev,
       location: { ...prev.location, [name]: value },
     }));
+  };
+
+  // Called when the user clicks on the map to drop a pin.
+  const handleMapLocationChange = async ({ lat, lng }) => {
+    setFormData((prev) => ({
+      ...prev,
+      location: { ...prev.location, lat, lng },
+    }));
+    const address = await reverseGeocode(lat, lng);
+    if (address) {
+      setFormData((prev) => ({
+        ...prev,
+        location: { ...prev.location, address },
+      }));
+    }
+  };
+
+  // Called when the user picks a result from the location search box.
+  const handleLocationSearchSelect = ({ lat, lng, address }) => {
+    setFormData((prev) => ({
+      ...prev,
+      location: { lat, lng, address },
+    }));
+  };
+
+  // Uses the browser's built-in Geolocation API (free, no key required).
+  const handleUseMyLocation = () => {
+    if (!navigator.geolocation) {
+      setErrors((prev) => ({
+        ...prev,
+        location: "Your browser doesn't support geolocation",
+      }));
+      return;
+    }
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        setFormData((prev) => ({
+          ...prev,
+          location: { ...prev.location, lat: latitude, lng: longitude },
+        }));
+        const address = await reverseGeocode(latitude, longitude);
+        if (address) {
+          setFormData((prev) => ({
+            ...prev,
+            location: { ...prev.location, address },
+          }));
+        }
+        setIsLocating(false);
+      },
+      (error) => {
+        console.error("Geolocation error:", error);
+        setErrors((prev) => ({
+          ...prev,
+          location: "Couldn't detect your location. Please allow location access or enter it manually.",
+        }));
+        setIsLocating(false);
+      }
+    );
   };
 
   const handleFileChange = (e) => {
@@ -78,8 +162,9 @@ export const IncidentForm = () => {
           </h2>
 
           <div className='form-group'>
-            <label className='label label-required'>Title</label>
+            <label className='label label-required' htmlFor='title'>Title</label>
             <input
+              id='title'
               type='text'
               name='title'
               className={`input ${errors.title ? "input-error" : ""}`}
@@ -94,8 +179,9 @@ export const IncidentForm = () => {
           </div>
 
           <div className='form-group'>
-            <label className='label label-required'>What happened?</label>
+            <label className='label label-required' htmlFor='description'>What happened?</label>
             <textarea
+              id='description'
               name='description'
               className={`input ${errors.description ? "input-error" : ""}`}
               placeholder='Describe the incident in detail...'
@@ -109,8 +195,9 @@ export const IncidentForm = () => {
           </div>
 
           <div className='form-group'>
-            <label className='label label-required'>Incident Type</label>
+            <label className='label label-required' htmlFor='type'>Incident Type</label>
             <select
+              id='type'
               name='type'
               className='input'
               value={formData.type}
@@ -132,18 +219,40 @@ export const IncidentForm = () => {
 
           <div className='form-group'>
             <label className='label'>Where is it happening?</label>
-            <button type='button' className='btn btn-secondary btn-block'>
-              Use my location
+            <LocationSearch onSelect={handleLocationSearchSelect} />
+            <button
+              type='button'
+              className='btn btn-secondary btn-block'
+              onClick={handleUseMyLocation}
+              disabled={isLocating}
+              style={{ marginTop: "0.75rem" }}
+            >
+              {isLocating ? "Detecting..." : "Use my location"}
             </button>
             <div className='form-hint' style={{ marginTop: "0.5rem" }}>
-              We'll detect your current location
+              We'll detect your current location, or search / click on the
+              map below
             </div>
+            {errors.location && (
+              <div className='form-error'>{errors.location}</div>
+            )}
+          </div>
+
+          <div className='form-group'>
+            <IncidentMap
+              location={{
+                lat: Number(formData.location.lat),
+                lng: Number(formData.location.lng),
+              }}
+              onLocationChange={handleMapLocationChange}
+            />
           </div>
 
           <div className='location-grid'>
             <div className='form-group'>
-              <label className='label'>Latitude</label>
+              <label className='label' htmlFor='lat'>Latitude</label>
               <input
+                id='lat'
                 type='text'
                 name='lat'
                 className='input'
@@ -152,8 +261,9 @@ export const IncidentForm = () => {
               />
             </div>
             <div className='form-group'>
-              <label className='label'>Longitude</label>
+              <label className='label' htmlFor='lng'>Longitude</label>
               <input
+                id='lng'
                 type='text'
                 name='lng'
                 className='input'
@@ -164,8 +274,9 @@ export const IncidentForm = () => {
           </div>
 
           <div className='form-group'>
-            <label className='label'>Address or Landmark</label>
+            <label className='label' htmlFor='address'>Address or Landmark</label>
             <input
+              id='address'
               type='text'
               name='address'
               className='input'
