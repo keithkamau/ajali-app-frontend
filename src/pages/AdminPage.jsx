@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import {
   fetchAllIncidents,
   updateIncidentStatus,
 } from "../redux/slices/adminSlice";
 import "./AdminPage.css";
 
-export const AdminPage = () => {
+const AdminPage = () => {
   const dispatch = useDispatch();
   const { incidents, isLoading, error, stats } = useSelector(
     (state) => state.admin,
@@ -201,3 +202,5 @@ export const AdminPage = () => {
     </div>
   );
 };
+
+export default AdminPage;
