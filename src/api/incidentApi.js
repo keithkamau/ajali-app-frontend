@@ -36,3 +36,10 @@ export const uploadIncidentMedia = (id, mediaType, file) => {
 // Admin endpoints
 export const updateIncidentStatus = (id, payload) =>
   apiClient.put(`/admin/incidents/${id}/status`, payload).then(unwrap);
+// Geocoding is proxied through our own backend (which uses OpenStreetMap/
+// Nominatim server-side) rather than calling Nominatim directly from the browser.
+export const reverseGeocode = (lat, lng) =>
+  apiClient.get("/incidents/geocode/reverse", { params: { lat, lng } }).then(unwrap);
+
+export const forwardGeocode = (address) =>
+  apiClient.get("/incidents/geocode/forward", { params: { address } }).then(unwrap);

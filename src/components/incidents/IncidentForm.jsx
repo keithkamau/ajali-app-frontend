@@ -3,22 +3,15 @@ import { useNavigate } from "react-router-dom";
 import { MapPinIcon, CameraIcon, VideoIcon, CloseIcon } from "../icons";
 import IncidentMap from "./IncidentMap";
 import LocationSearch from "./LocationSearch";
+import { reverseGeocode as apiReverseGeocode } from "../../api/incidentApi";
 
-// Free reverse-geocoding via OpenStreetMap's Nominatim API (no key needed).
+// Reverse-geocoding is proxied through our own authenticated backend
+// endpoint (which itself uses OpenStreetMap/Nominatim server-side), rather
+// than calling Nominatim directly from the browser.
 async function reverseGeocode(lat, lng) {
   try {
-    const params = new URLSearchParams({
-      lat: String(lat),
-      lon: String(lng),
-      format: "json",
-    });
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?${params.toString()}`,
-      { headers: { Accept: "application/json" } }
-    );
-    if (!response.ok) return "";
-    const data = await response.json();
-    return data.display_name || "";
+    const data = await apiReverseGeocode(lat, lng);
+    return data?.address || "";
   } catch (err) {
     console.error("Reverse geocode error:", err);
     return "";

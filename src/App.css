@@ -73,4 +73,6 @@ textarea { resize: vertical; }
 .location-search-results li { padding: .6rem .75rem; cursor: pointer; font-size: .85rem; border-bottom: 1px solid var(--line); }
 .location-search-results li:last-child { border-bottom: none; }
 .location-search-results li:hover { background: var(--paper-alt, #f4f4f2); }
+.location-search-results li.location-search-empty { color: var(--muted); cursor: default; }
+.location-search-results li.location-search-empty:hover { background: transparent; }
 @media (max-width: 680px) { .main-content { padding: 1.5rem 1rem 3rem; }.page-heading, .form-heading, .detail-heading { align-items: flex-start; flex-direction: column; gap: 1rem; margin-bottom: 1.7rem; }.page-heading .button { width: 100%; }.field-grid, .detail-grid { grid-template-columns: 1fr; }.detail-actions { width: 100%; }.detail-actions .button { flex: 1; }.section-row { align-items: flex-start; flex-direction: column; }.section-row .button { width: 100%; }.incident-form { padding: 1.2rem; }.form-actions { flex-direction: column-reverse; }.form-actions .button { width: 100%; } }
