@@ -3,27 +3,59 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   fetchUsers,
   updateUserRole,
-  deactivateUser,
+  deleteUser,
+  clearSuccess,
+  clearError,
 } from "../redux/slices/adminSlice";
 import "./AdminPages.css";
 
 const AdminUsers = () => {
   const dispatch = useDispatch();
-  const { users, isLoading, error } = useSelector((state) => state.admin);
+  const { users, isLoading, error, success } = useSelector(
+    (state) => state.admin,
+  );
   const [selectedUser, setSelectedUser] = useState(null);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     dispatch(fetchUsers());
   }, [dispatch]);
+
+  useEffect(() => {
+    if (success) {
+      setMessage(success);
+      const timer = setTimeout(() => {
+        dispatch(clearSuccess());
+        setMessage("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+    if (error) {
+      setMessage(
+        typeof error === "string"
+          ? error
+          : error?.message || "An error occurred",
+      );
+      const timer = setTimeout(() => {
+        dispatch(clearError());
+        setMessage("");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [success, error, dispatch]);
 
   const handleRoleChange = async (userId, role) => {
     await dispatch(updateUserRole({ userId, role }));
     setSelectedUser(null);
   };
 
-  const handleDeactivate = async (userId) => {
-    if (window.confirm("Are you sure you want to deactivate this user?")) {
-      await dispatch(deactivateUser(userId));
+  const handleDeleteUser = async (userId, userName) => {
+    if (
+      window.confirm(
+        `Are you sure you want to permanently delete "${userName || "this user"}"? This action cannot be undone.`,
+      )
+    ) {
+      await dispatch(deleteUser(userId));
     }
   };
 
@@ -43,11 +75,11 @@ const AdminUsers = () => {
         <p className='page-subtitle'>Manage all registered users</p>
       </div>
 
-      {error && (
-        <div className='alert alert-error'>
-          {typeof error === "string"
-            ? error
-            : error?.message || "An error occurred"}
+      {message && (
+        <div
+          className={`profile-message ${message.includes("error") || message.includes("failed") ? "profile-message-error" : "profile-message-success"}`}
+        >
+          {message}
         </div>
       )}
 
@@ -101,14 +133,12 @@ const AdminUsers = () => {
                   >
                     Manage
                   </button>
-                  {user.role !== "admin" && (
-                    <button
-                      className='btn btn-danger btn-sm'
-                      onClick={() => handleDeactivate(user.id)}
-                    >
-                      Deactivate
-                    </button>
-                  )}
+                  <button
+                    className='btn btn-danger btn-sm'
+                    onClick={() => handleDeleteUser(user.id, user.full_name)}
+                  >
+                    Delete
+                  </button>
                 </div>
 
                 {selectedUser === user.id && (

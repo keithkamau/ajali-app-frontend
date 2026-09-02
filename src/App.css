@@ -63,3 +63,23 @@
     padding-bottom: 76px !important;
   }
 }
+
+.profile-message {
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+}
+
+.profile-message-success {
+    background: var(--color-green-light);
+    color: var(--color-green);
+    border: 1px solid #bbf7d0;
+}
+
+.profile-message-error {
+    background: var(--color-red-light);
+    color: var(--color-red);
+    border: 1px solid var(--color-red-mid);
+}

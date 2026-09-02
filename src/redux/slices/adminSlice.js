@@ -13,8 +13,10 @@ const initialState = {
   },
   isLoading: false,
   error: null,
+  success: null,
 };
 
+// Fetch all incidents
 export const fetchAllIncidents = createAsyncThunk(
   "admin/fetchAllIncidents",
   async (_, { rejectWithValue }) => {
@@ -66,13 +68,13 @@ export const updateUserRole = createAsyncThunk(
   },
 );
 
-// Deactivate user
-export const deactivateUser = createAsyncThunk(
-  "admin/deactivateUser",
+// Delete user (hard delete)
+export const deleteUser = createAsyncThunk(
+  "admin/deleteUser",
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await adminApi.deactivateUser(userId);
-      return { userId, data: response.data };
+      await adminApi.deleteUser(userId);
+      return userId;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
@@ -86,6 +88,9 @@ const adminSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    clearSuccess: (state) => {
+      state.success = null;
+    },
     clearAdminState: () => initialState,
   },
   extraReducers: (builder) => {
@@ -94,6 +99,7 @@ const adminSlice = createSlice({
       .addCase(fetchAllIncidents.pending, (state) => {
         state.isLoading = true;
         state.error = null;
+        state.success = null;
       })
       .addCase(fetchAllIncidents.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -118,6 +124,7 @@ const adminSlice = createSlice({
       .addCase(updateIncidentStatus.pending, (state) => {
         state.isLoading = true;
         state.error = null;
+        state.success = null;
       })
       .addCase(updateIncidentStatus.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -136,6 +143,7 @@ const adminSlice = createSlice({
           resolved: incidents.filter((i) => i.status === "resolved").length,
           rejected: incidents.filter((i) => i.status === "rejected").length,
         };
+        state.success = "Status updated successfully";
         state.error = null;
       })
       .addCase(updateIncidentStatus.rejected, (state, action) => {
@@ -146,6 +154,7 @@ const adminSlice = createSlice({
       .addCase(fetchUsers.pending, (state) => {
         state.isLoading = true;
         state.error = null;
+        state.success = null;
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -160,6 +169,7 @@ const adminSlice = createSlice({
       .addCase(updateUserRole.pending, (state) => {
         state.isLoading = true;
         state.error = null;
+        state.success = null;
       })
       .addCase(updateUserRole.fulfilled, (state, action) => {
         state.isLoading = false;
@@ -168,32 +178,31 @@ const adminSlice = createSlice({
         if (index !== -1) {
           state.users[index] = updated;
         }
+        state.success = "User role updated successfully";
         state.error = null;
       })
       .addCase(updateUserRole.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Deactivate User
-      .addCase(deactivateUser.pending, (state) => {
+      // Delete User
+      .addCase(deleteUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
+        state.success = null;
       })
-      .addCase(deactivateUser.fulfilled, (state, action) => {
+      .addCase(deleteUser.fulfilled, (state, action) => {
         state.isLoading = false;
-        const { userId } = action.payload;
-        const index = state.users.findIndex((u) => u.id === userId);
-        if (index !== -1) {
-          state.users[index].is_active = false;
-        }
+        state.users = state.users.filter((u) => u.id !== action.payload);
+        state.success = "User deleted successfully";
         state.error = null;
       })
-      .addCase(deactivateUser.rejected, (state, action) => {
+      .addCase(deleteUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });
   },
 });
 
-export const { clearError, clearAdminState } = adminSlice.actions;
+export const { clearError, clearSuccess, clearAdminState } = adminSlice.actions;
 export default adminSlice.reducer;
