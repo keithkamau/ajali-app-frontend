@@ -4,10 +4,10 @@ import {
   fetchUsers,
   updateUserRole,
   deactivateUser,
-} from "../../redux/slices/adminSlice";
+} from "../redux/slices/adminSlice";
 import "./AdminPages.css";
 
-export const AdminUsers = () => {
+const AdminUsers = () => {
   const dispatch = useDispatch();
   const { users, isLoading, error } = useSelector((state) => state.admin);
   const [selectedUser, setSelectedUser] = useState(null);

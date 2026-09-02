@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAllIncidents } from "../../redux/slices/adminSlice";
+import { fetchAllIncidents } from "../redux/slices/adminSlice";
 import "./AdminPages.css";
 
-export const AdminStats = () => {
+const AdminStats = () => {
   const dispatch = useDispatch();
   const { incidents, isLoading, error, stats } = useSelector(
     (state) => state.admin,

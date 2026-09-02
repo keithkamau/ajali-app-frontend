@@ -4,10 +4,10 @@ import { Link } from "react-router-dom";
 import {
   fetchAllIncidents,
   updateIncidentStatus,
-} from "../../redux/slices/adminSlice";
+} from "../redux/slices/adminSlice";
 import "./AdminPages.css";
 
-export const AdminIncidents = () => {
+const AdminIncidents = () => {
   const dispatch = useDispatch();
   const { incidents, isLoading, error } = useSelector((state) => state.admin);
   const [selectedIncident, setSelectedIncident] = useState(null);
