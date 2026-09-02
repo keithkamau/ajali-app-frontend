@@ -1,375 +1,259 @@
-// src/pages/ProfilePage.jsx
-import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { LogoutIcon, ArrowIcon, CloseIcon } from "../components/icons";
-import { updateUser, logoutUser } from "../redux/slices/authSlice";
-import {
-  validateEmail,
-  validatePhoneNumber,
-  validateFullName,
-} from "../utils/validators";
+import { updateUser, logoutUser, clearSuccess, clearError } from "../redux/slices/authSlice";
+import "./ProfilePage.css";
 
 export const ProfilePage = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { user } = useSelector((state) => state.auth);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { user, isLoading, success, error } = useSelector((state) => state.auth);
+    
+    const [activeTab, setActiveTab] = useState("profile");
+    const [formData, setFormData] = useState({
+        full_name: user?.full_name || "",
+        phone_number: user?.phone_number || "",
+        email: user?.email || "",
+    });
+    const [passwordData, setPasswordData] = useState({
+        current_password: "",
+        new_password: "",
+        confirm_password: "",
+    });
+    const [errors, setErrors] = useState({});
+    const [formMessage, setFormMessage] = useState("");
 
-  // Modal states
-  const [activeModal, setActiveModal] = useState(null);
-  const [formData, setFormData] = useState({
-    fullName: user?.full_name || "",
-    email: user?.email || "",
-    phoneNumber: user?.phone_number || "",
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-  const [errors, setErrors] = useState({});
-  const [success, setSuccess] = useState("");
+    useEffect(() => {
+        if (success) {
+            setFormMessage(success);
+            const timer = setTimeout(() => {
+                dispatch(clearSuccess());
+                setFormMessage("");
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+        if (error) {
+            setFormMessage(typeof error === 'string' ? error : error?.message || 'An error occurred');
+            const timer = setTimeout(() => {
+                dispatch(clearError());
+                setFormMessage("");
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [success, error, dispatch]);
 
-  const getInitials = (name) => {
-    if (!name) return "U";
-    const parts = name.trim().split(" ");
-    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-    return (
-      parts[0].charAt(0) + parts[parts.length - 1].charAt(0)
-    ).toUpperCase();
-  };
-
-  const initials = getInitials(user?.full_name);
-
-  // Open modal
-  const openModal = (modalName) => {
-    setActiveModal(modalName);
-    setErrors({});
-    setSuccess("");
-    if (modalName === "editProfile") {
-      setFormData({
-        ...formData,
-        fullName: user?.full_name || "",
-        phoneNumber: user?.phone_number || "",
-      });
-    }
-    if (modalName === "changePassword") {
-      setFormData({
-        ...formData,
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-    }
-  };
-
-  // Close modal
-  const closeModal = () => {
-    setActiveModal(null);
-    setErrors({});
-    setSuccess("");
-  };
-
-  // Handle form input change
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
-
-  // Handle profile update
-  const handleProfileUpdate = (e) => {
-    e.preventDefault();
-    const newErrors = {};
-
-    if (!formData.fullName) {
-      newErrors.fullName = "Full name is required";
-    } else if (!validateFullName(formData.fullName)) {
-      newErrors.fullName = "Name must be between 2 and 100 characters";
-    }
-
-    if (formData.phoneNumber && !validatePhoneNumber(formData.phoneNumber)) {
-      newErrors.phoneNumber = "Please enter a valid Kenyan phone number";
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
-
-    // Update profile
-    const updatedUser = {
-      ...user,
-      full_name: formData.fullName,
-      phone_number: formData.phoneNumber,
+    const handleProfileChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+        setErrors({ ...errors, [e.target.name]: "" });
     };
-    dispatch(updateUser(updatedUser));
-    setSuccess("Profile updated successfully!");
-    setTimeout(() => {
-      closeModal();
-    }, 1500);
-  };
 
-  // Handle password change
-  const handlePasswordChange = (e) => {
-    e.preventDefault();
-    const newErrors = {};
+    const handlePasswordChange = (e) => {
+        setPasswordData({ ...passwordData, [e.target.name]: e.target.value });
+        setErrors({ ...errors, [e.target.name]: "" });
+    };
 
-    if (!formData.currentPassword) {
-      newErrors.currentPassword = "Current password is required";
-    }
+    const handleProfileSubmit = async (e) => {
+        e.preventDefault();
+        const newErrors = {};
+        if (!formData.full_name.trim()) newErrors.full_name = "Full name is required";
+        
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+        
+        const result = await dispatch(updateUser({
+            full_name: formData.full_name.trim(),
+            phone_number: formData.phone_number.trim(),
+        }));
+        
+        if (result.meta.requestStatus === 'fulfilled') {
+            setFormMessage("Profile updated successfully!");
+        }
+    };
 
-    if (!formData.newPassword) {
-      newErrors.newPassword = "New password is required";
-    } else if (formData.newPassword.length < 8) {
-      newErrors.newPassword = "Password must be at least 8 characters";
-    }
+    const handlePasswordSubmit = async (e) => {
+        e.preventDefault();
+        const newErrors = {};
+        if (!passwordData.current_password) newErrors.current_password = "Current password is required";
+        if (!passwordData.new_password || passwordData.new_password.length < 8) {
+            newErrors.new_password = "Password must be at least 8 characters";
+        }
+        if (passwordData.new_password !== passwordData.confirm_password) {
+            newErrors.confirm_password = "Passwords do not match";
+        }
+        
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+        
+        // This would need a changePassword action in authSlice
+        // For now, just show message
+        setFormMessage("Password change functionality coming soon!");
+    };
 
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your password";
-    } else if (formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
+    const handleLogout = () => {
+        dispatch(logoutUser());
+        navigate("/login");
+    };
 
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return;
-    }
+    return (
+        <div className="profile-page">
+            <div className="profile-header">
+                <h1 className="page-title">Profile</h1>
+                <p className="page-subtitle">Manage your account settings</p>
+            </div>
 
-    // In mock mode, just show success
-    setSuccess("Password changed successfully!");
-    setTimeout(() => {
-      closeModal();
-    }, 1500);
-  };
+            {formMessage && (
+                <div className={`profile-message ${formMessage.includes('error') || formMessage.includes('failed') ? 'profile-message-error' : 'profile-message-success'}`}>
+                    {formMessage}
+                </div>
+            )}
 
-  // Handle logout
-  const handleLogout = async () => {
-    await dispatch(logoutUser());
-    navigate("/login");
-  };
+            <div className="profile-layout">
+                {/* Sidebar */}
+                <div className="profile-sidebar">
+                    <div className="profile-avatar">
+                        <div className="avatar-large">
+                            {user?.full_name ? (
+                                <span className="avatar-initials-large">
+                                    {user.full_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
+                                </span>
+                            ) : (
+                                <span className="avatar-icon-large">U</span>
+                            )}
+                        </div>
+                        <h3 className="profile-name">{user?.full_name || "User"}</h3>
+                        <p className="profile-email">{user?.email || ""}</p>
+                    </div>
+                    
+                    <nav className="profile-nav">
+                        <button 
+                            className={`profile-nav-item ${activeTab === "profile" ? "active" : ""}`}
+                            onClick={() => setActiveTab("profile")}
+                        >
+                            Edit Profile
+                        </button>
+                        <button 
+                            className={`profile-nav-item ${activeTab === "password" ? "active" : ""}`}
+                            onClick={() => setActiveTab("password")}
+                        >
+                            Change Password
+                        </button>
+                        <button 
+                            className="profile-nav-item profile-nav-logout"
+                            onClick={handleLogout}
+                        >
+                            Logout
+                        </button>
+                    </nav>
+                </div>
 
-  // Handle deactivate account
-  const handleDeactivate = () => {
-    if (
-      window.confirm(
-        "Are you sure you want to deactivate your account? This action cannot be undone.",
-      )
-    ) {
-      // In mock mode, just logout
-      dispatch(logoutUser());
-      navigate("/login");
-    }
-  };
+                {/* Content */}
+                <div className="profile-content">
+                    {activeTab === "profile" && (
+                        <div className="profile-card">
+                            <h2 className="profile-card-title">Edit Profile</h2>
+                            <form onSubmit={handleProfileSubmit}>
+                                <div className="form-group">
+                                    <label className="label label-required">Full Name</label>
+                                    <input
+                                        type="text"
+                                        name="full_name"
+                                        className={`input ${errors.full_name ? "input-error" : ""}`}
+                                        value={formData.full_name}
+                                        onChange={handleProfileChange}
+                                        placeholder="Enter your full name"
+                                    />
+                                    {errors.full_name && <span className="form-error">{errors.full_name}</span>}
+                                </div>
+                                
+                                <div className="form-group">
+                                    <label className="label">Email</label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        className="input"
+                                        value={formData.email}
+                                        disabled
+                                        style={{ opacity: 0.7, cursor: "not-allowed" }}
+                                    />
+                                    <span className="form-hint">Email cannot be changed</span>
+                                </div>
+                                
+                                <div className="form-group">
+                                    <label className="label">Phone Number</label>
+                                    <input
+                                        type="tel"
+                                        name="phone_number"
+                                        className="input"
+                                        value={formData.phone_number}
+                                        onChange={handleProfileChange}
+                                        placeholder="Enter your phone number"
+                                    />
+                                </div>
+                                
+                                <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                                    {isLoading ? "Saving..." : "Save Changes"}
+                                </button>
+                            </form>
+                        </div>
+                    )}
 
-  // Handle notification preferences
-  const handleNotifications = () => {
-    navigate("/notifications");
-  };
-
-  return (
-    <div className='profile-page'>
-      <div className='profile-header'>
-        <div className='profile-avatar'>{initials}</div>
-        <h1 className='heading-2'>{user?.full_name || "User"}</h1>
-        <p className='body-small text-muted'>
-          {user?.email || "user@email.com"}
-        </p>
-        <p className='body-small text-muted'>
-          {user?.phone_number || "No phone number"}
-        </p>
-      </div>
-
-      <div className='profile-settings'>
-        <div className='card'>
-          <h3 className='heading-4'>Account Settings</h3>
-          <div className='divider'></div>
-
-          <div
-            className='profile-menu-item'
-            onClick={() => openModal("editProfile")}
-          >
-            <span>Edit Profile</span>
-            <span className='profile-menu-arrow'>
-              <ArrowIcon color='var(--color-ink-muted)' size={16} />
-            </span>
-          </div>
-
-          <div
-            className='profile-menu-item'
-            onClick={() => openModal("changePassword")}
-          >
-            <span>Change Password</span>
-            <span className='profile-menu-arrow'>
-              <ArrowIcon color='var(--color-ink-muted)' size={16} />
-            </span>
-          </div>
-
-          <div className='profile-menu-item' onClick={handleNotifications}>
-            <span>Notification Preferences</span>
-            <span className='profile-menu-arrow'>
-              <ArrowIcon color='var(--color-ink-muted)' size={16} />
-            </span>
-          </div>
-
-          <div className='profile-menu-item' onClick={handleLogout}>
-            <span>Logout</span>
-            <span className='profile-menu-arrow'>
-              <LogoutIcon color='var(--color-ink-muted)' size={16} />
-            </span>
-          </div>
-
-          <div className='profile-menu-item danger' onClick={handleDeactivate}>
-            <span>Deactivate Account</span>
-            <span className='profile-menu-arrow'>
-              <ArrowIcon color='var(--color-red)' size={16} />
-            </span>
-          </div>
+                    {activeTab === "password" && (
+                        <div className="profile-card">
+                            <h2 className="profile-card-title">Change Password</h2>
+                            <form onSubmit={handlePasswordSubmit}>
+                                <div className="form-group">
+                                    <label className="label label-required">Current Password</label>
+                                    <input
+                                        type="password"
+                                        name="current_password"
+                                        className={`input ${errors.current_password ? "input-error" : ""}`}
+                                        value={passwordData.current_password}
+                                        onChange={handlePasswordChange}
+                                        placeholder="Enter current password"
+                                    />
+                                    {errors.current_password && <span className="form-error">{errors.current_password}</span>}
+                                </div>
+                                
+                                <div className="form-group">
+                                    <label className="label label-required">New Password</label>
+                                    <input
+                                        type="password"
+                                        name="new_password"
+                                        className={`input ${errors.new_password ? "input-error" : ""}`}
+                                        value={passwordData.new_password}
+                                        onChange={handlePasswordChange}
+                                        placeholder="Enter new password (min 8 characters)"
+                                    />
+                                    {errors.new_password && <span className="form-error">{errors.new_password}</span>}
+                                </div>
+                                
+                                <div className="form-group">
+                                    <label className="label label-required">Confirm New Password</label>
+                                    <input
+                                        type="password"
+                                        name="confirm_password"
+                                        className={`input ${errors.confirm_password ? "input-error" : ""}`}
+                                        value={passwordData.confirm_password}
+                                        onChange={handlePasswordChange}
+                                        placeholder="Confirm new password"
+                                    />
+                                    {errors.confirm_password && <span className="form-error">{errors.confirm_password}</span>}
+                                </div>
+                                
+                                <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                                    {isLoading ? "Updating..." : "Update Password"}
+                                </button>
+                            </form>
+                        </div>
+                    )}
+                </div>
+            </div>
         </div>
-      </div>
-
-      {/* Edit Profile Modal */}
-      {activeModal === "editProfile" && (
-        <div className='modal-overlay' onClick={closeModal}>
-          <div className='modal-content' onClick={(e) => e.stopPropagation()}>
-            <div className='modal-header'>
-              <h3 className='heading-4'>Edit Profile</h3>
-              <button className='modal-close' onClick={closeModal}>
-                <CloseIcon color='var(--color-ink-muted)' size={20} />
-              </button>
-            </div>
-            <div className='modal-body'>
-              {success && <div className='alert alert-success'>{success}</div>}
-              {errors.general && (
-                <div className='alert alert-error'>{errors.general}</div>
-              )}
-              <form onSubmit={handleProfileUpdate}>
-                <div className='form-group'>
-                  <label className='label label-required'>Full Name</label>
-                  <input
-                    type='text'
-                    name='fullName'
-                    className={`input ${errors.fullName ? "input-error" : ""}`}
-                    value={formData.fullName}
-                    onChange={handleChange}
-                    placeholder='Enter your full name'
-                  />
-                  {errors.fullName && (
-                    <div className='form-error'>{errors.fullName}</div>
-                  )}
-                </div>
-                <div className='form-group'>
-                  <label className='label'>Phone Number</label>
-                  <input
-                    type='tel'
-                    name='phoneNumber'
-                    className={`input ${errors.phoneNumber ? "input-error" : ""}`}
-                    value={formData.phoneNumber}
-                    onChange={handleChange}
-                    placeholder='0712345678'
-                  />
-                  {errors.phoneNumber && (
-                    <div className='form-error'>{errors.phoneNumber}</div>
-                  )}
-                  <div className='form-hint'>Optional for SMS alerts</div>
-                </div>
-                <div className='modal-actions'>
-                  <button
-                    type='button'
-                    className='btn btn-secondary'
-                    onClick={closeModal}
-                  >
-                    Cancel
-                  </button>
-                  <button type='submit' className='btn btn-primary'>
-                    Save Changes
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Change Password Modal */}
-      {activeModal === "changePassword" && (
-        <div className='modal-overlay' onClick={closeModal}>
-          <div className='modal-content' onClick={(e) => e.stopPropagation()}>
-            <div className='modal-header'>
-              <h3 className='heading-4'>Change Password</h3>
-              <button className='modal-close' onClick={closeModal}>
-                <CloseIcon color='var(--color-ink-muted)' size={20} />
-              </button>
-            </div>
-            <div className='modal-body'>
-              {success && <div className='alert alert-success'>{success}</div>}
-              <form onSubmit={handlePasswordChange}>
-                <div className='form-group'>
-                  <label className='label label-required'>
-                    Current Password
-                  </label>
-                  <input
-                    type='password'
-                    name='currentPassword'
-                    className={`input ${errors.currentPassword ? "input-error" : ""}`}
-                    value={formData.currentPassword}
-                    onChange={handleChange}
-                    placeholder='Enter current password'
-                  />
-                  {errors.currentPassword && (
-                    <div className='form-error'>{errors.currentPassword}</div>
-                  )}
-                </div>
-                <div className='form-group'>
-                  <label className='label label-required'>New Password</label>
-                  <input
-                    type='password'
-                    name='newPassword'
-                    className={`input ${errors.newPassword ? "input-error" : ""}`}
-                    value={formData.newPassword}
-                    onChange={handleChange}
-                    placeholder='Enter new password'
-                  />
-                  {errors.newPassword && (
-                    <div className='form-error'>{errors.newPassword}</div>
-                  )}
-                  <div className='form-hint'>Must be at least 8 characters</div>
-                </div>
-                <div className='form-group'>
-                  <label className='label label-required'>
-                    Confirm New Password
-                  </label>
-                  <input
-                    type='password'
-                    name='confirmPassword'
-                    className={`input ${errors.confirmPassword ? "input-error" : ""}`}
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    placeholder='Confirm new password'
-                  />
-                  {errors.confirmPassword && (
-                    <div className='form-error'>{errors.confirmPassword}</div>
-                  )}
-                </div>
-                <div className='modal-actions'>
-                  <button
-                    type='button'
-                    className='btn btn-secondary'
-                    onClick={closeModal}
-                  >
-                    Cancel
-                  </button>
-                  <button type='submit' className='btn btn-primary'>
-                    Update Password
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default ProfilePage;
