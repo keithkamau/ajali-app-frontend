@@ -14,14 +14,14 @@ export const adminApi = {
   },
 
   getUsers: () => {
-    return axiosInstance.get("/api/auth/users/");
+    return axiosInstance.get("/auth/users/");
   },
 
   updateUserRole: (userId, data) => {
-    return axiosInstance.put(`/api/auth/users/${userId}/`, data);
+    return axiosInstance.put(`/auth/users/${userId}/`, data);
   },
 
   deactivateUser: (userId) => {
-    return axiosInstance.delete(`/api/auth/users/${userId}/`);
+    return axiosInstance.delete(`/auth/users/${userId}/`);
   },
 };

@@ -1,21 +1,16 @@
-// src/redux/store.js
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./slices/authSlice";
 import incidentReducer from "./slices/incidentSlice";
 import notificationReducer from "./slices/notificationSlice";
-import uiReducer from "./slices/uiSlice";
+import adminReducer from "./slices/adminSlice";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     incidents: incidentReducer,
     notifications: notificationReducer,
-    ui: uiReducer,
+    admin: adminReducer,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: false,
-    }),
 });
 
 export default store;
