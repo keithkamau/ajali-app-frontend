@@ -27,6 +27,7 @@ export const fetchAllIncidents = createAsyncThunk(
   },
 );
 
+// Update incident status
 export const updateIncidentStatus = createAsyncThunk(
   "admin/updateStatus",
   async ({ id, status, comment }, { rejectWithValue }) => {
@@ -39,6 +40,7 @@ export const updateIncidentStatus = createAsyncThunk(
   },
 );
 
+// Fetch all users
 export const fetchUsers = createAsyncThunk(
   "admin/fetchUsers",
   async (_, { rejectWithValue }) => {
@@ -51,6 +53,7 @@ export const fetchUsers = createAsyncThunk(
   },
 );
 
+// Update user role
 export const updateUserRole = createAsyncThunk(
   "admin/updateUserRole",
   async ({ userId, role }, { rejectWithValue }) => {
@@ -63,6 +66,7 @@ export const updateUserRole = createAsyncThunk(
   },
 );
 
+// Deactivate user
 export const deactivateUser = createAsyncThunk(
   "admin/deactivateUser",
   async (userId, { rejectWithValue }) => {
@@ -82,6 +86,7 @@ const adminSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    clearAdminState: () => initialState,
   },
   extraReducers: (builder) => {
     builder
@@ -92,7 +97,7 @@ const adminSlice = createSlice({
       })
       .addCase(fetchAllIncidents.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.incidents = action.payload.results || [];
+        state.incidents = action.payload.results || action.payload || [];
         const incidents = state.incidents;
         state.stats = {
           total: incidents.length,
@@ -110,7 +115,12 @@ const adminSlice = createSlice({
         state.error = action.payload;
       })
       // Update Status
+      .addCase(updateIncidentStatus.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(updateIncidentStatus.fulfilled, (state, action) => {
+        state.isLoading = false;
         const updated = action.payload;
         const index = state.incidents.findIndex((i) => i.id === updated.id);
         if (index !== -1) {
@@ -129,6 +139,7 @@ const adminSlice = createSlice({
         state.error = null;
       })
       .addCase(updateIncidentStatus.rejected, (state, action) => {
+        state.isLoading = false;
         state.error = action.payload;
       })
       // Fetch Users
@@ -138,7 +149,7 @@ const adminSlice = createSlice({
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.users = action.payload.results || [];
+        state.users = action.payload.results || action.payload || [];
         state.error = null;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
@@ -146,7 +157,12 @@ const adminSlice = createSlice({
         state.error = action.payload;
       })
       // Update User Role
+      .addCase(updateUserRole.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(updateUserRole.fulfilled, (state, action) => {
+        state.isLoading = false;
         const updated = action.payload;
         const index = state.users.findIndex((u) => u.id === updated.id);
         if (index !== -1) {
@@ -155,10 +171,16 @@ const adminSlice = createSlice({
         state.error = null;
       })
       .addCase(updateUserRole.rejected, (state, action) => {
+        state.isLoading = false;
         state.error = action.payload;
       })
       // Deactivate User
+      .addCase(deactivateUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
       .addCase(deactivateUser.fulfilled, (state, action) => {
+        state.isLoading = false;
         const { userId } = action.payload;
         const index = state.users.findIndex((u) => u.id === userId);
         if (index !== -1) {
@@ -167,10 +189,11 @@ const adminSlice = createSlice({
         state.error = null;
       })
       .addCase(deactivateUser.rejected, (state, action) => {
+        state.isLoading = false;
         state.error = action.payload;
       });
   },
 });
 
-export const { clearError } = adminSlice.actions;
+export const { clearError, clearAdminState } = adminSlice.actions;
 export default adminSlice.reducer;
