@@ -8,7 +8,7 @@ import {
 } from "../redux/slices/incidentSlice";
 import "./DashboardPage.css";
 
-export const DashboardPage = () => {
+const DashboardPage = () => {
   const dispatch = useDispatch();
   const { incidents, isLoading, error, success } = useSelector(
     (state) => state.incidents,
@@ -132,3 +132,5 @@ export const DashboardPage = () => {
     </div>
   );
 };
+
+export default DashboardPage;
