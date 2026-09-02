@@ -6,8 +6,9 @@ import {
   deleteIncident,
   clearSuccess,
 } from "../redux/slices/incidentSlice";
+import "./DashboardPage.css";
 
-const DashboardPage = () => {
+export const DashboardPage = () => {
   const dispatch = useDispatch();
   const { incidents, isLoading, error, success } = useSelector(
     (state) => state.incidents,
@@ -49,7 +50,7 @@ const DashboardPage = () => {
 
   return (
     <div className='dashboard-container'>
-      <div className='page-header'>
+      <div className='dashboard-header'>
         <div>
           <h1 className='page-title'>Dashboard</h1>
           <p className='page-subtitle'>
@@ -131,5 +132,3 @@ const DashboardPage = () => {
     </div>
   );
 };
-
-export default DashboardPage;

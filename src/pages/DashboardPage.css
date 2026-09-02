@@ -1,0 +1,186 @@
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    width: 100%;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.page-title {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-ink);
+    margin: 0;
+}
+
+.page-subtitle {
+    font-family: var(--font-body);
+    color: var(--color-ink-muted);
+    font-size: 0.95rem;
+    margin: 0.25rem 0 0 0;
+}
+
+.incident-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.25rem;
+}
+
+.incident-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    transition: all 0.2s ease;
+}
+
+.incident-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: translateY(-2px);
+}
+
+.incident-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+    gap: 0.5rem;
+}
+
+.incident-card-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-ink);
+    margin: 0;
+    flex: 1;
+}
+
+.incident-card-description {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-ink-muted);
+    margin: 0.5rem 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.incident-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-border);
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.incident-card-meta {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--color-ink-muted);
+    flex-wrap: wrap;
+}
+
+.incident-card-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+}
+
+.empty-state-icon {
+    font-size: 3rem;
+    opacity: 0.5;
+    margin-bottom: 1rem;
+}
+
+.empty-state-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: var(--color-ink);
+    margin: 0 0 0.5rem 0;
+}
+
+.empty-state-description {
+    font-family: var(--font-body);
+    color: var(--color-ink-muted);
+    max-width: 28rem;
+    margin: 0 auto;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    gap: 1rem;
+}
+
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    font-family: var(--font-display);
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+.badge-pending {
+    background: var(--color-amber-light);
+    color: var(--color-amber);
+}
+
+.badge-under-investigation {
+    background: var(--color-red-light);
+    color: var(--color-red);
+}
+
+.badge-resolved {
+    background: var(--color-green-light);
+    color: var(--color-green);
+}
+
+.badge-rejected {
+    background: var(--color-ground);
+    color: var(--color-ink-muted);
+}
+
+@media (max-width: 768px) {
+    .incident-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .dashboard-header .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
