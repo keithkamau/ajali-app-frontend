@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Header from "./components/common/Header";
 import Sidebar from "./components/common/Sidebar";
 import LoginPage from "./pages/LoginPage";
@@ -14,27 +14,90 @@ import AdminPage from "./pages/AdminPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
+import { getCurrentUser } from "./redux/slices/authSlice";
 import "./App.css";
 
 const PrivateRoute = ({ children }) => {
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated, isLoading } = useSelector((state) => state.auth);
+
+  if (isLoading) {
+    return (
+      <div
+        className='loading-container'
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div className='spinner'></div>
+      </div>
+    );
+  }
+
   return isAuthenticated ? children : <Navigate to='/login' />;
 };
 
 const AdminRoute = ({ children }) => {
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const { isAuthenticated, user, isLoading } = useSelector(
+    (state) => state.auth,
+  );
+
+  if (isLoading) {
+    return (
+      <div
+        className='loading-container'
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div className='spinner'></div>
+      </div>
+    );
+  }
+
   if (!isAuthenticated) return <Navigate to='/login' />;
   if (user?.role !== "admin") return <Navigate to='/dashboard' />;
   return children;
 };
 
 function App() {
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const { isAuthenticated, isLoading } = useSelector((state) => state.auth);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
+
+  // Check for existing session on app load
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+    if (token && !isAuthenticated) {
+      dispatch(getCurrentUser());
+    }
+  }, [dispatch, isAuthenticated]);
 
   const toggleSidebar = () => {
     setSidebarExpanded(!sidebarExpanded);
   };
+
+  // Show loading while checking authentication
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "var(--color-ground)",
+        }}
+      >
+        <div className='spinner'></div>
+      </div>
+    );
+  }
 
   return (
     <BrowserRouter>
