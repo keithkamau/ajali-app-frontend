@@ -9,6 +9,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import Header from "./components/common/Header";
 import Sidebar from "./components/common/Sidebar";
+import BottomNav from "./components/common/BottomNav";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
@@ -165,6 +166,7 @@ function App() {
           </Routes>
         </main>
       </div>
+      {isAuthenticated && <BottomNav />}
     </BrowserRouter>
   );
 }
