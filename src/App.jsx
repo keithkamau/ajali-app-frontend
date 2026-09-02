@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "./components/common/Header";
 import Sidebar from "./components/common/Sidebar";
@@ -18,170 +18,125 @@ import { getCurrentUser } from "./redux/slices/authSlice";
 import "./App.css";
 
 const PrivateRoute = ({ children }) => {
-  const { isAuthenticated, isLoading } = useSelector((state) => state.auth);
+    const { isAuthenticated, isLoading } = useSelector((state) => state.auth);
+    const location = useLocation();
 
-  if (isLoading) {
-    return (
-      <div
-        className='loading-container'
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <div className='spinner'></div>
-      </div>
-    );
-  }
+    // Only show loading if we're actually checking auth
+    if (isLoading) {
+        return (
+            <div className="loading-container" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div className="spinner"></div>
+            </div>
+        );
+    }
 
-  return isAuthenticated ? children : <Navigate to='/login' />;
+    if (!isAuthenticated) {
+        return <Navigate to="/login" state={{ from: location }} replace />;
+    }
+
+    return children;
 };
 
 const AdminRoute = ({ children }) => {
-  const { isAuthenticated, user, isLoading } = useSelector(
-    (state) => state.auth,
-  );
+    const { isAuthenticated, user, isLoading } = useSelector((state) => state.auth);
+    const location = useLocation();
 
-  if (isLoading) {
-    return (
-      <div
-        className='loading-container'
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <div className='spinner'></div>
-      </div>
-    );
-  }
+    if (isLoading) {
+        return (
+            <div className="loading-container" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <div className="spinner"></div>
+            </div>
+        );
+    }
 
-  if (!isAuthenticated) return <Navigate to='/login' />;
-  if (user?.role !== "admin") return <Navigate to='/dashboard' />;
-  return children;
+    if (!isAuthenticated) {
+        return <Navigate to="/login" state={{ from: location }} replace />;
+    }
+
+    if (user?.role !== "admin") {
+        return <Navigate to="/dashboard" replace />;
+    }
+
+    return children;
 };
 
 function App() {
-  const dispatch = useDispatch();
-  const { isAuthenticated, isLoading } = useSelector((state) => state.auth);
-  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+    const dispatch = useDispatch();
+    const { isAuthenticated, isLoading } = useSelector((state) => state.auth);
+    const [sidebarExpanded, setSidebarExpanded] = useState(true);
+    const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
-  // Check for existing session on app load
-  useEffect(() => {
-    const token = localStorage.getItem("access_token");
-    if (token && !isAuthenticated) {
-      dispatch(getCurrentUser());
+    // Check for existing session on app load
+    useEffect(() => {
+        const token = localStorage.getItem('access_token');
+        if (token) {
+            dispatch(getCurrentUser()).finally(() => {
+                setIsCheckingAuth(false);
+            });
+        } else {
+            setIsCheckingAuth(false);
+        }
+    }, [dispatch]);
+
+    const toggleSidebar = () => {
+        setSidebarExpanded(!sidebarExpanded);
+    };
+
+    // Only show loading while checking auth token
+    if (isCheckingAuth) {
+        return (
+            <div style={{ 
+                minHeight: "100vh", 
+                display: "flex", 
+                alignItems: "center", 
+                justifyContent: "center",
+                backgroundColor: "var(--color-ground)"
+            }}>
+                <div className="spinner"></div>
+            </div>
+        );
     }
-  }, [dispatch, isAuthenticated]);
 
-  const toggleSidebar = () => {
-    setSidebarExpanded(!sidebarExpanded);
-  };
-
-  // Show loading while checking authentication
-  if (isLoading) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "var(--color-ground)",
-        }}
-      >
-        <div className='spinner'></div>
-      </div>
+        <BrowserRouter>
+            <Header onToggleSidebar={toggleSidebar} sidebarExpanded={sidebarExpanded} />
+            <div className="app-layout">
+                {isAuthenticated && <Sidebar collapsed={!sidebarExpanded} />}
+                <main className={`main-content ${isAuthenticated ? (sidebarExpanded ? 'sidebar-expanded' : 'sidebar-collapsed') : ''}`}>
+                    <Routes>
+                        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/register" element={<RegisterPage />} />
+                        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+                        
+                        <Route path="/dashboard" element={
+                            <PrivateRoute><DashboardPage /></PrivateRoute>
+                        } />
+                        <Route path="/profile" element={
+                            <PrivateRoute><ProfilePage /></PrivateRoute>
+                        } />
+                        <Route path="/incidents/create" element={
+                            <PrivateRoute><CreateIncidentPage /></PrivateRoute>
+                        } />
+                        <Route path="/incidents/:id" element={
+                            <PrivateRoute><IncidentDetailPage /></PrivateRoute>
+                        } />
+                        <Route path="/incidents/:id/edit" element={
+                            <PrivateRoute><EditIncidentPage /></PrivateRoute>
+                        } />
+                        <Route path="/notifications" element={
+                            <PrivateRoute><NotificationsPage /></PrivateRoute>
+                        } />
+                        
+                        <Route path="/admin" element={
+                            <AdminRoute><AdminPage /></AdminRoute>
+                        } />
+                    </Routes>
+                </main>
+            </div>
+        </BrowserRouter>
     );
-  }
-
-  return (
-    <BrowserRouter>
-      <Header
-        onToggleSidebar={toggleSidebar}
-        sidebarExpanded={sidebarExpanded}
-      />
-      <div className='app-layout'>
-        {isAuthenticated && <Sidebar collapsed={!sidebarExpanded} />}
-        <main
-          className={`main-content ${isAuthenticated ? (sidebarExpanded ? "sidebar-expanded" : "sidebar-collapsed") : ""}`}
-        >
-          <Routes>
-            <Route path='/' element={<Navigate to='/dashboard' />} />
-            <Route path='/login' element={<LoginPage />} />
-            <Route path='/register' element={<RegisterPage />} />
-            <Route path='/forgot-password' element={<ForgotPasswordPage />} />
-            <Route
-              path='/reset-password/:token'
-              element={<ResetPasswordPage />}
-            />
-
-            <Route
-              path='/dashboard'
-              element={
-                <PrivateRoute>
-                  <DashboardPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path='/profile'
-              element={
-                <PrivateRoute>
-                  <ProfilePage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path='/incidents/create'
-              element={
-                <PrivateRoute>
-                  <CreateIncidentPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path='/incidents/:id'
-              element={
-                <PrivateRoute>
-                  <IncidentDetailPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path='/incidents/:id/edit'
-              element={
-                <PrivateRoute>
-                  <EditIncidentPage />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path='/notifications'
-              element={
-                <PrivateRoute>
-                  <NotificationsPage />
-                </PrivateRoute>
-              }
-            />
-
-            <Route
-              path='/admin'
-              element={
-                <AdminRoute>
-                  <AdminPage />
-                </AdminRoute>
-              }
-            />
-          </Routes>
-        </main>
-      </div>
-    </BrowserRouter>
-  );
 }
 
 export default App;
