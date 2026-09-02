@@ -8,7 +8,7 @@ import incidentReducer from "../../redux/slices/incidentSlice";
 test("renders the incident reporting fields", () => {
 	const store = configureStore({ reducer: { incidents: incidentReducer } });
 	render(<Provider store={store}><MemoryRouter><IncidentForm /></MemoryRouter></Provider>);
-	expect(screen.getByRole("heading", { name: /tell us what happened/i })).toBeInTheDocument();
+expect(screen.getByRole("heading", { name: /report an incident/i })).toBeInTheDocument();
 	expect(screen.getByLabelText(/title/i)).toBeInTheDocument();
 	expect(screen.getByLabelText(/latitude/i)).toBeInTheDocument();
 	expect(screen.getByRole("button", { name: /use my location/i })).toBeInTheDocument();
