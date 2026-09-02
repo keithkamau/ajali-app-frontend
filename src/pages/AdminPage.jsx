@@ -5,7 +5,7 @@ import {
   fetchAllIncidents,
   updateIncidentStatus,
 } from "../redux/slices/adminSlice";
-import "./AdminPage.css";
+import "./AdminPages.css";
 
 const AdminPage = () => {
   const dispatch = useDispatch();
