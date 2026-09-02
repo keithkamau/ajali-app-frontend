@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Header from "./components/common/Header";
@@ -30,12 +30,20 @@ const AdminRoute = ({ children }) => {
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.auth);
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
+
+  const toggleSidebar = () => {
+    setSidebarExpanded(!sidebarExpanded);
+  };
 
   return (
     <BrowserRouter>
-      <Header />
+      <Header
+        onToggleSidebar={toggleSidebar}
+        sidebarExpanded={sidebarExpanded}
+      />
       <div className='app-layout'>
-        {isAuthenticated && <Sidebar />}
+        {isAuthenticated && <Sidebar collapsed={!sidebarExpanded} />}
         <main className='main-content'>
           <Routes>
             <Route path='/' element={<Navigate to='/dashboard' />} />
