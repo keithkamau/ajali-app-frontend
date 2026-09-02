@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import "./Sidebar.css";
 
-const Sidebar = ({ collapsed, onToggle }) => {
+const Sidebar = ({ collapsed }) => {
   const location = useLocation();
   const { user } = useSelector((state) => state.auth);
 
@@ -125,6 +125,7 @@ const Sidebar = ({ collapsed, onToggle }) => {
             key={item.path}
             to={item.path}
             className={`sidebar-link ${isActive(item.path) ? "active" : ""}`}
+            title={collapsed ? item.label : ""}
           >
             <span className='sidebar-icon'>{item.icon}</span>
             {!collapsed && <span className='sidebar-label'>{item.label}</span>}

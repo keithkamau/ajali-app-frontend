@@ -1,5 +1,5 @@
 .header {
-    background-color: var(--color-surface);
+    background-color: var(--color-navy);
     border-bottom: 1px solid var(--color-border);
     padding: 0.75rem 1.5rem;
     position: sticky;
@@ -15,6 +15,28 @@
     justify-content: space-between;
 }
 
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.header-hamburger {
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+}
+
+.header-hamburger:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
+
 .header-logo {
     display: flex;
     align-items: center;
@@ -22,12 +44,16 @@
     font-family: var(--font-display);
     font-weight: 700;
     font-size: 1.25rem;
-    color: var(--color-navy);
+    color: #ffffff;
     text-decoration: none;
 }
 
 .header-logo svg {
-    color: var(--color-navy);
+    color: #ffffff;
+}
+
+.header-logo:hover {
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .header-nav {
@@ -40,13 +66,13 @@
     font-family: var(--font-body);
     font-weight: 500;
     font-size: 0.875rem;
-    color: var(--color-ink-muted);
+    color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
     transition: color 0.2s;
 }
 
 .header-nav-link:hover {
-    color: var(--color-ink);
+    color: #ffffff;
 }
 
 .header-user-section {
@@ -55,7 +81,7 @@
     gap: 0.75rem;
     margin-left: 0.5rem;
     padding-left: 0.75rem;
-    border-left: 1px solid var(--color-border);
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .header-user-avatar {
@@ -65,8 +91,8 @@
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 50%;
-    background-color: var(--color-navy);
-    color: white;
+    background-color: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
     text-decoration: none;
     font-weight: 600;
     font-size: 0.875rem;
@@ -76,7 +102,7 @@
 }
 
 .header-user-avatar:hover {
-    background-color: #1a2a4a;
+    background-color: rgba(255, 255, 255, 0.25);
     transform: scale(1.05);
 }
 
@@ -91,21 +117,19 @@
     font-weight: 600;
 }
 
-.header-user-name {
-    font-family: var(--font-body);
-    font-weight: 500;
-    font-size: 0.875rem;
-    color: var(--color-ink);
-    text-decoration: none;
-    transition: color 0.2s;
+/* Override button styles for header */
+.header-user-section .btn-secondary {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.header-user-name:hover {
-    color: var(--color-navy);
+.header-user-section .btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.2);
 }
 
 @media (max-width: 768px) {
-    .header-user-name {
-        display: none;
+    .header {
+        padding: 0.5rem 1rem;
     }
 }
