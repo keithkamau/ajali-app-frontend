@@ -1,181 +1,144 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchUsers,
+  updateUserRole,
+  deactivateUser,
+} from "../../redux/slices/adminSlice";
+import "./AdminPages.css";
 
-function AdminUsersPage() {
-  const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState("All");
+export const AdminUsers = () => {
+  const dispatch = useDispatch();
+  const { users, isLoading, error } = useSelector((state) => state.admin);
+  const [selectedUser, setSelectedUser] = useState(null);
 
-  const users = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      role: "user",
-      status: "active",
-      joined: "2024-01-10",
-      incidents: 5,
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      role: "admin",
-      status: "active",
-      joined: "2024-01-05",
-      incidents: 12,
-    },
-    {
-      id: 3,
-      name: "Bob Johnson",
-      email: "bob@example.com",
-      role: "user",
-      status: "active",
-      joined: "2024-01-12",
-      incidents: 3,
-    },
-    {
-      id: 4,
-      name: "Alice Brown",
-      email: "alice@example.com",
-      role: "user",
-      status: "inactive",
-      joined: "2024-01-08",
-      incidents: 7,
-    },
-    {
-      id: 5,
-      name: "Charlie Wilson",
-      email: "charlie@example.com",
-      role: "user",
-      status: "active",
-      joined: "2024-01-15",
-      incidents: 2,
-    },
-    {
-      id: 6,
-      name: "Sarah Parker",
-      email: "sarah@example.com",
-      role: "admin",
-      status: "active",
-      joined: "2024-01-03",
-      incidents: 8,
-    },
-  ];
+  useEffect(() => {
+    dispatch(fetchUsers());
+  }, [dispatch]);
 
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch =
-      user.name.toLowerCase().includes(search.toLowerCase()) ||
-      user.email.toLowerCase().includes(search.toLowerCase());
-
-    const matchesRole = roleFilter === "All" || user.role === roleFilter;
-
-    return matchesSearch && matchesRole;
-  });
-
-  const getRoleBadgeClass = (role) => {
-    return role === "admin" ? "status-badge-resolved" : "status-badge-pending";
+  const handleRoleChange = async (userId, role) => {
+    await dispatch(updateUserRole({ userId, role }));
+    setSelectedUser(null);
   };
 
-  const getStatusBadgeClass = (status) => {
-    return status === "active"
-      ? "status-badge-resolved"
-      : "status-badge-rejected";
+  const handleDeactivate = async (userId) => {
+    if (window.confirm("Are you sure you want to deactivate this user?")) {
+      await dispatch(deactivateUser(userId));
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className='admin-loading'>
+        <div className='spinner'></div>
+        <p>Loading users...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className='admin-users-page'>
-      <div className='page-header'>
-        <h1 className='heading-2'>Manage Users</h1>
-        <p className='body-small text-muted'>View and manage user accounts</p>
+    <div className='admin-page'>
+      <div className='admin-header'>
+        <h1 className='page-title'>Users</h1>
+        <p className='page-subtitle'>Manage all registered users</p>
       </div>
 
-      <div className='admin-toolbar'>
-        <div className='admin-toolbar-left'>
-          <input
-            type='text'
-            className='input'
-            placeholder='Search by name or email...'
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
+      {error && (
+        <div className='alert alert-error'>
+          {typeof error === "string"
+            ? error
+            : error?.message || "An error occurred"}
         </div>
-        <div className='admin-toolbar-right'>
-          <select
-            className='input'
-            value={roleFilter}
-            onChange={(event) => setRoleFilter(event.target.value)}
-          >
-            <option value='All'>All Roles</option>
-            <option value='admin'>Admin</option>
-            <option value='user'>User</option>
-          </select>
-          <button className='btn btn-primary'>Add User</button>
-        </div>
-      </div>
+      )}
 
-      <div className='admin-table-wrapper'>
-        <div className='card'>
-          <div className='admin-table-responsive'>
-            {filteredUsers.length === 0 ? (
-              <div className='empty-state'>
-                <p className='body-text text-muted'>No users found.</p>
-              </div>
-            ) : (
-              <table className='admin-table'>
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Incidents</th>
-                    <th>Joined</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredUsers.map((user) => (
-                    <tr key={user.id}>
-                      <td>
-                        <strong>{user.name}</strong>
-                      </td>
-                      <td>{user.email}</td>
-                      <td>
-                        <span
-                          className={`status-badge ${getRoleBadgeClass(user.role)}`}
-                        >
-                          {user.role}
-                        </span>
-                      </td>
-                      <td>
-                        <span
-                          className={`status-badge ${getStatusBadgeClass(user.status)}`}
-                        >
-                          {user.status}
-                        </span>
-                      </td>
-                      <td>{user.incidents}</td>
-                      <td>{new Date(user.joined).toLocaleDateString()}</td>
-                      <td>
-                        <button className='btn btn-sm btn-secondary'>
-                          Edit
-                        </button>
-                        <button
-                          className='btn btn-sm btn-danger'
-                          style={{ marginLeft: "0.5rem" }}
-                        >
-                          Delete
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+      <div className='admin-user-list'>
+        {users?.length === 0 ? (
+          <div className='empty-state'>
+            <p>No users found</p>
           </div>
-        </div>
+        ) : (
+          <div className='admin-user-grid'>
+            {users?.map((user) => (
+              <div key={user.id} className='admin-user-card'>
+                <div className='admin-user-header'>
+                  <div className='admin-user-avatar'>
+                    {user.full_name ? (
+                      <span>
+                        {user.full_name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()
+                          .slice(0, 2)}
+                      </span>
+                    ) : (
+                      <span>U</span>
+                    )}
+                  </div>
+                  <div className='admin-user-info'>
+                    <h4>{user.full_name || "User"}</h4>
+                    <p>{user.email}</p>
+                  </div>
+                  <span
+                    className={`badge badge-${user.role === "admin" ? "admin" : "user"}`}
+                  >
+                    {user.role || "user"}
+                  </span>
+                </div>
+                <div className='admin-user-details'>
+                  <span>Phone: {user.phone_number || "N/A"}</span>
+                  <span>•</span>
+                  <span>
+                    Joined: {new Date(user.created_at).toLocaleDateString()}
+                  </span>
+                  <span>•</span>
+                  <span>Status: {user.is_active ? "Active" : "Inactive"}</span>
+                </div>
+                <div className='admin-user-actions'>
+                  <button
+                    className='btn btn-primary btn-sm'
+                    onClick={() => setSelectedUser(user.id)}
+                  >
+                    Manage
+                  </button>
+                  {user.role !== "admin" && (
+                    <button
+                      className='btn btn-danger btn-sm'
+                      onClick={() => handleDeactivate(user.id)}
+                    >
+                      Deactivate
+                    </button>
+                  )}
+                </div>
+
+                {selectedUser === user.id && (
+                  <div className='admin-user-manage'>
+                    <label className='label'>Change Role</label>
+                    <select
+                      className='input'
+                      defaultValue={user.role}
+                      onChange={(e) =>
+                        handleRoleChange(user.id, e.target.value)
+                      }
+                    >
+                      <option value='user'>User</option>
+                      <option value='admin'>Admin</option>
+                    </select>
+                    <button
+                      className='btn btn-secondary btn-sm'
+                      onClick={() => setSelectedUser(null)}
+                    >
+                      Close
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
-}
+};
 
-export default AdminUsersPage;
+export default AdminUsers;
