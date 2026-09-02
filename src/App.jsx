@@ -18,6 +18,9 @@ import EditIncidentPage from "./pages/EditIncidentPage";
 import IncidentDetailPage from "./pages/IncidentDetailPage";
 import ProfilePage from "./pages/ProfilePage";
 import AdminPage from "./pages/AdminPage";
+import AdminIncidents from "./pages/admin/AdminIncidents";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminStats from "./pages/admin/AdminStats";
 import NotificationsPage from "./pages/NotificationsPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -160,6 +163,30 @@ function App() {
               element={
                 <AdminRoute>
                   <AdminPage />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path='/admin/incidents'
+              element={
+                <AdminRoute>
+                  <AdminIncidents />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path='/admin/users'
+              element={
+                <AdminRoute>
+                  <AdminUsers />
+                </AdminRoute>
+              }
+            />
+            <Route
+              path='/admin/stats'
+              element={
+                <AdminRoute>
+                  <AdminStats />
                 </AdminRoute>
               }
             />

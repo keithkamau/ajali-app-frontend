@@ -12,4 +12,16 @@ export const adminApi = {
   getStats: () => {
     return axiosInstance.get("/admin/incidents/stats/");
   },
+
+  getUsers: () => {
+    return axiosInstance.get("/api/auth/users/");
+  },
+
+  updateUserRole: (userId, data) => {
+    return axiosInstance.put(`/api/auth/users/${userId}/`, data);
+  },
+
+  deactivateUser: (userId) => {
+    return axiosInstance.delete(`/api/auth/users/${userId}/`);
+  },
 };
