@@ -44,7 +44,9 @@ function App() {
       />
       <div className='app-layout'>
         {isAuthenticated && <Sidebar collapsed={!sidebarExpanded} />}
-        <main className='main-content'>
+        <main
+          className={`main-content ${isAuthenticated ? (sidebarExpanded ? "sidebar-expanded" : "sidebar-collapsed") : ""}`}
+        >
           <Routes>
             <Route path='/' element={<Navigate to='/dashboard' />} />
             <Route path='/login' element={<LoginPage />} />
