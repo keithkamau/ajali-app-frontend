@@ -18,9 +18,9 @@ import EditIncidentPage from "./pages/EditIncidentPage";
 import IncidentDetailPage from "./pages/IncidentDetailPage";
 import ProfilePage from "./pages/ProfilePage";
 import AdminPage from "./pages/AdminPage";
-import AdminIncidents from "./pages/admin/AdminIncidents";
-import AdminUsers from "./pages/admin/AdminUsers";
-import AdminStats from "./pages/admin/AdminStats";
+import AdminIncidents from "./pages/AdminIncidents";
+import AdminUsers from "./pages/AdminUsers";
+import AdminStats from "./pages/AdminStats";
 import NotificationsPage from "./pages/NotificationsPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -158,6 +158,7 @@ function App() {
               }
             />
 
+            {/* Admin Routes */}
             <Route
               path='/admin'
               element={
