@@ -1,0 +1,232 @@
+.incident-detail-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    width: 100%;
+}
+
+.incident-detail-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.incident-detail-header .page-title {
+    flex: 1;
+    margin: 0;
+}
+
+.incident-detail-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1.5rem;
+}
+
+.detail-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+}
+
+.detail-card:last-child {
+    margin-bottom: 0;
+}
+
+.detail-card h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-ink);
+    margin: 0 0 0.75rem 0;
+}
+
+.detail-row {
+    display: flex;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+.detail-label {
+    font-weight: 500;
+    color: var(--color-ink-muted);
+    width: 120px;
+    flex-shrink: 0;
+    font-size: 0.85rem;
+}
+
+.detail-value {
+    font-size: 0.85rem;
+    color: var(--color-ink);
+}
+
+/* Map Container - FIX Z-INDEX */
+.detail-map-container {
+    position: relative;
+    z-index: 0;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+.detail-map-container .leaflet-container {
+    z-index: 0 !important;
+    border-radius: 0.5rem;
+}
+
+/* Ensure header stays above map */
+.header {
+    z-index: 100 !important;
+    position: sticky;
+}
+
+.coords-display {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--color-ink-muted);
+    font-family: var(--font-mono);
+}
+
+/* Status History */
+.status-history {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.status-history-item {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 3px;
+}
+
+.status-dot.status-pending { background: var(--color-amber); }
+.status-dot.status-under-investigation { background: var(--color-red); }
+.status-dot.status-resolved { background: var(--color-green); }
+.status-dot.status-rejected { background: var(--color-ink-muted); }
+
+.status-change {
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: var(--color-ink);
+    margin: 0;
+}
+
+.status-comment {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--color-ink-muted);
+    margin: 0.2rem 0 0;
+}
+
+.status-date {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    color: var(--color-ink-muted);
+    display: block;
+    margin-top: 0.2rem;
+}
+
+.no-history {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--color-ink-muted);
+    margin: 0;
+}
+
+/* Media */
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.5rem;
+}
+
+.media-item {
+    border-radius: 0.5rem;
+    overflow: hidden;
+    aspect-ratio: 1 / 1;
+    background: var(--color-ground);
+    cursor: pointer;
+}
+
+.media-item img,
+.media-item video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+/* Loading and Error */
+.loading-container,
+.error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    gap: 1rem;
+    text-align: center;
+}
+
+.error-container h2 {
+    font-family: var(--font-display);
+    color: var(--color-ink);
+    margin: 0;
+}
+
+.error-container p {
+    font-family: var(--font-body);
+    color: var(--color-ink-muted);
+    max-width: 400px;
+    margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .incident-detail-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .incident-detail-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    
+    .incident-detail-header .badge {
+        align-self: flex-start;
+    }
+    
+    .detail-row {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .detail-label {
+        width: 100%;
+    }
+}
