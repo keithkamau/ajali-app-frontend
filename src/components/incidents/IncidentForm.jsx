@@ -153,24 +153,38 @@ export const IncidentForm = ({ incident, isEditing }) => {
     }
 
     const submitData = {
-      ...formData,
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      type: formData.type, // Should be "accident" or "emergency"
       location_lat: parseFloat(formData.location_lat),
       location_lng: parseFloat(formData.location_lng),
+      location_address: formData.location_address || "",
+      is_anonymous: formData.is_anonymous,
     };
 
-    let result;
-    if (isEditing) {
-      result = await dispatch(updateIncident({ id: incident.id, data: submitData }));
-    } else {
-      result = await dispatch(createIncident(submitData));
-    }
-
-    if (result.payload && result.payload.id) {
-      // If there are files to upload
-      if (files.length > 0) {
-        await handleFileUpload(result.payload.id);
+    console.log("Submitting:", submitData); 
+    
+    try {
+      let result;
+      if (isEditing) {
+        result = await dispatch(
+          updateIncident({ id: incident.id, data: submitData }),
+        );
+      } else {
+        result = await dispatch(createIncident(submitData));
       }
-      navigate("/dashboard");
+
+      if (result.error) {
+        console.error("Error response:", result.payload);
+        // Handle error response
+      } else if (result.payload && result.payload.id) {
+        if (files.length > 0) {
+          await handleFileUpload(result.payload.id);
+        }
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      console.error("Submit error:", error);
     }
   };
 
