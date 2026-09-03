@@ -1,29 +1,117 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import {
-  GoogleMap,
-  LoadScript,
+  MapContainer,
+  TileLayer,
   Marker,
-  Autocomplete,
-} from "@react-google-maps/api";
+  Popup,
+  useMapEvents,
+} from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import "./LocationPicker.css";
 
-const mapContainerStyle = {
-  width: "100%",
-  height: "400px",
-  borderRadius: "0.75rem",
-};
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+});
+
+// Custom red marker icon
+const redMarkerIcon = new L.Icon({
+  iconUrl:
+    "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
 
 const defaultCenter = {
   lat: -1.286389,
   lng: 36.817223,
 };
 
-const options = {
-  disableDefaultUI: false,
-  zoomControl: true,
-  streetViewControl: false,
-  mapTypeControl: false,
-  fullscreenControl: false,
+const LocationMarker = ({
+  onLocationSelect,
+  marker,
+  setMarker,
+  setLocationAddress,
+}) => {
+  const map = useMapEvents({
+    click(e) {
+      const { lat, lng } = e.latlng;
+      setMarker({ lat, lng });
+      setLocationAddress("");
+
+      // Reverse geocode using Nominatim (free, no API key needed)
+      fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          const address = data.display_name || "";
+          setLocationAddress(address);
+          if (onLocationSelect) {
+            onLocationSelect({ lat, lng, address });
+          }
+        })
+        .catch(() => {
+          if (onLocationSelect) {
+            onLocationSelect({ lat, lng, address: "" });
+          }
+        });
+    },
+    dragend(e) {
+      // Handle marker drag end
+    },
+  });
+
+  return marker ? (
+    <Marker
+      position={[marker.lat, marker.lng]}
+      icon={redMarkerIcon}
+      draggable={true}
+      eventHandlers={{
+        dragend: (e) => {
+          const { lat, lng } = e.target.getLatLng();
+          setMarker({ lat, lng });
+          setLocationAddress("");
+
+          fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              const address = data.display_name || "";
+              setLocationAddress(address);
+              if (onLocationSelect) {
+                onLocationSelect({ lat, lng, address });
+              }
+            })
+            .catch(() => {
+              if (onLocationSelect) {
+                onLocationSelect({ lat, lng, address: "" });
+              }
+            });
+        },
+      }}
+    >
+      <Popup>
+        <strong>Selected Location</strong>
+        <p style={{ margin: "4px 0 0", fontSize: "12px", color: "#666" }}>
+          Lat: {marker.lat.toFixed(6)}
+          <br />
+          Lng: {marker.lng.toFixed(6)}
+        </p>
+      </Popup>
+    </Marker>
+  ) : null;
 };
 
 export const LocationPicker = ({
@@ -32,7 +120,6 @@ export const LocationPicker = ({
   initialLng = null,
   address = "",
 }) => {
-  const [map, setMap] = useState(null);
   const [marker, setMarker] = useState(
     initialLat && initialLng
       ? { lat: parseFloat(initialLat), lng: parseFloat(initialLng) }
@@ -44,166 +131,132 @@ export const LocationPicker = ({
       : defaultCenter,
   );
   const [locationAddress, setLocationAddress] = useState(address);
-  const autocompleteRef = useRef(null);
-  const inputRef = useRef(null);
+  const [searchQuery, setSearchQuery] = useState(address);
+  const mapRef = useRef(null);
 
-  const onLoad = useCallback((map) => {
-    setMap(map);
-  }, []);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
 
-  const onSearchLoad = useCallback((autocomplete) => {
-    autocompleteRef.current = autocomplete;
-  }, []);
+    fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1`,
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.length > 0) {
+          const { lat, lon, display_name } = data[0];
+          const newLat = parseFloat(lat);
+          const newLng = parseFloat(lon);
 
-  const onPlaceChanged = () => {
-    if (autocompleteRef.current) {
-      const place = autocompleteRef.current.getPlace();
-      if (place.geometry && place.geometry.location) {
-        const lat = place.geometry.location.lat();
-        const lng = place.geometry.location.lng();
-        const address = place.formatted_address || place.name || "";
+          setCenter({ lat: newLat, lng: newLng });
+          setMarker({ lat: newLat, lng: newLng });
+          setLocationAddress(display_name);
 
-        setCenter({ lat, lng });
-        setMarker({ lat, lng });
-        setLocationAddress(address);
+          if (mapRef.current) {
+            mapRef.current.flyTo([newLat, newLng], 15);
+          }
 
-        if (onLocationSelect) {
-          onLocationSelect({ lat, lng, address });
+          if (onLocationSelect) {
+            onLocationSelect({
+              lat: newLat,
+              lng: newLng,
+              address: display_name,
+            });
+          }
         }
-      }
-    }
+      })
+      .catch((err) => console.error("Search error:", err));
   };
 
-  const onMapClick = useCallback(
-    (e) => {
-      const lat = e.latLng.lat();
-      const lng = e.latLng.lng();
+  const handleUseCurrentLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser");
+      return;
+    }
 
-      setMarker({ lat, lng });
-      setCenter({ lat, lng });
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        const newLat = latitude;
+        const newLng = longitude;
 
-      if (map) {
-        const geocoder = new window.google.maps.Geocoder();
-        geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-          if (status === "OK" && results[0]) {
-            const address = results[0].formatted_address;
+        setCenter({ lat: newLat, lng: newLng });
+        setMarker({ lat: newLat, lng: newLng });
+
+        fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${newLat}&lon=${newLng}&zoom=18&addressdetails=1`,
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            const address = data.display_name || "";
             setLocationAddress(address);
             if (onLocationSelect) {
-              onLocationSelect({ lat, lng, address });
+              onLocationSelect({ lat: newLat, lng: newLng, address });
             }
-          } else {
+          })
+          .catch(() => {
             if (onLocationSelect) {
-              onLocationSelect({ lat, lng, address: "" });
+              onLocationSelect({ lat: newLat, lng: newLng, address: "" });
             }
-          }
-        });
-      }
-    },
-    [map, onLocationSelect],
-  );
+          });
 
-  const onMarkerDragEnd = useCallback(
-    (e) => {
-      const lat = e.latLng.lat();
-      const lng = e.latLng.lng();
-
-      setMarker({ lat, lng });
-      setCenter({ lat, lng });
-
-      const geocoder = new window.google.maps.Geocoder();
-      geocoder.geocode({ location: { lat, lng } }, (results, status) => {
-        if (status === "OK" && results[0]) {
-          const address = results[0].formatted_address;
-          setLocationAddress(address);
-          if (onLocationSelect) {
-            onLocationSelect({ lat, lng, address });
-          }
-        } else {
-          if (onLocationSelect) {
-            onLocationSelect({ lat, lng, address: "" });
-          }
+        if (mapRef.current) {
+          mapRef.current.flyTo([newLat, newLng], 15);
         }
-      });
-    },
-    [onLocationSelect],
-  );
-
-  const handleSearchInput = (e) => {
-    // Pass through
-  };
-
-  const inputStyle = {
-    position: "absolute",
-    top: "12px",
-    left: "50%",
-    transform: "translateX(-50%)",
-    width: "90%",
-    maxWidth: "400px",
-    padding: "12px 16px",
-    border: "1px solid #e4e4e0",
-    borderRadius: "8px",
-    fontSize: "14px",
-    fontFamily: "Inter, sans-serif",
-    backgroundColor: "#ffffff",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-    zIndex: 10,
-    outline: "none",
-  };
-
-  const googleMapsApiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
-  if (!googleMapsApiKey) {
-    return (
-      <div className='map-error'>
-        <p>Google Maps API key is not configured.</p>
-        <p className='body-small'>
-          Please add VITE_GOOGLE_MAPS_API_KEY to your environment variables.
-        </p>
-      </div>
+      },
+      (error) => {
+        alert("Unable to get your location: " + error.message);
+      },
     );
-  }
+  };
+
+  useEffect(() => {
+    if (initialLat && initialLng && !marker) {
+      setMarker({ lat: parseFloat(initialLat), lng: parseFloat(initialLng) });
+    }
+  }, [initialLat, initialLng]);
 
   return (
     <div className='location-picker'>
-      <div className='map-container'>
-        <LoadScript googleMapsApiKey={googleMapsApiKey} libraries={["places"]}>
-          <div className='map-wrapper'>
-            <GoogleMap
-              mapContainerStyle={mapContainerStyle}
-              center={center}
-              zoom={14}
-              options={options}
-              onLoad={onLoad}
-              onClick={onMapClick}
-            >
-              <Autocomplete
-                onLoad={onSearchLoad}
-                onPlaceChanged={onPlaceChanged}
-              >
-                <input
-                  ref={inputRef}
-                  type='text'
-                  placeholder='Search for a location...'
-                  style={inputStyle}
-                  onChange={handleSearchInput}
-                  defaultValue={locationAddress}
-                />
-              </Autocomplete>
+      <div className='search-container'>
+        <form onSubmit={handleSearch} className='search-form'>
+          <input
+            type='text'
+            className='input'
+            placeholder='Search for a location...'
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <button type='submit' className='btn btn-primary btn-sm'>
+            Search
+          </button>
+        </form>
+        <button
+          onClick={handleUseCurrentLocation}
+          className='btn btn-secondary btn-sm'
+        >
+          📍 Current Location
+        </button>
+      </div>
 
-              {marker && (
-                <Marker
-                  position={marker}
-                  draggable={true}
-                  onDragEnd={onMarkerDragEnd}
-                  icon={{
-                    url: "https://maps.google.com/mapfiles/ms/icons/red-dot.png",
-                    scaledSize: new window.google.maps.Size(40, 40),
-                  }}
-                />
-              )}
-            </GoogleMap>
-          </div>
-        </LoadScript>
+      <div className='map-container'>
+        <MapContainer
+          center={[center.lat, center.lng]}
+          zoom={14}
+          style={{ height: "400px", width: "100%", borderRadius: "0.75rem" }}
+          ref={mapRef}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+          />
+          <LocationMarker
+            onLocationSelect={onLocationSelect}
+            marker={marker}
+            setMarker={setMarker}
+            setLocationAddress={setLocationAddress}
+          />
+        </MapContainer>
       </div>
 
       <div className='selected-location-info'>
