@@ -12,7 +12,7 @@ import EditIncidentPage from "./pages/EditIncidentPage";
 import IncidentDetailPage from "./pages/IncidentDetailPage";
 import ProfilePage from "./pages/ProfilePage";
 import AdminPage from "./pages/AdminPage";
-import AdminIncidentsPage from "./pages/AdminIncidentsPage";  // ✅ Correct file name
+import AdminIncidents from "./pages/AdminIncidents";
 import AdminUsers from "./pages/AdminUsers";
 import AdminStats from "./pages/AdminStats";
 import NotificationsPage from "./pages/NotificationsPage";
@@ -49,7 +49,7 @@ const AdminRoute = ({ children }) => {
 
 function App() {
     const dispatch = useDispatch();
-    const { isAuthenticated } = useSelector((state) => state.auth);
+    const { isAuthenticated, user } = useSelector((state) => state.auth);
     const [sidebarExpanded, setSidebarExpanded] = useState(true);
     const [isAppLoading, setIsAppLoading] = useState(true);
 
@@ -81,6 +81,12 @@ function App() {
             </div>
         );
     }
+    
+    const getRootRedirect = () => {
+        if (!isAuthenticated) return "/login";
+        if (user?.role === "admin") return "/admin";
+        return "/dashboard";
+    };
 
     return (
         <BrowserRouter>
@@ -89,7 +95,7 @@ function App() {
                 {isAuthenticated && <Sidebar collapsed={!sidebarExpanded} />}
                 <main className="main-content">
                     <Routes>
-                        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                        <Route path="/" element={<Navigate to={getRootRedirect()} replace />} />
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/register" element={<RegisterPage />} />
                         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -119,7 +125,7 @@ function App() {
                             <AdminRoute><AdminPage /></AdminRoute>
                         } />
                         <Route path="/admin/incidents" element={
-                            <AdminRoute><AdminIncidentsPage /></AdminRoute>
+                            <AdminRoute><AdminIncidents /></AdminRoute>
                         } />
                         <Route path="/admin/users" element={
                             <AdminRoute><AdminUsers /></AdminRoute>
