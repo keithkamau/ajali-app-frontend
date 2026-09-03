@@ -5,6 +5,7 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import "leaflet/dist/leaflet.css";
+import "./IncidentMap.css";
 
 // Leaflet's default marker icon paths break under bundlers like Vite,
 // so point them at the bundled asset URLs directly.
@@ -32,14 +33,17 @@ function ClickHandler({ onLocationChange }) {
 
 // MapContainer only reads `center` once on mount, so this keeps the view in
 // sync when `location` changes from outside the map (search box selection,
-// "Use my location", etc).
+// "Use my location", etc). It also calls invalidateSize() on mount, since
+// Leaflet measures its container's size once at init time; if the container
+// was 0x0 at that instant (e.g. during initial layout), Leaflet caches that
+// and never re-measures on its own even after CSS gives it real height.
 function MapRecenter({ center }) {
 	const map = useMap();
 	useEffect(() => {
+		map.invalidateSize();
 		if (center) {
 			map.setView([center.lat, center.lng], map.getZoom());
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [center?.lat, center?.lng]);
 	return null;
 }

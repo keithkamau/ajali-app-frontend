@@ -1,0 +1,6 @@
+.leaflet-map {
+	min-height: 260px;
+	width: 100%;
+	border-radius: 5px;
+	z-index: 0;
+}
