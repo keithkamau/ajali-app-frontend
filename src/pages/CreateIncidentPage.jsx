@@ -1,8 +1,12 @@
 import React from "react";
 import IncidentForm from "../components/incidents/IncidentForm";
 
-export const CreateIncidentPage = () => {
-  return <IncidentForm />;
+const CreateIncidentPage = () => {
+  return (
+    <div className='create-incident-page'>
+      <IncidentForm isEditing={false} />
+    </div>
+  );
 };
 
 export default CreateIncidentPage;
