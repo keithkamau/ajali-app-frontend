@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { loginUser, clearError } from "../../redux/slices/authSlice";
 import { validateEmail } from "../../utils/validators";
 import "../../styles/auth.css";
@@ -8,17 +8,14 @@ import "../../styles/auth.css";
 export const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
   const { isLoading, error } = useSelector((state) => state.auth);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  const [loginError, setLoginError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoginError("");
 
     const newErrors = {};
     if (!validateEmail(email)) newErrors.email = "Valid email required";
@@ -33,21 +30,14 @@ export const Login = () => {
     setErrors({});
     dispatch(clearError());
 
-    try {
-      const result = await dispatch(loginUser({ email, password })).unwrap();
+    const result = await dispatch(loginUser({ email, password }));
 
-      if (result.user?.role === "admin") {
+    if (result.payload?.user) {
+      if (result.payload.user.role === "admin") {
         navigate("/admin");
       } else {
         navigate("/dashboard");
       }
-    } catch (err) {
-      console.error("Login error:", err);
-      setLoginError(
-        typeof err === "string"
-          ? err
-          : err?.message || err?.error || "Login failed",
-      );
     }
   };
 
@@ -59,12 +49,11 @@ export const Login = () => {
           <p>Login to your Ajali! account</p>
         </div>
 
-        {(loginError || error) && (
+        {error && (
           <div className='alert alert-error'>
-            {loginError ||
-              (typeof error === "string"
-                ? error
-                : error?.message || error?.error || "Login failed")}
+            {typeof error === "string"
+              ? error
+              : error?.message || error?.error || "Login failed"}
           </div>
         )}
 
@@ -77,7 +66,6 @@ export const Login = () => {
               placeholder='Enter your email'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
             />
             {errors.email && <span className='form-error'>{errors.email}</span>}
           </div>
@@ -90,7 +78,6 @@ export const Login = () => {
               placeholder='Enter your password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              disabled={isLoading}
             />
             {errors.password && (
               <span className='form-error'>{errors.password}</span>

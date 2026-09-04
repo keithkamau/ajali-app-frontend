@@ -4,12 +4,11 @@ import { authApi } from "../../api/authApi";
 const initialState = {
   user: null,
   isAuthenticated: false,
-  isLoading: true,
+  isLoading: false,
   error: null,
   success: null,
 };
 
-// Register
 export const register = createAsyncThunk(
   "auth/register",
   async (userData, { rejectWithValue }) => {
@@ -17,23 +16,12 @@ export const register = createAsyncThunk(
       const response = await authApi.register(userData);
       return response.data;
     } catch (error) {
-      const errorData = error.response?.data;
-      let errorMessage = "Registration failed";
-      if (errorData) {
-        if (typeof errorData === "string") errorMessage = errorData;
-        else if (errorData.error) errorMessage = errorData.error;
-        else if (errorData.detail) errorMessage = errorData.detail;
-        else if (errorData.message) errorMessage = errorData.message;
-        else if (errorData.email) errorMessage = errorData.email[0];
-        else errorMessage = JSON.stringify(errorData);
-      }
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
 export const registerUser = register;
 
-// Login
 export const login = createAsyncThunk(
   "auth/login",
   async (credentials, { rejectWithValue }) => {
@@ -46,24 +34,12 @@ export const login = createAsyncThunk(
 
       return { user };
     } catch (error) {
-      const errorData = error.response?.data;
-      let errorMessage = "Login failed";
-      if (errorData) {
-        if (typeof errorData === "string") errorMessage = errorData;
-        else if (errorData.error) errorMessage = errorData.error;
-        else if (errorData.detail) errorMessage = errorData.detail;
-        else if (errorData.message) errorMessage = errorData.message;
-        else if (errorData.non_field_errors)
-          errorMessage = errorData.non_field_errors[0];
-        else errorMessage = JSON.stringify(errorData);
-      }
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
-export const loginUser = login; 
+export const loginUser = login;
 
-// Logout
 export const logoutUser = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
@@ -81,7 +57,6 @@ export const logoutUser = createAsyncThunk(
   },
 );
 
-// Get Current User
 export const getCurrentUser = createAsyncThunk(
   "auth/getCurrentUser",
   async (_, { rejectWithValue }) => {
@@ -91,21 +66,11 @@ export const getCurrentUser = createAsyncThunk(
     } catch (error) {
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
-      const errorData = error.response?.data;
-      let errorMessage = "Session expired";
-      if (errorData) {
-        if (typeof errorData === "string") errorMessage = errorData;
-        else if (errorData.error) errorMessage = errorData.error;
-        else if (errorData.detail) errorMessage = errorData.detail;
-        else if (errorData.message) errorMessage = errorData.message;
-        else errorMessage = JSON.stringify(errorData);
-      }
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
 
-// Update Profile
 export const updateProfile = createAsyncThunk(
   "auth/updateProfile",
   async (userData, { rejectWithValue }) => {
@@ -113,22 +78,12 @@ export const updateProfile = createAsyncThunk(
       const response = await authApi.updateProfile(userData);
       return response.data.user;
     } catch (error) {
-      const errorData = error.response?.data;
-      let errorMessage = "Profile update failed";
-      if (errorData) {
-        if (typeof errorData === "string") errorMessage = errorData;
-        else if (errorData.error) errorMessage = errorData.error;
-        else if (errorData.detail) errorMessage = errorData.detail;
-        else if (errorData.message) errorMessage = errorData.message;
-        else errorMessage = JSON.stringify(errorData);
-      }
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
 export const updateUser = updateProfile;
 
-// Change Password
 export const changePassword = createAsyncThunk(
   "auth/changePassword",
   async (data, { rejectWithValue }) => {
@@ -136,21 +91,11 @@ export const changePassword = createAsyncThunk(
       const response = await authApi.changePassword(data);
       return response.data;
     } catch (error) {
-      const errorData = error.response?.data;
-      let errorMessage = "Password change failed";
-      if (errorData) {
-        if (typeof errorData === "string") errorMessage = errorData;
-        else if (errorData.error) errorMessage = errorData.error;
-        else if (errorData.detail) errorMessage = errorData.detail;
-        else if (errorData.message) errorMessage = errorData.message;
-        else errorMessage = JSON.stringify(errorData);
-      }
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
 
-// Forgot Password
 export const forgotPassword = createAsyncThunk(
   "auth/forgotPassword",
   async (email, { rejectWithValue }) => {
@@ -158,21 +103,11 @@ export const forgotPassword = createAsyncThunk(
       const response = await authApi.forgotPassword(email);
       return response.data;
     } catch (error) {
-      const errorData = error.response?.data;
-      let errorMessage = "Password reset request failed";
-      if (errorData) {
-        if (typeof errorData === "string") errorMessage = errorData;
-        else if (errorData.error) errorMessage = errorData.error;
-        else if (errorData.detail) errorMessage = errorData.detail;
-        else if (errorData.message) errorMessage = errorData.message;
-        else errorMessage = JSON.stringify(errorData);
-      }
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
 
-// Reset Password
 export const resetPassword = createAsyncThunk(
   "auth/resetPassword",
   async ({ token, newPassword }, { rejectWithValue }) => {
@@ -180,21 +115,11 @@ export const resetPassword = createAsyncThunk(
       const response = await authApi.resetPassword(token, newPassword);
       return response.data;
     } catch (error) {
-      const errorData = error.response?.data;
-      let errorMessage = "Password reset failed";
-      if (errorData) {
-        if (typeof errorData === "string") errorMessage = errorData;
-        else if (errorData.error) errorMessage = errorData.error;
-        else if (errorData.detail) errorMessage = errorData.detail;
-        else if (errorData.message) errorMessage = errorData.message;
-        else errorMessage = JSON.stringify(errorData);
-      }
-      return rejectWithValue(errorMessage);
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
 
-// AUTH SLICE
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -221,13 +146,9 @@ const authSlice = createSlice({
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
     },
-    setLoading: (state, action) => {
-      state.isLoading = action.payload;
-    },
   },
   extraReducers: (builder) => {
     builder
-      // Register
       .addCase(register.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -243,7 +164,6 @@ const authSlice = createSlice({
         state.error = action.payload;
         state.success = null;
       })
-      // Login
       .addCase(login.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -261,7 +181,6 @@ const authSlice = createSlice({
         state.error = action.payload;
         state.success = null;
       })
-      // Logout
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.isAuthenticated = false;
@@ -271,7 +190,6 @@ const authSlice = createSlice({
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
       })
-      // Get Current User
       .addCase(getCurrentUser.pending, (state) => {
         state.isLoading = true;
       })
@@ -281,13 +199,11 @@ const authSlice = createSlice({
         state.user = action.payload;
         state.error = null;
       })
-      .addCase(getCurrentUser.rejected, (state, action) => {
+      .addCase(getCurrentUser.rejected, (state) => {
         state.isLoading = false;
         state.isAuthenticated = false;
         state.user = null;
-        state.error = action.payload;
       })
-      // Update Profile
       .addCase(updateProfile.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -304,7 +220,6 @@ const authSlice = createSlice({
         state.error = action.payload;
         state.success = null;
       })
-      // Change Password
       .addCase(changePassword.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -320,7 +235,6 @@ const authSlice = createSlice({
         state.error = action.payload;
         state.success = null;
       })
-      // Forgot Password
       .addCase(forgotPassword.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -336,7 +250,6 @@ const authSlice = createSlice({
         state.error = action.payload;
         state.success = null;
       })
-      // Reset Password
       .addCase(resetPassword.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -356,7 +269,6 @@ const authSlice = createSlice({
   },
 });
 
-// EXPORTS
-export const { clearError, clearSuccess, resetState, logout, setLoading } =
+export const { clearError, clearSuccess, resetState, logout } =
   authSlice.actions;
 export default authSlice.reducer;
