@@ -43,21 +43,11 @@ export const Login = () => {
       }
     } catch (err) {
       console.error("Login error:", err);
-
-      let errorMsg = "Login failed. Please try again.";
-      if (typeof err === "string") {
-        errorMsg = err;
-      } else if (err?.message) {
-        errorMsg = err.message;
-      } else if (err?.error) {
-        errorMsg = err.error;
-      } else if (err?.detail) {
-        errorMsg = err.detail;
-      } else if (err?.non_field_errors) {
-        errorMsg = err.non_field_errors[0];
-      }
-
-      setLoginError(errorMsg);
+      setLoginError(
+        typeof err === "string"
+          ? err
+          : err?.message || err?.error || "Login failed",
+      );
     }
   };
 
