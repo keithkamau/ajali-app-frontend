@@ -43,15 +43,23 @@ export const Login = () => {
       }
     } catch (err) {
       console.error("Login error:", err);
-      setLoginError(
-        typeof err === "string"
-          ? err
-          : err?.message || err?.error || "Login failed",
-      );
+
+      let errorMsg = "Login failed. Please try again.";
+      if (typeof err === "string") {
+        errorMsg = err;
+      } else if (err?.message) {
+        errorMsg = err.message;
+      } else if (err?.error) {
+        errorMsg = err.error;
+      } else if (err?.detail) {
+        errorMsg = err.detail;
+      } else if (err?.non_field_errors) {
+        errorMsg = err.non_field_errors[0];
+      }
+
+      setLoginError(errorMsg);
     }
   };
-
-  const from = location.state?.from?.pathname || "/";
 
   return (
     <div className='auth-page'>
@@ -79,6 +87,7 @@ export const Login = () => {
               placeholder='Enter your email'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
             />
             {errors.email && <span className='form-error'>{errors.email}</span>}
           </div>
@@ -91,6 +100,7 @@ export const Login = () => {
               placeholder='Enter your password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
             />
             {errors.password && (
               <span className='form-error'>{errors.password}</span>

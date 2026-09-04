@@ -23,22 +23,40 @@ export const register = createAsyncThunk(
 export const registerUser = register;
 
 export const login = createAsyncThunk(
-    'auth/login',
-    async (credentials, { rejectWithValue }) => {
-        try {
-            const response = await authApi.login(credentials);
-            const { access_token, refresh_token, user } = response.data;
-            
-            localStorage.setItem('access_token', access_token);
-            localStorage.setItem('refresh_token', refresh_token);
-            
-            return { user };
-        } catch (error) {
-            return rejectWithValue(error.response?.data || error.message);
+  "auth/login",
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const response = await authApi.login(credentials);
+      const { access_token, refresh_token, user } = response.data;
+
+      localStorage.setItem("access_token", access_token);
+      localStorage.setItem("refresh_token", refresh_token);
+
+      return { user };
+    } catch (error) {
+      const errorData = error.response?.data;
+      let errorMessage = "Login failed";
+
+      if (errorData) {
+        if (typeof errorData === "string") {
+          errorMessage = errorData;
+        } else if (errorData.error) {
+          errorMessage = errorData.error;
+        } else if (errorData.detail) {
+          errorMessage = errorData.detail;
+        } else if (errorData.non_field_errors) {
+          errorMessage = errorData.non_field_errors[0];
+        } else if (errorData.message) {
+          errorMessage = errorData.message;
+        } else {
+          errorMessage = JSON.stringify(errorData);
         }
+      }
+
+      return rejectWithValue(errorMessage);
     }
+  },
 );
-export const loginUser = login;
 
 export const logoutUser = createAsyncThunk(
     'auth/logout',
