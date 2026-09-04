@@ -8,22 +8,22 @@
     padding: 2rem;
     overflow-y: auto;
     background-color: var(--color-ground);
-    transition: margin-left 0.3s ease, width 0.3s ease;
+    transition: margin-left 0.3s ease;
     min-height: calc(100vh - 64px);
     box-sizing: border-box;
     width: 100%;
 }
 
 .main-content.sidebar-expanded {
-    margin-left: 0;
-    width: calc(100% - 240px);
+    flex: 0 0 calc(100% - 240px);
     max-width: calc(100% - 240px);
+    margin-left: 0;
 }
 
 .main-content.sidebar-collapsed {
-    margin-left: 0;
-    width: calc(100% - 64px);
+    flex: 0 0 calc(100% - 64px);
     max-width: calc(100% - 64px);
+    margin-left: 0;
 }
 
 /* When no sidebar */
