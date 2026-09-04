@@ -234,12 +234,16 @@ export const IncidentDetailPage = () => {
                 {currentIncident.status_history.map((history, index) => (
                   <div key={index} className='status-history-item'>
                     <span
-                      className={`status-dot status-${history.new_status?.replace("_", "-")}`}
+                      className={`status-dot status-${history.new_status?.replace("_", "-") || "reported"}`}
                     ></span>
                     <div>
                       <p className='status-change'>
-                        {history.old_status ? `${history.old_status} → ` : ""}
-                        {history.new_status}
+                        {history.old_status
+                          ? `${history.old_status.replace("_", " ")} → `
+                          : ""}
+                        <strong>
+                          {history.new_status?.replace("_", " ") || "Reported"}
+                        </strong>
                       </p>
                       {history.comment && (
                         <p className='status-comment'>{history.comment}</p>
@@ -248,6 +252,9 @@ export const IncidentDetailPage = () => {
                         {new Date(
                           history.changed_at || history.created_at,
                         ).toLocaleString()}
+                      </span>
+                      <span className='status-by'>
+                        By: {history.changed_by?.full_name || "System"}
                       </span>
                     </div>
                   </div>
